@@ -1,0 +1,1 @@
+{ BasedOnStyle: Google,  BreakBeforeBraces: Linux,  UseTab: Never, IndentWidth: 2, TabWidth: 2, AllowShortIfStatementsOnASingleLine: false, ColumnLimit: 0}
