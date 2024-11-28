@@ -27,7 +27,7 @@ get_filename_component(CMAKE_CURRENT_SOURCE_PARENT_DIR
 
 # ########################## USER CONFIG SECTION ##############################
 # Set the project name and the languages used
-project(hero_chassis C CXX ASM) # TODO: change project name here
+project(infantry_chassis C CXX ASM) # TODO: change project name here
 
 # Specify user folders TODO Add your own user folders here
 set(user_folders "RobotComponents" "Instance" "Task" "RobotModules")
