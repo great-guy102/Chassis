@@ -23,5 +23,5 @@
 /* Exported types ------------------------------------------------------------*/
 /* Exported variables --------------------------------------------------------*/
 /* Exported function prototypes ----------------------------------------------*/
-robot::GimbalChassisComm* CraeteGimbalChassisComm(void);
+robot::GimbalChassisComm* CreateGimbalChassisComm(void);
 #endif /* INSTANCE_INS_CHASSIS_GIMBAL_COMM_HPP_ */

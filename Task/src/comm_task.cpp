@@ -1,6 +1,6 @@
 /** 
  *******************************************************************************
- * @file      : comm_task.cpp
+ * @file      :comm_task.cpp
  * @brief     : 
  * @history   :
  *  Version     Date            Author          Note
@@ -217,7 +217,7 @@ static void PrivatePointerInit(void)
 static void CommAddReceiver(void)
 {
   HW_ASSERT(can1_rx_mgr_ptr != nullptr, "can1_rx_mgr_ptr is nullptr", can1_rx_mgr_ptr);
-  can1_rx_mgr_ptr->addReceiver(CraeteGimbalChassisComm());
+  can1_rx_mgr_ptr->addReceiver(CreateGimbalChassisComm());
   can1_rx_mgr_ptr->addReceiver(CreateMotorYaw());  // 用于底盘控制，只接受消息
 
   HW_ASSERT(can2_rx_mgr_ptr != nullptr, "can2_rx_mgr_ptr is nullptr", can2_rx_mgr_ptr);
@@ -237,7 +237,7 @@ static void CommAddReceiver(void)
 static void CommAddTransmitter()
 {
   HW_ASSERT(can1_tx_mgr_ptr != nullptr, "can1_tx_mgr_ptr is nullptr", can1_tx_mgr_ptr);
-  can1_tx_mgr_ptr->addTransmitter(CraeteGimbalChassisComm());
+  can1_tx_mgr_ptr->addTransmitter(CreateGimbalChassisComm());
 
   HW_ASSERT(can2_tx_mgr_ptr != nullptr, "can2_tx_mgr_ptr is nullptr", can2_tx_mgr_ptr);
   can2_tx_mgr_ptr->addTransmitter(CreateCap());

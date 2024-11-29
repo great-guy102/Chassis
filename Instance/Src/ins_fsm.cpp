@@ -55,7 +55,7 @@ robot::Chassis* CreateChassis()
 
     // * 2. 只接收数据的组件指针
     // 云台和底盘通信
-    unique_chassis.registerGimbalChassisComm(CraeteGimbalChassisComm());
+    unique_chassis.registerGimbalChassisComm(CreateGimbalChassisComm());
     // YAW 轴电机
     unique_chassis.registerYawMotor(CreateMotorYaw());
     // * 3. 接收、发送数据的组件指针
@@ -98,7 +98,7 @@ robot::Robot* CreateRobot()
     unique_robot.registerMotorWheels(CreateMotorWheelRightRear(), robot::Robot::kWheelMotorIdxRightRear, CreateCan2TxMgr());
     unique_robot.registerMotorWheels(CreateMotorWheelRightFront(), robot::Robot::kWheelMotorIdxRightFront, CreateCan2TxMgr());
     // 收发数据的组件指针
-    unique_robot.registerGimbalChassisComm(CraeteGimbalChassisComm(), CreateCan1TxMgr());
+    unique_robot.registerGimbalChassisComm(CreateGimbalChassisComm(), CreateCan1TxMgr());
     unique_robot.registerReferee(CreateReferee(), CreateRfrTxMgr());
 
     unique_robot.registerPerformancePkg(CreateRobotPerformancePackage());
