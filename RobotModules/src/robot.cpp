@@ -329,10 +329,6 @@ void Robot::genModulesCmdFromKb()
   Feed::WorkingMode feed_working_mode = Feed::WorkingMode::Normal;
   bool shoot_flag = false;
 
-  Scope::WorkingMode scope_working_mode = Scope::WorkingMode::Normal;
-  bool switch_scope_flag = false;
-  bool scope_ctrl_angle_flag = false;
-
   if (rc_ptr_->key_Q()) {
     chassis_working_mode = Chassis::WorkingMode::Gyro;
   } else if (rc_ptr_->key_E()) {
@@ -340,7 +336,6 @@ void Robot::genModulesCmdFromKb()
   } else if (rc_ptr_->key_X()) {
     chassis_working_mode = Chassis::WorkingMode::Farshoot;
     gimbal_working_mode = Gimbal::WorkingMode::Farshoot;
-    scope_working_mode = Scope::WorkingMode::Farshoot;
   } else {
     if (chassis_working_mode == Chassis::WorkingMode::Farshoot) {
       chassis_working_mode = chassis_ptr_->getLastWorkingMode();
@@ -357,12 +352,12 @@ void Robot::genModulesCmdFromKb()
   if (rc_ptr_->key_Z()) {
     shooter_working_mode = Shooter::WorkingMode::FricBackward;
   }
-  if (rc_ptr_->key_R()) {
-    scope_ctrl_angle_flag = (scope_working_mode == Scope::WorkingMode::Farshoot);
-  }
-  if (rc_ptr_->key_F()) {
-    switch_scope_flag = (scope_working_mode == Scope::WorkingMode::Farshoot);
-  }
+  // if (rc_ptr_->key_R()) {
+  //   scope_ctrl_angle_flag = (scope_working_mode == Scope::WorkingMode::Farshoot);
+  // }
+  // if (rc_ptr_->key_F()) {
+  //   switch_scope_flag = (scope_working_mode == Scope::WorkingMode::Farshoot);
+  // }
 
   if (rc_ptr_->mouse_l_btn()) {
     shoot_flag = true;
@@ -394,10 +389,6 @@ void Robot::genModulesCmdFromKb()
   feed_ptr_->setShootFlag(shoot_flag);
 
   shooter_ptr_->setWorkingMode(shooter_working_mode);
-
-  scope_ptr_->setWorkingMode(scope_working_mode);
-  scope_ptr_->setCtrlAngleFlag(scope_ctrl_angle_flag);
-  scope_ptr_->setSwitchScopeFlag(switch_scope_flag);
 };
 
 #pragma endregion
@@ -439,7 +430,6 @@ void Robot::setGimbalChassisCommData()
   HW_ASSERT(gc_comm_ptr_ != nullptr, "GimbalChassisComm pointer is null", gc_comm_ptr_);
   HW_ASSERT(gimbal_ptr_ != nullptr, "Gimbal pointer is null", gimbal_ptr_);
   HW_ASSERT(shooter_ptr_ != nullptr, "Shooter pointer is null", shooter_ptr_);
-  HW_ASSERT(scope_ptr_ != nullptr, "Scope pointer is null", scope_ptr_);
 
   // main board
 
@@ -450,12 +440,6 @@ void Robot::setGimbalChassisCommData()
   gimbal_data.pitch_delta = gimbal_ptr_->getNormCmdDelta().pitch;
   gimbal_data.ctrl_mode = gimbal_ptr_->getCtrlMode();
   gimbal_data.working_mode = gimbal_ptr_->getWorkingMode();
-
-  // scope
-  GimbalChassisComm::ScopeData::ChassisPart &scope_data = gc_comm_ptr_->scope_data().cp;
-  scope_data.switch_flag = scope_ptr_->getSwitchScopeFlag();
-  scope_data.ctrl_angle_flag = scope_ptr_->getCtrlAngleFlag();
-  scope_data.working_mode = scope_ptr_->getWorkingMode();
 
   // shooter
   GimbalChassisComm::ShooterData::ChassisPart &shooter_data = gc_comm_ptr_->shooter_data().cp;
@@ -617,11 +601,6 @@ void Robot::registerGimbal(Gimbal *ptr)
 {
   HW_ASSERT(ptr != nullptr, "Gimbal pointer is null", ptr);
   gimbal_ptr_ = ptr;
-};
-void Robot::registerScope(Scope *ptr)
-{
-  HW_ASSERT(ptr != nullptr, "Scope pointer is null", ptr);
-  scope_ptr_ = ptr;
 };
 void Robot::registerShooter(Shooter *ptr)
 {
