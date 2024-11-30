@@ -36,74 +36,74 @@ robot::Shooter unique_shooter = robot::Shooter();
 /* External variables --------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
 /* Exported function definitions ---------------------------------------------*/
-robot::Chassis* CreateChassis()
+robot::Chassis* GetChassis()
 {
   if (!is_chassis_inited) {
     // * 1. 无通信功能的组件指针
     // * - 底盘逆解
-    unique_chassis.registerIkSolver(CreateChassisIkSolver());
+    unique_chassis.registerIkSolver(GetChassisIkSolver());
     // * - pid
     // 轮组 pid
-    unique_chassis.registerWheelPid(CreatePidMotorWheelLeftFront(), robot::Chassis::kWheelPidIdxLeftFront);
-    unique_chassis.registerWheelPid(CreatePidMotorWheelLeftRear(), robot::Chassis::kWheelPidIdxLeftRear);
-    unique_chassis.registerWheelPid(CreatePidMotorWheelRightRear(), robot::Chassis::kWheelPidIdxRightRear);
-    unique_chassis.registerWheelPid(CreatePidMotorWheelRightFront(), robot::Chassis::kWheelPidIdxRightFront);
+    unique_chassis.registerWheelPid(GetPidMotorWheelLeftFront(), robot::Chassis::kWheelPidIdxLeftFront);
+    unique_chassis.registerWheelPid(GetPidMotorWheelLeftRear(), robot::Chassis::kWheelPidIdxLeftRear);
+    unique_chassis.registerWheelPid(GetPidMotorWheelRightRear(), robot::Chassis::kWheelPidIdxRightRear);
+    unique_chassis.registerWheelPid(GetPidMotorWheelRightFront(), robot::Chassis::kWheelPidIdxRightFront);
     // 随动速度
-    unique_chassis.registerFollowOmegaPid(CreatePidFollowOmega());
+    unique_chassis.registerFollowOmegaPid(GetPidFollowOmega());
     // * - 功率限制
-    unique_chassis.registerPwrLimiter(CreatePwrLimiter());
+    unique_chassis.registerPwrLimiter(GetPwrLimiter());
 
     // * 2. 只接收数据的组件指针
     // 云台和底盘通信
-    unique_chassis.registerGimbalChassisComm(CreateGimbalChassisComm());
+    unique_chassis.registerGimbalChassisComm(GetGimbalChassisComm());
     // YAW 轴电机
-    unique_chassis.registerYawMotor(CreateMotorYaw());
+    unique_chassis.registerYawMotor(GetMotorYaw());
     // * 3. 接收、发送数据的组件指针
     // 超级电容
-    unique_chassis.registerCap(CreateCap());
+    unique_chassis.registerCap(GetCap());
     // 轮组电机
-    unique_chassis.registerWheelMotor(CreateMotorWheelLeftFront(), robot::Chassis::kWheelMotorIdxLeftFront);
-    unique_chassis.registerWheelMotor(CreateMotorWheelLeftRear(), robot::Chassis::kWheelMotorIdxLeftRear);
-    unique_chassis.registerWheelMotor(CreateMotorWheelRightRear(), robot::Chassis::kWheelMotorIdxRightRear);
-    unique_chassis.registerWheelMotor(CreateMotorWheelRightFront(), robot::Chassis::kWheelMotorIdxRightFront);
+    unique_chassis.registerWheelMotor(GetMotorWheelLeftFront(), robot::Chassis::kWheelMotorIdxLeftFront);
+    unique_chassis.registerWheelMotor(GetMotorWheelLeftRear(), robot::Chassis::kWheelMotorIdxLeftRear);
+    unique_chassis.registerWheelMotor(GetMotorWheelRightRear(), robot::Chassis::kWheelMotorIdxRightRear);
+    unique_chassis.registerWheelMotor(GetMotorWheelRightFront(), robot::Chassis::kWheelMotorIdxRightFront);
     is_chassis_inited = true;
   }
   return &unique_chassis;
 };
 
-robot::Gimbal* CreateGimbal() { return &unique_gimbal; };
-robot::Shooter* CreateShooter() { return &unique_shooter; };
-robot::Feed* CreateFeed() { return &unique_feed; }
+robot::Gimbal* GetGimbal() { return &unique_gimbal; };
+robot::Shooter* GetShooter() { return &unique_shooter; };
+robot::Feed* GetFeed() { return &unique_feed; }
 
-robot::Robot* CreateRobot()
+robot::Robot* GetRobot()
 {
   if (!is_robot_inited) {
     // main 组件指针注册
     // 主要模块状态机组件指针
-    unique_robot.registerChassis(CreateChassis());
-    unique_robot.registerShooter(CreateShooter());
-    unique_robot.registerGimbal(CreateGimbal());
-    unique_robot.registerFeed(CreateFeed());
+    unique_robot.registerChassis(GetChassis());
+    unique_robot.registerShooter(GetShooter());
+    unique_robot.registerGimbal(GetGimbal());
+    unique_robot.registerFeed(GetFeed());
 
     // 无通信功能的组件指针
-    unique_robot.registerBuzzer(CreateBuzzer());
-    unique_robot.registerImu(CreateImu());
+    unique_robot.registerBuzzer(GetBuzzer());
+    unique_robot.registerImu(GetImu());
 
     // 只接收数据的组件指针
-    unique_robot.registerRc(CreateRemoteControl());
+    unique_robot.registerRc(GetRemoteControl());
     // 只发送数据的组件指针
-    unique_robot.registerCap(CreateCap(), CreateCan2TxMgr());
-    unique_robot.registerMotorWheels(CreateMotorWheelLeftFront(), robot::Robot::kWheelMotorIdxLeftFront, CreateCan2TxMgr());
-    unique_robot.registerMotorWheels(CreateMotorWheelLeftRear(), robot::Robot::kWheelMotorIdxLeftRear, CreateCan2TxMgr());
-    unique_robot.registerMotorWheels(CreateMotorWheelRightRear(), robot::Robot::kWheelMotorIdxRightRear, CreateCan2TxMgr());
-    unique_robot.registerMotorWheels(CreateMotorWheelRightFront(), robot::Robot::kWheelMotorIdxRightFront, CreateCan2TxMgr());
+    unique_robot.registerCap(GetCap(), GetCan2TxMgr());
+    unique_robot.registerMotorWheels(GetMotorWheelLeftFront(), robot::Robot::kWheelMotorIdxLeftFront, GetCan2TxMgr());
+    unique_robot.registerMotorWheels(GetMotorWheelLeftRear(), robot::Robot::kWheelMotorIdxLeftRear, GetCan2TxMgr());
+    unique_robot.registerMotorWheels(GetMotorWheelRightRear(), robot::Robot::kWheelMotorIdxRightRear, GetCan2TxMgr());
+    unique_robot.registerMotorWheels(GetMotorWheelRightFront(), robot::Robot::kWheelMotorIdxRightFront, GetCan2TxMgr());
     // 收发数据的组件指针
-    unique_robot.registerGimbalChassisComm(CreateGimbalChassisComm(), CreateCan1TxMgr());
-    unique_robot.registerReferee(CreateReferee(), CreateRfrTxMgr());
+    unique_robot.registerGimbalChassisComm(GetGimbalChassisComm(), GetCan1TxMgr());
+    unique_robot.registerReferee(GetReferee(), GetRfrTxMgr());
 
-    unique_robot.registerPerformancePkg(CreateRobotPerformancePackage());
-    unique_robot.registerPowerHeatPkg(CreateRobotPowerHeatPackage());
-    unique_robot.registerShooterPkg(CreateRobotShooterPackage());
+    unique_robot.registerPerformancePkg(GetRobotPerformancePackage());
+    unique_robot.registerPowerHeatPkg(GetRobotPowerHeatPackage());
+    unique_robot.registerShooterPkg(GetRobotShooterPackage());
     is_robot_inited = true;
   }
   return &unique_robot;

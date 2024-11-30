@@ -24,9 +24,9 @@
 /* Exported types ------------------------------------------------------------*/
 /* Exported variables --------------------------------------------------------*/
 /* Exported function prototypes ----------------------------------------------*/
-hello_world::referee::RobotPerformancePackage *CreateRobotPerformancePackage();
-hello_world::referee::RobotPowerHeatPackage *CreateRobotPowerHeatPackage();
-hello_world::referee::RobotShooterPackage *CreateRobotShooterPackage();
-hello_world::referee::Referee *CreateReferee();
+hello_world::referee::RobotPerformancePackage *GetRobotPerformancePackage();
+hello_world::referee::RobotPowerHeatPackage *GetRobotPowerHeatPackage();
+hello_world::referee::RobotShooterPackage *GetRobotShooterPackage();
+hello_world::referee::Referee *GetReferee();
 
 #endif /* INS_RFR_HPP_ */

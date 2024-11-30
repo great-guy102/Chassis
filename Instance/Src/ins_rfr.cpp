@@ -29,14 +29,14 @@ hello_world::referee::Referee unique_referee;
 
 /* Exported function definitions ---------------------------------------------*/
 
-hello_world::referee::RobotPerformancePackage *CreateRobotPerformancePackage() { return &unique_robot_performance_package; };
-hello_world::referee::RobotPowerHeatPackage *CreateRobotPowerHeatPackage() { return &unique_robot_power_heat_package; };
-hello_world::referee::RobotShooterPackage *CreateRobotShooterPackage() { return &unique_robot_shooter_package; };
-hello_world::referee::Referee *CreateReferee(void)
+hello_world::referee::RobotPerformancePackage *GetRobotPerformancePackage() { return &unique_robot_performance_package; };
+hello_world::referee::RobotPowerHeatPackage *GetRobotPowerHeatPackage() { return &unique_robot_power_heat_package; };
+hello_world::referee::RobotShooterPackage *GetRobotShooterPackage() { return &unique_robot_shooter_package; };
+hello_world::referee::Referee *GetReferee(void)
 {
-  unique_referee.appendRxPkg(CreateRobotPerformancePackage());
-  unique_referee.appendRxPkg(CreateRobotPowerHeatPackage());
-  unique_referee.appendRxPkg(CreateRobotShooterPackage());
+  unique_referee.appendRxPkg(GetRobotPerformancePackage());
+  unique_referee.appendRxPkg(GetRobotPowerHeatPackage());
+  unique_referee.appendRxPkg(GetRobotShooterPackage());
   return &unique_referee;
 };
 

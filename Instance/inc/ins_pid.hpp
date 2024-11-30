@@ -25,9 +25,9 @@ namespace hw_pid = hello_world::pid;
 /* Exported types ------------------------------------------------------------*/
 /* Exported variables --------------------------------------------------------*/
 /* Exported function prototypes ----------------------------------------------*/
-hw_pid::MultiNodesPid* CreatePidMotorWheelLeftFront();
-hw_pid::MultiNodesPid* CreatePidMotorWheelLeftRear();
-hw_pid::MultiNodesPid* CreatePidMotorWheelRightRear();
-hw_pid::MultiNodesPid* CreatePidMotorWheelRightFront();
-hw_pid::MultiNodesPid* CreatePidFollowOmega();
+hw_pid::MultiNodesPid* GetPidMotorWheelLeftFront();
+hw_pid::MultiNodesPid* GetPidMotorWheelLeftRear();
+hw_pid::MultiNodesPid* GetPidMotorWheelRightRear();
+hw_pid::MultiNodesPid* GetPidMotorWheelRightFront();
+hw_pid::MultiNodesPid* GetPidFollowOmega();
 #endif /* INSTANCE_INS_PID_HPP_ */

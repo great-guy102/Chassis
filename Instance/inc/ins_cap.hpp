@@ -23,7 +23,7 @@
 /* Exported types ------------------------------------------------------------*/
 /* Exported variables --------------------------------------------------------*/
 
-hello_world::cap::SuperCap* CreateCap(void);
+hello_world::cap::SuperCap* GetCap(void);
 /* Exported function prototypes ----------------------------------------------*/
 
 #endif /* INSTANCE_INS_CAP_HPP_ */

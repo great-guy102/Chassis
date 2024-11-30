@@ -25,6 +25,6 @@ namespace hw_chassis_iksolver = hello_world::chassis_ik_solver;
 /* Exported types ------------------------------------------------------------*/
 /* Exported variables --------------------------------------------------------*/
 /* Exported function prototypes ----------------------------------------------*/
-hw_chassis_iksolver::ChassisIkSolver* CreateChassisIkSolver(void);
+hw_chassis_iksolver::ChassisIkSolver* GetChassisIkSolver(void);
 
 #endif /* INSTANCE_INS_CHASSIS_IKSOLVER_HPP_ */

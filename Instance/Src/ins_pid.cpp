@@ -73,9 +73,9 @@ hw_pid::MultiNodesPid unique_pid_follow_omega(kPidTypeCascade, kOutLimitFollowOm
 /* External variables --------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
 /* Exported function definitions ---------------------------------------------*/
-hw_pid::MultiNodesPid* CreatePidMotorWheelLeftFront() { return &unique_pid_wheel_left_front; };
-hw_pid::MultiNodesPid* CreatePidMotorWheelLeftRear() { return &unique_pid_wheel_left_rear; };
-hw_pid::MultiNodesPid* CreatePidMotorWheelRightFront() { return &unique_pid_wheel_right_front; };
-hw_pid::MultiNodesPid* CreatePidMotorWheelRightRear() { return &unique_pid_wheel_right_rear; };
-hw_pid::MultiNodesPid* CreatePidFollowOmega() { return &unique_pid_follow_omega; };
+hw_pid::MultiNodesPid* GetPidMotorWheelLeftFront() { return &unique_pid_wheel_left_front; };
+hw_pid::MultiNodesPid* GetPidMotorWheelLeftRear() { return &unique_pid_wheel_left_rear; };
+hw_pid::MultiNodesPid* GetPidMotorWheelRightFront() { return &unique_pid_wheel_right_front; };
+hw_pid::MultiNodesPid* GetPidMotorWheelRightRear() { return &unique_pid_wheel_right_rear; };
+hw_pid::MultiNodesPid* GetPidFollowOmega() { return &unique_pid_follow_omega; };
 /* Private function definitions ----------------------------------------------*/

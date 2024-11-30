@@ -1,6 +1,6 @@
 /** 
  *******************************************************************************
- * @file      : ins_chassis_iksolver.cpp
+ * @file      :ins_chassis_iksolver.cpp
  * @brief     : 
  * @history   :
  *  Version     Date            Author          Note
@@ -16,10 +16,9 @@
 #include "ins_chassis_iksolver.hpp"
 /* Private constants ---------------------------------------------------------*/
 
-const float kWheelRadius = 154 * 0.001 / 2;  ///< 轮子半径 [m]
-const float kWheelGamma = PI / 4;            ///< Swidish 轮的 gamma 角
-const float kWheelBase = 0.4;                ///< 左右轮距 [m]
-const float kWheelTrack = 0.4;               ///< 前后轮距 [m]
+const float kWheelRadius = 66 * 0.001;  ///< 轮子半径 [m]
+const float kWheelBase = 0.334;                ///< 左右轮距 [m]
+const float kWheelTrack = 0.334;               ///< 前后轮距 [m]
 
 const hw_chassis_iksolver::PosVec kCenterPos = hw_chassis_iksolver::PosVec(0, 0);
 
@@ -39,34 +38,30 @@ static void InitChassisIkSolver(void)
     hw_chassis_iksolver::WheelParams ik_solver_params[4] = {0};
     // 左前轮
     ik_solver_params[0].theta_vel_fdb = 0;
-    ik_solver_params[0].gamma = -kWheelGamma;
     ik_solver_params[0].radius = kWheelRadius;
     ik_solver_params[0].wheel_pos = hw_chassis_iksolver::PosVec(kWheelTrack / 2, kWheelBase / 2);
     // 左后轮
     ik_solver_params[1].theta_vel_fdb = 0;
-    ik_solver_params[1].gamma = kWheelGamma;
     ik_solver_params[1].radius = kWheelRadius;
     ik_solver_params[1].wheel_pos = hw_chassis_iksolver::PosVec(-kWheelTrack / 2, kWheelBase / 2);
     // 右后轮
     ik_solver_params[2].theta_vel_fdb = 0;
-    ik_solver_params[2].gamma = -kWheelGamma;
     ik_solver_params[2].radius = kWheelRadius;
     ik_solver_params[2].wheel_pos = hw_chassis_iksolver::PosVec(-kWheelTrack / 2, -kWheelBase / 2);
 
     // 右前轮
     ik_solver_params[3].theta_vel_fdb = 0;
-    ik_solver_params[3].gamma = kWheelGamma;
     ik_solver_params[3].radius = kWheelRadius;
     ik_solver_params[3].wheel_pos = hw_chassis_iksolver::PosVec(kWheelTrack / 2, -kWheelBase / 2);
 
     for (int i = 0; i < 4; i++) {
-      iksolver.append(hw_chassis_iksolver::WheelType::kSwedish, ik_solver_params[i]);
+      iksolver.append(hw_chassis_iksolver::WheelType::kSteeredStandard, ik_solver_params[i]);
     }
   }
 }
 
 /* Exported function definitions ---------------------------------------------*/
-hw_chassis_iksolver::ChassisIkSolver* CreateChassisIkSolver(void)
+hw_chassis_iksolver::ChassisIkSolver* GetChassisIkSolver(void)
 {
   if (!is_chassis_iksolver_init) {
     is_chassis_iksolver_init = true;

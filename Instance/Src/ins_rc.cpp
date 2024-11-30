@@ -25,6 +25,6 @@ hw_rc::DT7 unique_rc = hw_rc::DT7();
 /* Private function prototypes -----------------------------------------------*/
 /* Exported function definitions ---------------------------------------------*/
 
-hw_rc::DT7* CreateRemoteControl() { return &unique_rc; };
+hw_rc::DT7* GetRemoteControl() { return &unique_rc; };
 
 /* Private function definitions ----------------------------------------------*/

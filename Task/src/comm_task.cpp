@@ -202,52 +202,52 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef* huart)
 
 static void PrivatePointerInit(void)
 {
-  can1_rx_mgr_ptr = CreateCan1RxMgr();
-  can1_tx_mgr_ptr = CreateCan1TxMgr();
+  can1_rx_mgr_ptr = GetCan1RxMgr();
+  can1_tx_mgr_ptr = GetCan1TxMgr();
 
-  can2_rx_mgr_ptr = CreateCan2RxMgr();
-  can2_tx_mgr_ptr = CreateCan2TxMgr();
+  can2_rx_mgr_ptr = GetCan2RxMgr();
+  can2_tx_mgr_ptr = GetCan2TxMgr();
 
-  rc_rx_mgr_ptr = CreateRcRxMgr();
+  rc_rx_mgr_ptr = GetRcRxMgr();
 
-  rfr_rx_mgr_ptr = CreateRfrRxMgr();
-  rfr_tx_mgr_ptr = CreateRfrTxMgr();
+  rfr_rx_mgr_ptr = GetRfrRxMgr();
+  rfr_tx_mgr_ptr = GetRfrTxMgr();
 }
 
 static void CommAddReceiver(void)
 {
   HW_ASSERT(can1_rx_mgr_ptr != nullptr, "can1_rx_mgr_ptr is nullptr", can1_rx_mgr_ptr);
-  can1_rx_mgr_ptr->addReceiver(CreateGimbalChassisComm());
-  can1_rx_mgr_ptr->addReceiver(CreateMotorYaw());  // 用于底盘控制，只接受消息
+  can1_rx_mgr_ptr->addReceiver(GetGimbalChassisComm());
+  can1_rx_mgr_ptr->addReceiver(GetMotorYaw());  // 用于底盘控制，只接受消息
 
   HW_ASSERT(can2_rx_mgr_ptr != nullptr, "can2_rx_mgr_ptr is nullptr", can2_rx_mgr_ptr);
-  can2_rx_mgr_ptr->addReceiver(CreateCap());
-  can2_rx_mgr_ptr->addReceiver(CreateMotorWheelLeftFront());
-  can2_rx_mgr_ptr->addReceiver(CreateMotorWheelLeftRear());
-  can2_rx_mgr_ptr->addReceiver(CreateMotorWheelRightRear());
-  can2_rx_mgr_ptr->addReceiver(CreateMotorWheelRightFront());
+  can2_rx_mgr_ptr->addReceiver(GetCap());
+  can2_rx_mgr_ptr->addReceiver(GetMotorWheelLeftFront());
+  can2_rx_mgr_ptr->addReceiver(GetMotorWheelLeftRear());
+  can2_rx_mgr_ptr->addReceiver(GetMotorWheelRightRear());
+  can2_rx_mgr_ptr->addReceiver(GetMotorWheelRightFront());
 
   HW_ASSERT(rc_rx_mgr_ptr != nullptr, "rc_rx_mgr_ptr is nullptr", rc_rx_mgr_ptr);
-  rc_rx_mgr_ptr->addReceiver(CreateRemoteControl());
+  rc_rx_mgr_ptr->addReceiver(GetRemoteControl());
 
   HW_ASSERT(rfr_rx_mgr_ptr != nullptr, "rfr_rx_mgr_ptr is nullptr", rfr_rx_mgr_ptr);
-  rfr_rx_mgr_ptr->addReceiver(CreateReferee());
+  rfr_rx_mgr_ptr->addReceiver(GetReferee());
 }
 
 static void CommAddTransmitter()
 {
   HW_ASSERT(can1_tx_mgr_ptr != nullptr, "can1_tx_mgr_ptr is nullptr", can1_tx_mgr_ptr);
-  can1_tx_mgr_ptr->addTransmitter(CreateGimbalChassisComm());
+  can1_tx_mgr_ptr->addTransmitter(GetGimbalChassisComm());
 
   HW_ASSERT(can2_tx_mgr_ptr != nullptr, "can2_tx_mgr_ptr is nullptr", can2_tx_mgr_ptr);
-  can2_tx_mgr_ptr->addTransmitter(CreateCap());
-  can2_tx_mgr_ptr->addTransmitter(CreateMotorWheelLeftFront());
-  can2_tx_mgr_ptr->addTransmitter(CreateMotorWheelLeftRear());
-  can2_tx_mgr_ptr->addTransmitter(CreateMotorWheelRightRear());
-  can2_tx_mgr_ptr->addTransmitter(CreateMotorWheelRightFront());
+  can2_tx_mgr_ptr->addTransmitter(GetCap());
+  can2_tx_mgr_ptr->addTransmitter(GetMotorWheelLeftFront());
+  can2_tx_mgr_ptr->addTransmitter(GetMotorWheelLeftRear());
+  can2_tx_mgr_ptr->addTransmitter(GetMotorWheelRightRear());
+  can2_tx_mgr_ptr->addTransmitter(GetMotorWheelRightFront());
 
   HW_ASSERT(rfr_tx_mgr_ptr != nullptr, "rfr_tx_mgr_ptr is nullptr", rfr_tx_mgr_ptr);
-  rfr_tx_mgr_ptr->addTransmitter(CreateReferee());
+  rfr_tx_mgr_ptr->addTransmitter(GetReferee());
 }
 
 void CommHardWareInit(void)

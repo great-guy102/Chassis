@@ -26,5 +26,5 @@ namespace hw_buzzer = hello_world::buzzer;
 /* Exported types ------------------------------------------------------------*/
 /* Exported variables --------------------------------------------------------*/
 /* Exported function prototypes ----------------------------------------------*/
-hw_buzzer::Buzzer* CreateBuzzer(void);
+hw_buzzer::Buzzer* GetBuzzer(void);
 #endif /* INSTANCE_INS_BUZZER_HPP_ */

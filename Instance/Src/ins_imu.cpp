@@ -35,7 +35,7 @@ const robot::Imu::Config kImuInitConfig = {
 /* External variables --------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
 /* Exported function definitions ---------------------------------------------*/
-robot::Imu *CreateImu(void) {
+robot::Imu *GetImu(void) {
     static robot::Imu unique_imu = robot::Imu(kImuInitConfig); 
     return &unique_imu; 
 };

@@ -22,4 +22,4 @@ static const hw_pwr_limiter::PowerLimiter::MotorStaticParamsList kMotorStaticPar
 
 hw_pwr_limiter::PowerLimiter unique_pwr_limiter = hw_pwr_limiter::PowerLimiter(kMotorStaticParamsList, kStaticParams);
 
-hw_pwr_limiter::PowerLimiter* CreatePwrLimiter() { return &unique_pwr_limiter; }
+hw_pwr_limiter::PowerLimiter* GetPwrLimiter() { return &unique_pwr_limiter; }

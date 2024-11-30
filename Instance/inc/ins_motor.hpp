@@ -25,11 +25,17 @@ namespace hw_motor = hello_world::motor;
 /* Exported types ------------------------------------------------------------*/
 /* Exported variables --------------------------------------------------------*/
 /* Exported function prototypes ----------------------------------------------*/
-hw_motor::Motor* CreateMotorWheelLeftFront();
-hw_motor::Motor* CreateMotorWheelLeftRear();
-hw_motor::Motor* CreateMotorWheelRightRear();
-hw_motor::Motor* CreateMotorWheelRightFront();
-hw_motor::Motor* CreateMotorYaw();
-hw_motor::Motor* CreateMotorFeed();
+//创建轮电机
+hw_motor::Motor* GetMotorWheelLeftFront();
+hw_motor::Motor* GetMotorWheelLeftRear();
+hw_motor::Motor* GetMotorWheelRightRear();
+hw_motor::Motor* GetMotorWheelRightFront();
+//创建舵电机
+hw_motor::Motor* GetMotorSteerLeftFront();
+hw_motor::Motor* GetMotorSteerLeftRear();
+hw_motor::Motor* GetMotorSteerRightRear();
+hw_motor::Motor* GetMotorSteerRightFront();
+hw_motor::Motor* GetMotorYaw();
+hw_motor::Motor* GetMotorFeed();
 
 #endif /* INSTANCE_INS_MOTOR_HPP_ */

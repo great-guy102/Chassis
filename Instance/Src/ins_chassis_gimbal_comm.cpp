@@ -22,5 +22,5 @@ robot::GimbalChassisComm unique_gimbal_chassis_comm = robot::GimbalChassisComm(r
 /* External variables --------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
 /* Exported function definitions ---------------------------------------------*/
-robot::GimbalChassisComm* CreateGimbalChassisComm(void) { return &unique_gimbal_chassis_comm; };
+robot::GimbalChassisComm* GetGimbalChassisComm(void) { return &unique_gimbal_chassis_comm; };
 /* Private function definitions ----------------------------------------------*/

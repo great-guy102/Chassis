@@ -35,6 +35,6 @@ static Cap unique_cap = Cap(100, kCapConfig, Cap::Version::kVer2024);
 /* Private function prototypes -----------------------------------------------*/
 /* Exported function definitions ---------------------------------------------*/
 
-Cap* CreateCap(void) { return &unique_cap; };
+Cap* GetCap(void) { return &unique_cap; };
 
 /* Private function definitions ----------------------------------------------*/

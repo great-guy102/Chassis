@@ -1,6 +1,6 @@
 /** 
  *******************************************************************************
- * @file      : ins_fsm.hpp
+ * @file      :ins_fsm.hpp
  * @brief     : 
  * @history   :
  *  Version     Date            Author          Note
@@ -27,11 +27,11 @@
 /* Exported types ------------------------------------------------------------*/
 /* Exported variables --------------------------------------------------------*/
 
-robot::Chassis* CreateChassis();
-robot::Gimbal* CreateGimbal();
-robot::Robot* CreateRobot();
-robot::Shooter* CreateShooter();
-robot::Feed* CreateFeed();
+robot::Chassis* GetChassis();
+robot::Gimbal* GetGimbal();
+robot::Robot* GetRobot();
+robot::Shooter* GetShooter();
+robot::Feed* GetFeed();
 /* Exported function prototypes ----------------------------------------------*/
 
 #endif /* INSTANCE_INS_FSM_HPP_ */
