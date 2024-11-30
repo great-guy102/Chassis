@@ -131,7 +131,7 @@ hw_motor::Motor* GetMotorWheelRightFront() {
 };
 
 hw_motor::Motor* GetMotorSteerLeftFront() { 
-    if(!is_motor_wheel_left_front_inited){
+    if(!is_motor_steer_left_front_inited){
         hw_motor::OptionalParams SteerMotorParamsLeftFront = kSteerMotorParams;
         SteerMotorParamsLeftFront.angle_offset = steer_motor_offset[0];
         unique_motor_steer_left_front = hw_motor::GM6020(0x01, SteerMotorParamsLeftFront);
