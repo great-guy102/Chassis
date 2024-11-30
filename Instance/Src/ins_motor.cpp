@@ -47,7 +47,7 @@ const float steer_motor_offset[4] = {2.09644055,
                                     -3.13814092, 
                                     -1.03863168};
 
-const hw_motor::OptionalParams kMotorParamsYaw = {
+const hw_motor::OptionalParams kYawMotorParams = {
     .input_type = hw_motor::InputType::kTorq,
     .angle_range = hw_motor::AngleRange::kNegPiToPosPi,
     .dir = hw_motor::kDirFwd,
@@ -108,24 +108,24 @@ hw_motor::Motor* GetMotorWheelLeftFront() {
 
 hw_motor::Motor* GetMotorWheelLeftRear() { 
     if(!is_motor_wheel_left_rear_inited){
-        unique_motor_wheel_left_front = hw_motor::M3508(0x02, kWheelMotorParams);
-        is_motor_wheel_left_front_inited = true;
+        unique_motor_wheel_left_rear = hw_motor::M3508(0x02, kWheelMotorParams);
+        is_motor_wheel_left_rear_inited = true;
     }
     return &unique_motor_wheel_left_rear; 
 };
 
 hw_motor::Motor* GetMotorWheelRightRear() { 
     if(!is_motor_wheel_right_rear_inited){
-        unique_motor_wheel_left_front = hw_motor::M3508(0x03, kWheelMotorParams);
-        is_motor_wheel_left_front_inited = true;
+        unique_motor_wheel_right_rear = hw_motor::M3508(0x03, kWheelMotorParams);
+        is_motor_wheel_right_rear_inited = true;
     }
     return &unique_motor_wheel_right_rear; 
 };
 
 hw_motor::Motor* GetMotorWheelRightFront() { 
     if(!is_motor_wheel_right_front_inited){
-        unique_motor_wheel_left_front = hw_motor::M3508(0x04, kWheelMotorParams);
-        is_motor_wheel_left_front_inited = true;
+        unique_motor_wheel_right_front = hw_motor::M3508(0x04, kWheelMotorParams);
+        is_motor_wheel_right_front_inited = true;
     }
     return &unique_motor_wheel_right_front; 
 };
@@ -172,7 +172,7 @@ hw_motor::Motor* GetMotorSteerRightFront() {
 
 hw_motor::Motor* GetMotorYaw() { 
     if(!is_motor_yaw_inited){
-        unique_motor_yaw = hw_motor::DM_J4310(0x01, kMotorParamsYaw);
+        unique_motor_yaw = hw_motor::DM_J4310(0x01, kYawMotorParams);
         is_motor_yaw_inited = true;
     }
     return &unique_motor_yaw;
