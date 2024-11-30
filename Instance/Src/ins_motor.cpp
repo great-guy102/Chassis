@@ -15,44 +15,11 @@
 /* Includes ------------------------------------------------------------------*/
 #include "ins_motor.hpp"
 /* Private constants ---------------------------------------------------------*/
-//轮电机参数配置
-const hw_motor::OptionalParams kMotorParamsWheelLeftFront = {
+//轮电机通用参数配置
+const hw_motor::OptionalParams kWheelMotorParams = {
     .input_type = hw_motor::InputType::kRaw,
     .angle_range = hw_motor::AngleRange::kNegPiToPosPi,
     .dir = hw_motor::kDirFwd,
-    /** 是否移除电机自带的减速器 */
-    .remove_build_in_reducer = true,
-    /** 电机输出端实际角度与规定角度的差值 */
-    .angle_offset = 0,
-    /** 电机外置减速器的减速比（额外） */
-    .ex_redu_rat = 14,
-};
-const hw_motor::OptionalParams kMotorParamsWheelLeftRear = {
-    .input_type = hw_motor::InputType::kRaw,
-    .angle_range = hw_motor::AngleRange::kNegPiToPosPi,
-    .dir = hw_motor::kDirFwd,
-    /** 是否移除电机自带的减速器 */
-    .remove_build_in_reducer = true,
-    /** 电机输出端实际角度与规定角度的差值 */
-    .angle_offset = 0,
-    /** 电机外置减速器的减速比（额外） */
-    .ex_redu_rat = 14,
-};
-const hw_motor::OptionalParams kMotorParamsWheelRightRear = {
-    .input_type = hw_motor::InputType::kRaw,
-    .angle_range = hw_motor::AngleRange::kNegPiToPosPi,
-    .dir = hw_motor::kDirRev,
-    /** 是否移除电机自带的减速器 */
-    .remove_build_in_reducer = true,
-    /** 电机输出端实际角度与规定角度的差值 */
-    .angle_offset = 0,
-    /** 电机外置减速器的减速比（额外） */
-    .ex_redu_rat = 14,
-};
-const hw_motor::OptionalParams kMotorParamsWheelRightFront = {
-    .input_type = hw_motor::InputType::kRaw,
-    .angle_range = hw_motor::AngleRange::kNegPiToPosPi,
-    .dir = hw_motor::kDirRev,
     /** 是否移除电机自带的减速器 */
     .remove_build_in_reducer = true,
     /** 电机输出端实际角度与规定角度的差值 */
@@ -61,8 +28,8 @@ const hw_motor::OptionalParams kMotorParamsWheelRightFront = {
     .ex_redu_rat = 14,
 };
 
-//舵电机参数配置
-const hw_motor::OptionalParams kMotorParamsSteerLeftFront = {
+//舵电机通用参数配置
+hw_motor::OptionalParams kSteerMotorParams = {
     .input_type = hw_motor::InputType::kRaw,             // 输入类型为原始类型
     .angle_range = hw_motor::AngleRange::kNegPiToPosPi,  // 角度范围为[-π, π)
     .dir = hw_motor::kDirRev,                          // 方向为正向
@@ -73,39 +40,12 @@ const hw_motor::OptionalParams kMotorParamsSteerLeftFront = {
     .max_torq_input_lim = 1.2,                      // 力矩输入限制
     .max_curr_input_lim = 1.62                      // 电流输入限制为0.2A
 };
-const hw_motor::OptionalParams kMotorParamsSteerLeftRear = {
-    .input_type = hw_motor::InputType::kRaw,             // 输入类型为原始类型
-    .angle_range = hw_motor::AngleRange::kNegPiToPosPi,  // 角度范围为[-π, π)
-    .dir = hw_motor::kDirRev,                          // 方向为正向
-    .remove_build_in_reducer = false,               // 不移除内置减速器
-    .angle_offset = 0,                              // 角度偏移为0
-    .ex_redu_rat = 1,                               // 外置减速器的减速比为1
-    .max_raw_input_lim = 30000,                     // 报文输入限制
-    .max_torq_input_lim = 1.2,                      // 力矩输入限制
-    .max_curr_input_lim = 1.62                      // 电流输入限制为0.2A
-};
-const hw_motor::OptionalParams kMotorParamsSteerRightRear = {
-    .input_type = hw_motor::InputType::kRaw,             // 输入类型为原始类型
-    .angle_range = hw_motor::AngleRange::kNegPiToPosPi,  // 角度范围为[-π, π)
-    .dir = hw_motor::kDirRev,                          // 方向为正向
-    .remove_build_in_reducer = false,               // 不移除内置减速器
-    .angle_offset = 0,                              // 角度偏移为0
-    .ex_redu_rat = 1,                               // 外置减速器的减速比为1
-    .max_raw_input_lim = 30000,                     // 报文输入限制
-    .max_torq_input_lim = 1.2,                      // 力矩输入限制
-    .max_curr_input_lim = 1.62                      // 电流输入限制为0.2A
-};
-const hw_motor::OptionalParams kMotorParamsSteerRightFront = {
-    .input_type = hw_motor::InputType::kRaw,             // 输入类型为原始类型
-    .angle_range = hw_motor::AngleRange::kNegPiToPosPi,  // 角度范围为[-π, π)
-    .dir = hw_motor::kDirRev,                          // 方向为正向
-    .remove_build_in_reducer = false,               // 不移除内置减速器
-    .angle_offset = 0,                              // 角度偏移为0
-    .ex_redu_rat = 1,                               // 外置减速器的减速比为1
-    .max_raw_input_lim = 30000,                     // 报文输入限制
-    .max_torq_input_lim = 1.2,                      // 力矩输入限制
-    .max_curr_input_lim = 1.62                      // 电流输入限制为0.2A
-};
+
+//舵电机零位设置
+const float steer_motor_offset[4] = {2.09644055, 
+                                    -3.11436129, 
+                                    -3.13814092, 
+                                    -1.03863168};
 
 const hw_motor::OptionalParams kMotorParamsYaw = {
     .input_type = hw_motor::InputType::kTorq,
@@ -119,35 +59,123 @@ const hw_motor::OptionalParams kMotorParamsYaw = {
     // .ex_redu_rat = 14,
 };
 
+
 // TODO: 这里的 MotorId 需要按照实际情况修改
-enum MotorID {
-  kMotorIdWheelLeftFront = 1u,
-  kMotorIdWheelLeftRear,
-  kMotorIdWheelRightRear,
-  kMotorIdWheelRightFront,
-  kMotorIdSteerLeftFront,
-  kMotorIdSteerLeftRear,
-  kMotorIdSteerRightRear,
-  kMotorIdSteerRightFront,
-  kMotorIdYaw = 3u,
-};
+
 /* Private macro -------------------------------------------------------------*/
 /* Private types -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-
-hw_motor::M3508 unique_motor_wheel_left_front = hw_motor::M3508(kMotorIdWheelLeftFront, kMotorParamsWheelLeftFront);
-hw_motor::M3508 unique_motor_wheel_left_rear = hw_motor::M3508(kMotorIdWheelLeftRear, kMotorParamsWheelLeftRear);
-hw_motor::M3508 unique_motor_wheel_right_rear = hw_motor::M3508(kMotorIdWheelRightRear, kMotorParamsWheelRightRear);
-hw_motor::M3508 unique_motor_wheel_right_front = hw_motor::M3508(kMotorIdWheelRightFront, kMotorParamsWheelRightFront);
-hw_motor::DM_J4310 unique_motor_yaw = hw_motor::DM_J4310(kMotorIdYaw, kMotorParamsYaw);
 /* External variables --------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
 /* Exported function definitions ---------------------------------------------*/
+//轮电机单例
+static bool is_motor_wheel_left_front_inited = false;
+hw_motor::M3508 unique_motor_wheel_left_front;
 
-hw_motor::Motor* GetMotorWheelLeftFront() { return &unique_motor_wheel_left_front; };
-hw_motor::Motor* GetMotorWheelLeftRear() { return &unique_motor_wheel_left_rear; };
-hw_motor::Motor* GetMotorWheelRightRear() { return &unique_motor_wheel_right_rear; };
-hw_motor::Motor* GetMotorWheelRightFront() { return &unique_motor_wheel_right_front; };
-hw_motor::Motor* GetMotorYaw() { return &unique_motor_yaw; };
+static bool is_motor_wheel_left_rear_inited = false;
+hw_motor::M3508 unique_motor_wheel_left_rear;
+
+static bool is_motor_wheel_right_rear_inited = false;
+hw_motor::M3508 unique_motor_wheel_right_rear;
+
+static bool is_motor_wheel_right_front_inited = false;
+hw_motor::M3508 unique_motor_wheel_right_front;
+
+//舵电机单例
+static bool is_motor_steer_left_front_inited = false;
+hw_motor::GM6020 unique_motor_steer_left_front;
+
+static bool is_motor_steer_left_rear_inited = false;
+hw_motor::GM6020 unique_motor_steer_left_rear;
+
+static bool is_motor_steer_right_rear_inited = false;
+hw_motor::GM6020 unique_motor_steer_right_rear;
+
+static bool is_motor_steer_right_front_inited = false;
+hw_motor::GM6020 unique_motor_steer_right_front;
+
+//yaw电机单例
+static bool is_motor_yaw_inited = false;
+hw_motor::DM_J4310 unique_motor_yaw;
+
+hw_motor::Motor* GetMotorWheelLeftFront() { 
+    if(!is_motor_wheel_left_front_inited){
+        unique_motor_wheel_left_front = hw_motor::M3508(0x01, kWheelMotorParams);
+        is_motor_wheel_left_front_inited = true;
+    }
+    return &unique_motor_wheel_left_front; 
+};
+
+hw_motor::Motor* GetMotorWheelLeftRear() { 
+    if(!is_motor_wheel_left_rear_inited){
+        unique_motor_wheel_left_front = hw_motor::M3508(0x02, kWheelMotorParams);
+        is_motor_wheel_left_front_inited = true;
+    }
+    return &unique_motor_wheel_left_rear; 
+};
+
+hw_motor::Motor* GetMotorWheelRightRear() { 
+    if(!is_motor_wheel_right_rear_inited){
+        unique_motor_wheel_left_front = hw_motor::M3508(0x03, kWheelMotorParams);
+        is_motor_wheel_left_front_inited = true;
+    }
+    return &unique_motor_wheel_right_rear; 
+};
+
+hw_motor::Motor* GetMotorWheelRightFront() { 
+    if(!is_motor_wheel_right_front_inited){
+        unique_motor_wheel_left_front = hw_motor::M3508(0x04, kWheelMotorParams);
+        is_motor_wheel_left_front_inited = true;
+    }
+    return &unique_motor_wheel_right_front; 
+};
+
+hw_motor::Motor* GetMotorSteerLeftFront() { 
+    if(!is_motor_wheel_left_front_inited){
+        hw_motor::OptionalParams SteerMotorParamsLeftFront = kSteerMotorParams;
+        SteerMotorParamsLeftFront.angle_offset = steer_motor_offset[0];
+        unique_motor_steer_left_front = hw_motor::GM6020(0x01, SteerMotorParamsLeftFront);
+        is_motor_steer_left_front_inited = true;
+    }
+    return &unique_motor_steer_left_front; 
+};
+
+hw_motor::Motor* GetMotorSteerLeftRear() { 
+    if(!is_motor_steer_left_rear_inited){
+        hw_motor::OptionalParams SteerMotorParamsLeftRear = kSteerMotorParams;
+        SteerMotorParamsLeftRear.angle_offset = steer_motor_offset[1];
+        unique_motor_steer_left_rear = hw_motor::GM6020(0x02, SteerMotorParamsLeftRear);
+        is_motor_steer_left_rear_inited = true;
+    }
+    return &unique_motor_steer_left_rear; 
+};
+
+hw_motor::Motor* GetMotorSteerRightRear() { 
+    if(!is_motor_steer_right_rear_inited){
+        hw_motor::OptionalParams SteerMotorParamsRightRear = kSteerMotorParams;
+        SteerMotorParamsRightRear.angle_offset = steer_motor_offset[2];
+        unique_motor_steer_right_rear = hw_motor::GM6020(0x03, SteerMotorParamsRightRear);
+        is_motor_steer_right_rear_inited = true;
+    }
+    return &unique_motor_steer_right_rear; 
+};
+
+hw_motor::Motor* GetMotorSteerRightFront() { 
+    if(!is_motor_steer_right_front_inited){
+        hw_motor::OptionalParams SteerMotorParamsRightFront = kSteerMotorParams;
+        SteerMotorParamsRightFront.angle_offset = steer_motor_offset[3];
+        unique_motor_steer_right_front = hw_motor::GM6020(0x04, SteerMotorParamsRightFront);
+        is_motor_steer_right_front_inited = true;
+    }
+    return &unique_motor_steer_right_front; 
+};
+
+hw_motor::Motor* GetMotorYaw() { 
+    if(!is_motor_yaw_inited){
+        unique_motor_yaw = hw_motor::DM_J4310(0x01, kMotorParamsYaw);
+        is_motor_yaw_inited = true;
+    }
+    return &unique_motor_yaw;
+};
 
 /* Private function definitions ----------------------------------------------*/
