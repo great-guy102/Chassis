@@ -29,5 +29,11 @@ hw_pid::MultiNodesPid* GetPidMotorWheelLeftFront();
 hw_pid::MultiNodesPid* GetPidMotorWheelLeftRear();
 hw_pid::MultiNodesPid* GetPidMotorWheelRightRear();
 hw_pid::MultiNodesPid* GetPidMotorWheelRightFront();
+
+hw_pid::MultiNodesPid* GetPidMotorSteerLeftFront();
+hw_pid::MultiNodesPid* GetPidMotorSteerLeftRear();
+hw_pid::MultiNodesPid* GetPidMotorSteerRightRear();
+hw_pid::MultiNodesPid* GetPidMotorSteerRightFront();
+
 hw_pid::MultiNodesPid* GetPidFollowOmega();
 #endif /* INSTANCE_INS_PID_HPP_ */
