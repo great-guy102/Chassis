@@ -16,7 +16,6 @@
 #include "main_task.hpp"
 
 #include "comm_task.hpp"
-#include "communication_tools.hpp"
 #include "ins_all.hpp"
 #include "tim.h"
 /* Private macro -------------------------------------------------------------*/
