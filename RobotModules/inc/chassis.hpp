@@ -1,6 +1,6 @@
 /** 
  *******************************************************************************
- * @file      : chassis.hpp
+ * @file      :chassis.hpp
  * @brief     : 
  * @history   :
  *  Version     Date            Author          Note
@@ -123,7 +123,7 @@ class Chassis : public Fsm
     kWheelMotorIdxLeftRear,    ///< 左后轮电机下标
     kWheelMotorIdxRightRear,   ///< 右后轮电机下标
     kWheelMotorIdxRightFront,  ///< 右前轮电机下标
-    kWheelMotorNum,            ///< 电机数量
+    kWheelMotorNum,            ///< 轮电机数量
   };
 
   enum WheelPidIdx : uint8_t {
@@ -131,7 +131,23 @@ class Chassis : public Fsm
     kWheelPidIdxLeftRear,    ///< 左后轮 PID
     kWheelPidIdxRightRear,   ///< 右后轮 PID
     kWheelPidIdxRightFront,  ///< 右前轮 PID
-    kWheelPidNum,            ///< PID 数量
+    kWheelPidNum,            ///< 轮PID数量
+  };
+
+  enum SteerMotorIdx : uint8_t {
+    kSteerMotorIdxLeftFront,   ///< 左前舵电机下标
+    kSteerMotorIdxLeftRear,    ///< 左后舵电机下标
+    kSteerMotorIdxRightRear,   ///< 右后舵电机下标
+    kSteerMotorIdxRightFront,  ///< 右前舵电机下标
+    kSteerMotorNum,            ///< 舵电机数量
+  };
+
+  enum SteerPidIdx : uint8_t {
+    kSteerPidIdxLeftFront,   ///< 左前舵 PID
+    kSteerPidIdxLeftRear,    ///< 左后舵 PID
+    kSteerPidIdxRightRear,   ///< 右后舵 PID
+    kSteerPidIdxRightFront,  ///< 右前舵 PID
+    kSteerPidNum,            ///< 舵PID数量
   };
 
   Chassis(const Config &config) { config_ = config; };
@@ -178,8 +194,10 @@ class Chassis : public Fsm
 
   void registerIkSolver(ChassisIkSolver *ptr);
   void registerWheelMotor(Motor *ptr, int idx);
+  void registerSteerMotor(Motor *ptr, int idx);
   void registerYawMotor(Motor *ptr);
   void registerWheelPid(MultiNodesPid *ptr, int idx);
+  void registerSteerPid(MultiNodesPid *ptr, int idx);
   void registerFollowOmegaPid(MultiNodesPid *ptr);
   void registerCap(Cap *ptr);
   void registerGimbalChassisComm(GimbalChassisComm *ptr);
@@ -211,15 +229,18 @@ class Chassis : public Fsm
   void resetDataOnDead();
   void resetDataOnResurrection();
   void resetDataOnStandby();
+  void resetCmds();
+  void resetMotorsRef();
+  void resetMotorsFdb();
   void resetPids();
 
   // 设置通讯组件数据函数
   void setCommData(bool is_working)
   {
-    setCommDataWheels(is_working);
+    setCommDataMotors(is_working);
     setCommDataCap(is_working);
   };
-  void setCommDataWheels(bool is_working);
+  void setCommDataMotors(bool is_working);
   void setCommDataCap(bool is_working);
 
   // 工具函数
@@ -250,6 +271,11 @@ class Chassis : public Fsm
   float wheel_speed_ref_[4] = {0};          ///< 轮电机的速度参考值 单位 rad/s
   float wheel_speed_ref_limited_[4] = {0};  ///< 轮电机的速度参考值(限幅后) 单位 rad/s
   float wheel_current_ref_[4] = {0};        ///< 轮电机的电流参考值 单位 A [-20, 20]
+  float steer_speed_ref_[4] = {0};          ///< 舵电机的速度参考值 单位 rad/s
+  float steer_speed_ref_limited_[4] = {0};  ///< 舵电机的速度参考值(限幅后) 单位 rad/s
+  float steer_angle_ref_[4] = {0};          ///< 舵电机的角度参考值 单位 rad
+  float steer_voltage_ref_[4] = {0};        ///< 舵电机的电压参考值 单位 待定 [-30000, 30000]  TODO
+  
   bool rev_head_flag_ = false;              ///< 转向后退标志
   uint32_t last_rev_head_tick_ = 0;         ///< 上一次转向后退的时间戳
 
@@ -258,9 +284,14 @@ class Chassis : public Fsm
 
   // motor fdb data 在 update 函数中更新
   bool is_all_wheel_online_ = false;  ///< 所有轮电机是否都处于就绪状态
-  bool is_any_wheel_online_ = false;  ///< 任意电机是否处于就绪状态
+  bool is_any_wheel_online_ = false;  ///< 任意轮电机是否处于就绪状态
   float wheel_speed_fdb_[4] = {0};    ///< 轮速反馈数据
   float wheel_current_fdb_[4] = {0};  ///< 轮电流反馈数据
+  bool is_all_steer_online_ = false;  ///< 所有舵电机是否都处于就绪状态
+  bool is_any_steer_online_ = false;  ///< 任意舵电机是否处于就绪状态
+  float steer_speed_fdb_[4] = {0};    ///< 舵速反馈数据
+  float steer_angle_fdb_[4] = {0};    ///< 舵角度反馈数据
+  float steer_current_fdb_[4] = {0};  ///< 舵电流反馈数据
   float theta_i2r_ = 0.0f;            ///< 图传坐标系绕 Z 轴到底盘坐标系的旋转角度，右手定则判定正反向，单位 rad
 
   // cap fdb data 在 update 函数中更新
@@ -270,7 +301,8 @@ class Chassis : public Fsm
   // 各组件指针
   // 无通信功能的组件指针
   ChassisIkSolver *ik_solver_ptr_ = nullptr;                ///< 逆解算器指针
-  MultiNodesPid *wheel_pid_ptr_[kWheelPidNum] = {nullptr};  ///< PID 指针
+  MultiNodesPid *wheel_pid_ptr_[kWheelPidNum] = {nullptr};  ///<轮电机 PID 指针
+  MultiNodesPid *steer_pid_ptr_[kSteerPidNum] = {nullptr};  ///<舵电机 PID 指针
   MultiNodesPid *follow_omega_pid_ptr_ = nullptr;           ///< 跟随模式下角速度 PID 指针
   PwrLimiter *pwr_limiter_ptr_ = nullptr;
   // 只接收数据的组件指针
@@ -278,7 +310,8 @@ class Chassis : public Fsm
   Motor *yaw_motor_ptr_ = nullptr;            ///< 云台电机指针 接收、发送数据
   // 接收、发送数据的组件指针
   Cap *cap_ptr_ = nullptr;                              ///< 超电指针 接收、发送数据
-  Motor *wheel_motor_ptr_[kWheelMotorNum] = {nullptr};  ///< 电机指针 接收、发送数据 【YAW 只接收数据】
+  Motor *wheel_motor_ptr_[kWheelMotorNum] = {nullptr};  ///< 轮电机指针 接收、发送数据 【YAW 只接收数据】
+  Motor *steer_motor_ptr_[kSteerMotorNum] = {nullptr};  ///< 舵电机指针 接收、发送数据 【YAW 只接收数据】
 };
 
 /* Exported variables --------------------------------------------------------*/
