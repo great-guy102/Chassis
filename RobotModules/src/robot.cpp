@@ -21,7 +21,7 @@ namespace robot
 {
 /* Private constants ---------------------------------------------------------*/
 const hello_world::referee::RobotPerformanceData kDefaultRobotPerformanceData = {
-    .robot_id = hello_world::referee::ids::RobotId::kRobotRedHero,  ///< 本机器人ID
+    .robot_id = hello_world::referee::ids::RobotId::kRobotRedStandard3,  ///< 本机器人ID
 
     .robot_level = 0,   ///< 机器人等级
     .current_hp = 200,  ///< 机器人当前血量
@@ -247,7 +247,7 @@ void Robot::genModulesCmdFromRc()
     // * 左上
     chassis_working_mode = Chassis::WorkingMode::Depart;
     feed_ctrl_mode = CtrlMode::Auto;
-    gimbal_working_mode = Gimbal::WorkingMode::Farshoot;
+    gimbal_working_mode = Gimbal::WorkingMode::Normal;
     gimbal_ctrl_mode = CtrlMode::Auto;
     shoot_flag = (rc_wheel > 0.9f);
     shooter_working_mode = Shooter::WorkingMode::Normal;
@@ -334,12 +334,13 @@ void Robot::genModulesCmdFromKb()
   } else if (rc_ptr_->key_E()) {
     chassis_working_mode = Chassis::WorkingMode::Follow;
   } else if (rc_ptr_->key_X()) {
-    chassis_working_mode = Chassis::WorkingMode::Farshoot;
-    gimbal_working_mode = Gimbal::WorkingMode::Farshoot;
+    // chassis_working_mode = Chassis::WorkingMode::Farshoot;
+    // gimbal_working_mode = Gimbal::WorkingMode::Farshoot;
   } else {
-    if (chassis_working_mode == Chassis::WorkingMode::Farshoot) {
-      chassis_working_mode = chassis_ptr_->getLastWorkingMode();
-    } else if (chassis_working_mode == Chassis::WorkingMode::Depart) {
+    // if (chassis_working_mode == Chassis::WorkingMode::Farshoot) {
+    //   chassis_working_mode = chassis_ptr_->getLastWorkingMode();
+    // } else 
+    if (chassis_working_mode == Chassis::WorkingMode::Depart) {
       chassis_working_mode = Chassis::WorkingMode::Follow;
     }
   }
@@ -522,6 +523,7 @@ void Robot::sendCommData()
 void Robot::sendCanData()
 {
   sendWheelsMotorData();
+  sendSteersMotorData();
   if (work_tick_ % 10 == 0) {
     sendCapData();
   }
@@ -547,13 +549,40 @@ void Robot::sendWheelsMotorData()
   for (size_t i = 0; i < 4; i++) {
     WheelMotorIdx midx = motor_idx[i];
     dev_ptr = motor_wheels_ptr_[midx];
-    HW_ASSERT(dev_ptr != nullptr, "Motor pointer %d is null", midx);
+    HW_ASSERT(dev_ptr != nullptr, "Wheel Motor pointer %d is null", midx);
     if (dev_ptr == nullptr) {
       continue;
     }
     tx_dev_mgr_pairs_[(uint32_t)tx_dev_idx[i]].setTransmitterNeedToTransmit();
   }
 };
+
+void Robot::sendSteersMotorData()
+{
+  SteerMotorIdx motor_idx[4] = {
+    kSteerMotorIdxLeftFront,   
+    kSteerMotorIdxLeftRear,    
+    kSteerMotorIdxRightRear,   
+    kSteerMotorIdxRightFront,  
+  };
+  TxDevIdx tx_dev_idx[4] = {
+    TxDevIdx::kMotorSteerLeftFront,   
+    TxDevIdx::kMotorSteerLeftRear,    
+    TxDevIdx::kMotorSteerRightRear,   
+    TxDevIdx::kMotorSteerRightFront,  
+  };
+  Motor *dev_ptr = nullptr;
+  for (size_t i = 0; i < 4; i++) {
+    SteerMotorIdx midx = motor_idx[i];
+    dev_ptr = motor_steers_ptr_[midx];
+    HW_ASSERT(dev_ptr != nullptr, "Steer Motor pointer %d is null", midx);
+    if (dev_ptr == nullptr) {
+      continue;
+    }
+    tx_dev_mgr_pairs_[(uint32_t)tx_dev_idx[i]].setTransmitterNeedToTransmit();
+  }
+}
+
 void Robot::sendCapData()
 {
   HW_ASSERT(cap_ptr_ != nullptr, "Cap pointer is null", cap_ptr_);
@@ -620,8 +649,8 @@ void Robot::registerImu(Imu *ptr)
 
 void Robot::registerMotorWheels(Motor *dev_ptr, uint8_t idx, CanTxMgr *tx_mgr_ptr)
 {
-  HW_ASSERT(dev_ptr != nullptr, "Motor pointer is null", dev_ptr);
-  HW_ASSERT(idx >= 0 && idx < kWheelMotorNum, "Motor index is out of range", idx);
+  HW_ASSERT(dev_ptr != nullptr, "Wheel Motor pointer is null", dev_ptr);
+  HW_ASSERT(idx >= 0 && idx < kWheelMotorNum, "Wheel Motor index is out of range", idx);
   if (dev_ptr == nullptr || idx >= kWheelMotorNum || motor_wheels_ptr_[idx] == dev_ptr || tx_mgr_ptr == nullptr) {
     return;
   }
@@ -641,6 +670,31 @@ void Robot::registerMotorWheels(Motor *dev_ptr, uint8_t idx, CanTxMgr *tx_mgr_pt
   tx_dev_mgr_pairs_[(uint32_t)tidx[idx]].transmitter_ptr_ = dev_ptr;
   tx_dev_mgr_pairs_[(uint32_t)tidx[idx]].tx_mgr_ptr_ = tx_mgr_ptr;
 };
+
+void Robot::registerMotorSteers(Motor *dev_ptr, uint8_t idx, CanTxMgr *tx_mgr_ptr)
+{
+  HW_ASSERT(dev_ptr != nullptr, "Steer Motor pointer is null", dev_ptr);
+  HW_ASSERT(idx >= 0 && idx < kSteerMotorNum, "Steer Motor index is out of range", idx);
+  if (dev_ptr == nullptr || idx >= kSteerMotorNum || motor_steers_ptr_[idx] == dev_ptr || tx_mgr_ptr == nullptr) {
+    return;
+  }
+  SteerMotorIdx midx[4] = {
+      SteerMotorIdx::kSteerMotorIdxLeftFront,
+      SteerMotorIdx::kSteerMotorIdxLeftRear,
+      SteerMotorIdx::kSteerMotorIdxRightRear,
+      SteerMotorIdx::kSteerMotorIdxRightFront,
+  };
+  TxDevIdx tidx[4] = {
+      TxDevIdx::kMotorSteerLeftFront,
+      TxDevIdx::kMotorSteerLeftRear,
+      TxDevIdx::kMotorSteerRightRear,
+      TxDevIdx::kMotorSteerRightFront,
+  };
+  motor_steers_ptr_[midx[idx]] = dev_ptr;
+  tx_dev_mgr_pairs_[(uint32_t)tidx[idx]].transmitter_ptr_ = dev_ptr;
+  tx_dev_mgr_pairs_[(uint32_t)tidx[idx]].tx_mgr_ptr_ = tx_mgr_ptr;
+}
+
 void Robot::registerCap(Cap *dev_ptr, CanTxMgr *tx_mgr_ptr)
 {
   HW_ASSERT(dev_ptr != nullptr, "Cap pointer is null", dev_ptr);
@@ -653,6 +707,7 @@ void Robot::registerCap(Cap *dev_ptr, CanTxMgr *tx_mgr_ptr)
   tx_dev_mgr_pairs_[(uint32_t)TxDevIdx::kCap].transmitter_ptr_ = dev_ptr;
   tx_dev_mgr_pairs_[(uint32_t)TxDevIdx::kCap].tx_mgr_ptr_ = tx_mgr_ptr;
 };
+
 void Robot::registerGimbalChassisComm(GimbalChassisComm *dev_ptr, CanTxMgr *tx_mgr_ptr)
 {
   HW_ASSERT(dev_ptr != nullptr, "GimbalChassisComm pointer is null", dev_ptr);
