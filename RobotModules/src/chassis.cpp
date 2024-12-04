@@ -221,9 +221,10 @@ void Chassis::runOnResurrection()
 void Chassis::runOnWorking()
 {
   revNormCmd();
-  calcWheelSpeedRef();
-  calcWheelLimitedSpeedRef();
+  calcMotorsRef();
+  // calcWheelLimitedSpeedRef();
   calcWheelCurrentRef();
+  calcSteerVoltageRef();
   setCommData(true);
 };
 
@@ -283,7 +284,8 @@ void Chassis::revNormCmd()
 
   setCmdSmoothly(cmd, beta);
 };
-void Chassis::calcWheelSpeedRef()
+
+void Chassis::calcMotorsRef()
 {
   // 底盘坐标系下，x轴正方向为底盘正前方，y轴正方向为底盘正左方，z轴正方向为底盘正上方
   // 轮子顺序按照象限顺序进行编号：左前，左后，右后，右前
@@ -292,7 +294,9 @@ void Chassis::calcWheelSpeedRef()
   float theta_i2r = theta_i2r_;
   ik_solver_ptr_->solve(move_vec, theta_i2r, nullptr);
   ik_solver_ptr_->getRotSpdAll(wheel_speed_ref_);
+  ik_solver_ptr_->getThetaVelRefAll(steer_angle_ref_);
 };
+
 void Chassis::calcWheelLimitedSpeedRef()
 {
   hello_world::power_limiter::PwrLimitRuntimeParams runtime_params = {
@@ -341,20 +345,37 @@ void Chassis::calcWheelCurrentRef()
   MultiNodesPid *pid_ptr = nullptr;
   for (size_t i = 0; i < 4; i++) {
     pid_ptr = wheel_pid_ptr_[wpis[i]];
-    HW_ASSERT(pid_ptr != nullptr, "pointer to PID %d is nullptr", wpis[i]);
-    pid_ptr->calc(&wheel_speed_ref_limited_[i], &wheel_speed_fdb_[i], nullptr, &wheel_current_ref_[i]);
-    // pid_ptr->calc(&wheel_speed_ref_[i], &wheel_speed_fdb_[i], nullptr, &wheel_current_ref_[i]);
+    HW_ASSERT(pid_ptr != nullptr, "pointer to Wheel PID %d is nullptr", wpis[i]);
+    // pid_ptr->calc(&wheel_speed_ref_limited_[i], &wheel_speed_fdb_[i], nullptr, &wheel_current_ref_[i]);
+    pid_ptr->calc(&wheel_speed_ref_[i], &wheel_speed_fdb_[i], nullptr, &wheel_current_ref_[i]);
   }
   
   // DEBUG:
   wheel_speed_fdb_debug = wheel_speed_fdb_[3];
   wheel_speed_ref_debug = wheel_speed_ref_limited_[3];
 };
-
 void Chassis::calcWheelCurrentLimited() {
 };
-void Chassis::calcWheelRawInput() {
-};
+
+void Chassis::calcSteerVoltageRef()
+{
+  SteerPidIdx spis[4] = {
+      kSteerPidIdxLeftFront,
+      kSteerPidIdxLeftRear,
+      kSteerPidIdxRightRear,
+      kSteerPidIdxRightFront,
+  };
+
+    MultiNodesPid *pid_ptr = nullptr;
+  for (size_t i = 0; i < 4; i++) {
+    pid_ptr = steer_pid_ptr_[spis[i]];
+    HW_ASSERT(pid_ptr != nullptr, "pointer to Steer PID %d is nullptr", spis[i]);
+
+    float steer_motor_fdb[2] = {steer_angle_fdb_[i], steer_speed_fdb_[i]}; //TODO滤波处理速度
+
+    pid_ptr->calc(&steer_angle_ref_[i], steer_motor_fdb, nullptr, &steer_voltage_ref_[i]);
+  }
+}
 
 #pragma endregion
 

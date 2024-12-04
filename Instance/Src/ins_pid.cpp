@@ -21,7 +21,7 @@
 const float kMaxPidOutWheel = 16384.0f;  ///< 3508电流控制的最大输出
 const float kMaxPidOutSteerAngle = 38.0f;  ///< 6020电流控制的角度环限幅
 const float kMaxPidOutSteerVel = 30000.0f;  ///< 速度环限幅
-const float kMaxPidOutFollowOmega = 1.0f;
+const float kMaxPidOutFollowOmega = 35.0f;
 
 const hw_pid::OutLimit kOutLimitWheel = hw_pid::OutLimit(true, -kMaxPidOutWheel, kMaxPidOutWheel);
 const hw_pid::OutLimit kOutLimitSteerAngle = hw_pid::OutLimit(true, -kMaxPidOutSteerAngle, kMaxPidOutSteerAngle);
@@ -63,11 +63,12 @@ const hw_pid::MultiNodesPid::ParamsList kPidParamsSteer = {
 const hw_pid::MultiNodesPid::ParamsList kPidParamsFollowOmega = {
     {
      .auto_reset = true,
-     .kp = 0.7,
+     .kp = 6.0,
      .ki = 0,
-     .kd = 0,
-     .setpoint_ramping = hw_pid::SetpointRamping(false, -0.1, 1.0, 0.1),
+     .kd = 5.0,
+     .setpoint_ramping = hw_pid::SetpointRamping(false, -0.1, 0.1, 0.1),
      .period_sub = hw_pid::PeriodSub(true, 2 * PI),
+     .inte_anti_windup = hw_pid::InteAntiWindup(true, -10.00, 10.00),
      .out_limit = kOutLimitFollowOmega,
      },
     //  这个双环不一定有用，拿的是YAW轴电机速度

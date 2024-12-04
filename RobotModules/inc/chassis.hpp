@@ -18,6 +18,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include <cmath>
+#include <stdint.h>
 
 #include "allocator.hpp"
 #include "chassis_iksolver.hpp"
@@ -218,12 +219,12 @@ class Chassis : public Fsm
 
   // 工作状态下，获取控制指令的函数
   void revNormCmd();
-  void calcWheelSpeedRef();
+  void calcMotorsRef();
   void calcWheelLimitedSpeedRef();
   void calcPwrLimitedCurrentRef();
   void calcWheelCurrentRef();
   void calcWheelCurrentLimited();
-  void calcWheelRawInput();
+  void calcSteerVoltageRef();
 
   // 重置数据函数
   void resetDataOnDead();
