@@ -217,16 +217,20 @@ static void PrivatePointerInit(void)
 static void CommAddReceiver(void)
 {
   HW_ASSERT(can1_rx_mgr_ptr != nullptr, "can1_rx_mgr_ptr is nullptr", can1_rx_mgr_ptr);
-  can1_rx_mgr_ptr->addReceiver(GetGimbalChassisComm());
-  can1_rx_mgr_ptr->addReceiver(GetMotorYaw());  // 用于底盘控制，只接受消息
+  can1_rx_mgr_ptr->addReceiver(GetCap());
+  can1_rx_mgr_ptr->addReceiver(GetMotorSteerLeftFront());
+  can1_rx_mgr_ptr->addReceiver(GetMotorSteerLeftRear());
+  can1_rx_mgr_ptr->addReceiver(GetMotorSteerRightRear());
+  can1_rx_mgr_ptr->addReceiver(GetMotorSteerRightFront());
 
   HW_ASSERT(can2_rx_mgr_ptr != nullptr, "can2_rx_mgr_ptr is nullptr", can2_rx_mgr_ptr);
-  can2_rx_mgr_ptr->addReceiver(GetCap());
+  can2_rx_mgr_ptr->addReceiver(GetGimbalChassisComm());
   can2_rx_mgr_ptr->addReceiver(GetMotorWheelLeftFront());
   can2_rx_mgr_ptr->addReceiver(GetMotorWheelLeftRear());
   can2_rx_mgr_ptr->addReceiver(GetMotorWheelRightRear());
   can2_rx_mgr_ptr->addReceiver(GetMotorWheelRightFront());
-
+  can2_rx_mgr_ptr->addReceiver(GetMotorYaw());  // 用于底盘控制，只接受消息
+  
   HW_ASSERT(rc_rx_mgr_ptr != nullptr, "rc_rx_mgr_ptr is nullptr", rc_rx_mgr_ptr);
   rc_rx_mgr_ptr->addReceiver(GetRemoteControl());
 
@@ -234,13 +238,17 @@ static void CommAddReceiver(void)
   rfr_rx_mgr_ptr->addReceiver(GetReferee());
 }
 
-static void CommAddTransmitter()
+static void CommAddTransmitter(void)
 {
   HW_ASSERT(can1_tx_mgr_ptr != nullptr, "can1_tx_mgr_ptr is nullptr", can1_tx_mgr_ptr);
-  can1_tx_mgr_ptr->addTransmitter(GetGimbalChassisComm());
+  can1_tx_mgr_ptr->addTransmitter(GetCap());
+  can1_tx_mgr_ptr->addTransmitter(GetMotorSteerLeftFront());
+  can1_tx_mgr_ptr->addTransmitter(GetMotorSteerLeftRear());
+  can1_tx_mgr_ptr->addTransmitter(GetMotorSteerRightRear());
+  can1_tx_mgr_ptr->addTransmitter(GetMotorSteerRightFront());
 
   HW_ASSERT(can2_tx_mgr_ptr != nullptr, "can2_tx_mgr_ptr is nullptr", can2_tx_mgr_ptr);
-  can2_tx_mgr_ptr->addTransmitter(GetCap());
+  can2_tx_mgr_ptr->addTransmitter(GetGimbalChassisComm());
   can2_tx_mgr_ptr->addTransmitter(GetMotorWheelLeftFront());
   can2_tx_mgr_ptr->addTransmitter(GetMotorWheelLeftRear());
   can2_tx_mgr_ptr->addTransmitter(GetMotorWheelRightRear());
