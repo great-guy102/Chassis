@@ -76,9 +76,6 @@ void CommTask(void)
 {
   HW_ASSERT(can1_tx_mgr_ptr != nullptr, "can1_tx_mgr_ptr is nullptr", can1_tx_mgr_ptr);
   HW_ASSERT(can2_tx_mgr_ptr != nullptr, "can2_tx_mgr_ptr is nullptr", can2_tx_mgr_ptr);
-  if (can1_tx_mgr_ptr == nullptr || can2_tx_mgr_ptr == nullptr) {
-    return;
-  }
   can1_tx_mgr_ptr->startTransmit();
   can2_tx_mgr_ptr->startTransmit();
 };
@@ -87,9 +84,6 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef* hcan)
 {
   HW_ASSERT(can1_rx_mgr_ptr != nullptr, "can1_rx_mgr_ptr is nullptr", can1_rx_mgr_ptr);
   HW_ASSERT(can2_rx_mgr_ptr != nullptr, "can2_rx_mgr_ptr is nullptr", can2_rx_mgr_ptr);
-  if (can1_rx_mgr_ptr == nullptr || can2_rx_mgr_ptr == nullptr) {
-    return;
-  }
   can1_rx_mgr_ptr->rxFifoMsgPendingCallback(hcan);
   can2_rx_mgr_ptr->rxFifoMsgPendingCallback(hcan);
 }
@@ -98,9 +92,6 @@ void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef* hcan)
 {
   HW_ASSERT(can1_rx_mgr_ptr != nullptr, "can1_rx_mgr_ptr is nullptr", can1_rx_mgr_ptr);
   HW_ASSERT(can2_rx_mgr_ptr != nullptr, "can2_rx_mgr_ptr is nullptr", can2_rx_mgr_ptr);
-  if (can1_rx_mgr_ptr == nullptr || can2_rx_mgr_ptr == nullptr) {
-    return;
-  }
   can1_rx_mgr_ptr->rxFifoMsgPendingCallback(hcan);
   can2_rx_mgr_ptr->rxFifoMsgPendingCallback(hcan);
 }
@@ -109,9 +100,6 @@ void HAL_CAN_TxMailbox0CompleteCallback(CAN_HandleTypeDef* hcan)
 {
   HW_ASSERT(can1_tx_mgr_ptr != nullptr, "can1_tx_mgr_ptr is nullptr", can1_tx_mgr_ptr);
   HW_ASSERT(can2_tx_mgr_ptr != nullptr, "can2_tx_mgr_ptr is nullptr", can2_tx_mgr_ptr);
-  if (can1_tx_mgr_ptr == nullptr || can2_tx_mgr_ptr == nullptr) {
-    return;
-  }
   can1_tx_mgr_ptr->txMailboxCompleteCallback(hcan);
   can2_tx_mgr_ptr->txMailboxCompleteCallback(hcan);
 }
@@ -120,9 +108,6 @@ void HAL_CAN_TxMailbox1CompleteCallback(CAN_HandleTypeDef* hcan)
 {
   HW_ASSERT(can1_tx_mgr_ptr != nullptr, "can1_tx_mgr_ptr is nullptr", can1_tx_mgr_ptr);
   HW_ASSERT(can2_tx_mgr_ptr != nullptr, "can2_tx_mgr_ptr is nullptr", can2_tx_mgr_ptr);
-  if (can1_tx_mgr_ptr == nullptr || can2_tx_mgr_ptr == nullptr) {
-    return;
-  }
   can1_tx_mgr_ptr->txMailboxCompleteCallback(hcan);
   can2_tx_mgr_ptr->txMailboxCompleteCallback(hcan);
 }
@@ -131,9 +116,6 @@ void HAL_CAN_TxMailbox2CompleteCallback(CAN_HandleTypeDef* hcan)
 {
   HW_ASSERT(can1_tx_mgr_ptr != nullptr, "can1_tx_mgr_ptr is nullptr", can1_tx_mgr_ptr);
   HW_ASSERT(can2_tx_mgr_ptr != nullptr, "can2_tx_mgr_ptr is nullptr", can2_tx_mgr_ptr);
-  if (can1_tx_mgr_ptr == nullptr || can2_tx_mgr_ptr == nullptr) {
-    return;
-  }
   can1_tx_mgr_ptr->txMailboxCompleteCallback(hcan);
   can2_tx_mgr_ptr->txMailboxCompleteCallback(hcan);
 }
@@ -142,9 +124,6 @@ void HAL_CAN_ErrorCallback(CAN_HandleTypeDef* hcan)
 {
   HW_ASSERT(can1_tx_mgr_ptr != nullptr, "can1_tx_mgr_ptr is nullptr", can1_tx_mgr_ptr);
   HW_ASSERT(can2_tx_mgr_ptr != nullptr, "can2_tx_mgr_ptr is nullptr", can2_tx_mgr_ptr);
-  if (can1_tx_mgr_ptr == nullptr || can2_tx_mgr_ptr == nullptr) {
-    return;
-  }
   can1_tx_mgr_ptr->errorCallback(hcan);
   can2_tx_mgr_ptr->errorCallback(hcan);
 }
