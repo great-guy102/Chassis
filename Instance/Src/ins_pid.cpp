@@ -31,7 +31,7 @@ const hw_pid::OutLimit kOutLimitFollowOmega = hw_pid::OutLimit(true, -kMaxPidOut
 const hw_pid::MultiNodesPid::ParamsList kPidParamsWheel = {
     {
         .auto_reset = true,  ///< 是否自动清零
-        .kp = 1300.0f,
+        .kp = 1500.0f,
         .ki = 0.0f,
         .kd = 0.0f,
         .inte_anti_windup = hw_pid::InteAntiWindup(true, -10000.0, 10000.0),
@@ -42,17 +42,16 @@ const hw_pid::MultiNodesPid::ParamsList kPidParamsWheel = {
 const hw_pid::MultiNodesPid::ParamsList kPidParamsSteer = {
     {
         .auto_reset = false,  ///< 是否自动清零
-        .kp = 60.0f,         // 16
+        .kp = 120.0f,         // 16
         .ki = 0.0f,
         .kd = 0.0f,
         .setpoint_ramping = hw_pid::SetpointRamping(false, -0.1, 0.1, 0.1),
         .period_sub = hw_pid::PeriodSub(true, 2.0 * PI),
         .out_limit = kOutLimitSteerAngle,
     },
-
     {
         .auto_reset = false,  ///< 是否自动清零
-        .kp = 1400.0f,          // 1200.0f,
+        .kp = 600.0f,          // 1200.0f,
         .ki = 0.0f,          // 3.5
         .kd = 0.0f,          // 100
         .setpoint_ramping = hw_pid::SetpointRamping(true, -10, 10, 0.95),
