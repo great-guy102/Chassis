@@ -41,7 +41,7 @@ hw_motor::OptionalParams kSteerMotorParams = {
     .max_curr_input_lim = 1.62                      // 电流输入限制为0.2A
 };
 
-//舵电机零位设置
+// //舵电机零位设置
 // const float steer_motor_offset[4] = {2.09644055, 
 //                                     -3.11436129, 
 //                                     -3.13814092, 
@@ -60,7 +60,7 @@ const hw_motor::OptionalParams kYawMotorParams = {
     /** 是否移除电机自带的减速器 */
     .remove_build_in_reducer = false,
     /** 电机输出端实际角度与规定角度的差值 */
-    .angle_offset = 0.0f,
+    .angle_offset = -1.5166986,
     /** 电机外置减速器的减速比（额外） */
     // .ex_redu_rat = 14,
 };
