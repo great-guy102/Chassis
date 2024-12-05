@@ -62,9 +62,9 @@ const hw_pid::MultiNodesPid::ParamsList kPidParamsSteer = {
 const hw_pid::MultiNodesPid::ParamsList kPidParamsFollowOmega = {
     {
      .auto_reset = true,
-     .kp = 6.0,
+     .kp = 0.1, //待优化舵轮逻辑后调整
      .ki = 0,
-     .kd = 5.0,
+     .kd = 0.0,
      .setpoint_ramping = hw_pid::SetpointRamping(false, -0.1, 0.1, 0.1),
      .period_sub = hw_pid::PeriodSub(true, 2 * PI),
      .inte_anti_windup = hw_pid::InteAntiWindup(true, -10.00, 10.00),
