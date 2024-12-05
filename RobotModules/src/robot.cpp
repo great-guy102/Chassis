@@ -522,13 +522,17 @@ void Robot::sendCommData()
 };
 void Robot::sendCanData()
 {
-  sendWheelsMotorData();
   sendSteersMotorData();
   if (work_tick_ % 10 == 0) {
     sendCapData();
   }
-  if (work_tick_ > 1010) {
-    sendGimbalChassisCommData();
+  if (work_tick_ % 2 == 0) {
+    sendWheelsMotorData();
+  }
+  else if(work_tick_ % 2 == 1) {
+    if (work_tick_ > 1000) {
+      sendGimbalChassisCommData();
+    }
   }
 };
 void Robot::sendWheelsMotorData()
