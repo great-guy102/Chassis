@@ -48,6 +48,7 @@ robot::Chassis* GetChassis()
     unique_chassis.registerWheelPid(GetPidMotorWheelLeftRear(), robot::Chassis::kWheelPidIdxLeftRear);
     unique_chassis.registerWheelPid(GetPidMotorWheelRightRear(), robot::Chassis::kWheelPidIdxRightRear);
     unique_chassis.registerWheelPid(GetPidMotorWheelRightFront(), robot::Chassis::kWheelPidIdxRightFront);
+
     unique_chassis.registerSteerPid(GetPidMotorSteerLeftFront(), robot::Chassis::kSteerPidIdxLeftFront);
     unique_chassis.registerSteerPid(GetPidMotorSteerLeftRear(), robot::Chassis::kSteerPidIdxLeftRear);
     unique_chassis.registerSteerPid(GetPidMotorSteerRightRear(), robot::Chassis::kSteerPidIdxRightRear);
@@ -101,17 +102,18 @@ robot::Robot* GetRobot()
     // 只接收数据的组件指针
     unique_robot.registerRc(GetRemoteControl());
     // 只发送数据的组件指针
-    unique_robot.registerCap(GetCap(), GetCan2TxMgr());
-    unique_robot.registerMotorWheels(GetMotorWheelLeftFront(), robot::Robot::kWheelMotorIdxLeftFront, GetCan2TxMgr());
-    unique_robot.registerMotorWheels(GetMotorWheelLeftRear(), robot::Robot::kWheelMotorIdxLeftRear, GetCan2TxMgr());
-    unique_robot.registerMotorWheels(GetMotorWheelRightRear(), robot::Robot::kWheelMotorIdxRightRear, GetCan2TxMgr());
-    unique_robot.registerMotorWheels(GetMotorWheelRightFront(), robot::Robot::kWheelMotorIdxRightFront, GetCan2TxMgr());
+    unique_robot.registerCap(GetCap(), GetCan1TxMgr());
     unique_robot.registerMotorSteers(GetMotorSteerLeftFront(), robot::Robot::kSteerMotorIdxLeftFront, GetCan1TxMgr());
     unique_robot.registerMotorSteers(GetMotorSteerLeftRear(), robot::Robot::kSteerMotorIdxLeftRear, GetCan1TxMgr());
     unique_robot.registerMotorSteers(GetMotorSteerRightRear(), robot::Robot::kSteerMotorIdxRightRear, GetCan1TxMgr());
     unique_robot.registerMotorSteers(GetMotorSteerRightFront(), robot::Robot::kSteerMotorIdxRightFront, GetCan1TxMgr());
+
+    unique_robot.registerMotorWheels(GetMotorWheelLeftFront(), robot::Robot::kWheelMotorIdxLeftFront, GetCan2TxMgr());
+    unique_robot.registerMotorWheels(GetMotorWheelLeftRear(), robot::Robot::kWheelMotorIdxLeftRear, GetCan2TxMgr());
+    unique_robot.registerMotorWheels(GetMotorWheelRightRear(), robot::Robot::kWheelMotorIdxRightRear, GetCan2TxMgr());
+    unique_robot.registerMotorWheels(GetMotorWheelRightFront(), robot::Robot::kWheelMotorIdxRightFront, GetCan2TxMgr());
     // 收发数据的组件指针
-    unique_robot.registerGimbalChassisComm(GetGimbalChassisComm(), GetCan1TxMgr());
+    unique_robot.registerGimbalChassisComm(GetGimbalChassisComm(), GetCan2TxMgr());
     unique_robot.registerReferee(GetReferee(), GetRfrTxMgr());
 
     unique_robot.registerPerformancePkg(GetRobotPerformancePackage());
