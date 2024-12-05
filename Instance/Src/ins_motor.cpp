@@ -42,10 +42,16 @@ hw_motor::OptionalParams kSteerMotorParams = {
 };
 
 //舵电机零位设置
-const float steer_motor_offset[4] = {2.09644055, 
-                                    -3.11436129, 
-                                    -3.13814092, 
-                                    -1.03863168};
+// const float steer_motor_offset[4] = {2.09644055, 
+//                                     -3.11436129, 
+//                                     -3.13814092, 
+//                                     -1.03863168};
+
+//白车
+const float steer_motor_offset[4] = {2.61345506,
+                                     1.07315087,
+                                    -3.13430548,
+                                    -1.55641353};
 
 const hw_motor::OptionalParams kYawMotorParams = {
     .input_type = hw_motor::InputType::kTorq,
