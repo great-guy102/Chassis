@@ -112,16 +112,16 @@ void Chassis::updateMotor()
   Motor *wheel_motor_ptr = nullptr;
   Motor *steer_motor_ptr = nullptr;
   WheelMotorIdx wmis[4] = {
-      kWheelMotorIdxLeftFront,
-      kWheelMotorIdxLeftRear,
-      kWheelMotorIdxRightRear,
-      kWheelMotorIdxRightFront,
+    kWheelMotorIdxLeftFront,
+    kWheelMotorIdxLeftRear,
+    kWheelMotorIdxRightRear,
+    kWheelMotorIdxRightFront,
   };
   SteerMotorIdx smis[4] = {
-      kSteerMotorIdxLeftFront,
-      kSteerMotorIdxLeftRear,
-      kSteerMotorIdxRightRear,
-      kSteerMotorIdxRightFront,
+    kSteerMotorIdxLeftFront,
+    kSteerMotorIdxLeftRear,
+    kSteerMotorIdxRightRear,
+    kSteerMotorIdxRightFront,
   };
   bool is_all_wheel_online = true;
   bool is_any_wheel_online = false;
@@ -349,10 +349,6 @@ void Chassis::calcWheelCurrentRef()
     // pid_ptr->calc(&wheel_speed_ref_limited_[i], &wheel_speed_fdb_[i], nullptr, &wheel_current_ref_[i]);
     pid_ptr->calc(&wheel_speed_ref_[i], &wheel_speed_fdb_[i], nullptr, &wheel_current_ref_[i]);
   }
-  
-  // DEBUG:
-  wheel_speed_fdb_debug = wheel_speed_fdb_[3];
-  wheel_speed_ref_debug = wheel_speed_ref_limited_[3];
 };
 void Chassis::calcWheelCurrentLimited() {
 };
@@ -555,13 +551,18 @@ void Chassis::setCommDataMotors(bool working_flag)
     HW_ASSERT(wheel_motor_ptr != nullptr, "pointer to wheel motor %d is nullptr", wmi);
     HW_ASSERT(steer_motor_ptr != nullptr, "pointer to steer motor %d is nullptr", smi);
 
-    if (!working_flag || wheel_motor_ptr->isOffline() || steer_motor_ptr->isOffline()) {
+    if (!working_flag || wheel_motor_ptr->isOffline()) {
       wheel_pid_ptr->reset();
-      steer_pid_ptr->reset();
       wheel_motor_ptr->setInput(0);
+    } else {
+      // wheel_motor_ptr->setInput(0); //TODO调试
+      wheel_motor_ptr->setInput(wheel_current_ref_[wmi]);
+    }
+
+    if (!working_flag ||steer_motor_ptr->isOffline()) {
+      steer_pid_ptr->reset();
       steer_motor_ptr->setInput(0);
     } else {
-      wheel_motor_ptr->setInput(wheel_current_ref_[wmi]);
       steer_motor_ptr->setInput(steer_voltage_ref_[smi]);
     }
   }
