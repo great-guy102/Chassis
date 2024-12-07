@@ -50,6 +50,9 @@ include("${HWC_DIR}/config.cmake") # Default configuration
 # TODO: Overwrite default configuration instead of changing it in file tools
 # set(use_hwcomponents_tools ON) set(use_prebuilt_hwcomponents_tools OFF)
 # set(... ON)
+set(use_hwcomponents_algorithms_ik_solver_chassis ON)
+set(use_prebuilt_hwcomponents_algorithms_ik_solver_chassis OFF)
+set(CHASSIS_IKSOLVER_USE_ARM_MATH ON)
 
 # TODO: Add your own `config.cmake` file or set your own configuration here
 

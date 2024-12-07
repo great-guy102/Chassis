@@ -92,7 +92,8 @@ struct ChassisRfrData {
 
 struct ChassisConfig {
   float normal_trans_vel;  ///< 正常平移速度
-  float normal_rot_spd;    ///< 正常旋转速度
+  float gyro_rot_spd;      ///< 小陀螺旋转速度
+  float yaw_sensitivity;   ///< 跟随前馈灵敏度
   float max_trans_vel;     ///< 最大平移速度
   float max_rot_spd;       ///< 最大旋转速度
 };
@@ -190,6 +191,7 @@ class Chassis : public Fsm
     }
   }
   void setGyroDir(GyroDir dir) { gyro_dir_ = dir; }
+  void setOmegaFeedforward(float omega) { omega_feedforward_ = omega; }
   void setUseCapFlag(bool flag) { use_cap_flag_ = flag; }
   bool getUseCapFlag() const { return use_cap_flag_; }
 
@@ -263,12 +265,17 @@ class Chassis : public Fsm
   WorkingMode working_mode_ = WorkingMode::Depart;       ///< 工作模式
   WorkingMode last_working_mode_ = WorkingMode::Depart;  ///< 上一次工作模式
 
+  //debug用数据
+  float theta_vel_delta_debug_ = 0.0f;
+  float rot_spd_dir_debug_ = 0.0f;
+  
   // 在 update 函数中更新的数据
   bool is_power_on_ = false;        ///< 底盘电源是否开启
   uint32_t last_pwr_off_tick_ = 0;  ///< 上一次底盘电源处于关闭状态的时间戳，单位为 ms，实际上是作为上电瞬间的记录
 
   // 在 runOnWorking 函数中更新的数据
   Cmd cmd_ = {0}, last_cmd_ = {0};          ///< 控制指令，基于图传坐标系
+  float omega_feedforward_ = 0;             ///< 云台 YAW 轴角速度，单位 rad/s
   float wheel_speed_ref_[4] = {0};          ///< 轮电机的速度参考值 单位 rad/s
   float wheel_speed_ref_limited_[4] = {0};  ///< 轮电机的速度参考值(限幅后) 单位 rad/s
   float wheel_current_ref_[4] = {0};        ///< 轮电机的电流参考值 单位 A [-20, 20]

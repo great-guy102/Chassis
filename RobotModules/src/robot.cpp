@@ -298,6 +298,9 @@ void Robot::genModulesCmdFromRc()
   chassis_cmd.v_y = hello_world::Bound(-rc_ptr_->rc_rh(), -1, 1);
   chassis_cmd.w = 0;
   chassis_ptr_->setNormCmd(chassis_cmd);
+ 
+  float omega_feedforward = hello_world::Bound(-rc_ptr_->rc_lh(), -1, 1);;
+  chassis_ptr_->setOmegaFeedforward(omega_feedforward);
 
   gimbal_ptr_->setCtrlMode(gimbal_ctrl_mode);
   gimbal_ptr_->setWorkingMode(gimbal_working_mode);

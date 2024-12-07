@@ -16,10 +16,11 @@
 #include "ins_all.hpp"
 /* Private constants ---------------------------------------------------------*/
 const robot::Chassis::Config kChassisConfig = {
-    .normal_trans_vel = 3.0f,  ///< 正常平移速度
-    .normal_rot_spd = 2 * PI,  ///< 正常旋转速度
-    .max_trans_vel = 5.0f,     ///< 最大平移速度 
-    .max_rot_spd = 3 * PI,     ///< 最大旋转速度
+    .normal_trans_vel = 3.0f,                 ///< 正常平移速度
+    .gyro_rot_spd = 2 * PI,                   ///< 小陀螺旋转速度
+    .yaw_sensitivity = 2 * PI,                ///< YAW 轴灵敏度(单位：rad/s)
+    .max_trans_vel = 5.0f,                    ///< 最大平移速度 
+    .max_rot_spd = 3 * PI,                    ///< 最大旋转速度
 };
 /* Private macro -------------------------------------------------------------*/
 /* Private types -------------------------------------------------------------*/

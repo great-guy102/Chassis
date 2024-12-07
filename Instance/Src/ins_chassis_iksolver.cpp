@@ -21,7 +21,11 @@ const float kWheelBase = 0.334;                ///< 左右轮距 [m]
 const float kWheelTrack = 0.334;               ///< 前后轮距 [m]
 
 const hw_chassis_iksolver::PosVec kCenterPos = hw_chassis_iksolver::PosVec(0, 0);
-
+const hw_chassis_iksolver::WheelParams kIkSolverParams = {
+  .opt_mask = hw_chassis_iksolver::SteeredStandardWheel::kOptMaskCosRotSpd | 
+              hw_chassis_iksolver::SteeredStandardWheel::kOptMaskMinThetaVelDelta,
+  .radius = kWheelRadius,
+};
 /* Private macro -------------------------------------------------------------*/
 /* Private types -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
@@ -33,30 +37,25 @@ bool is_chassis_iksolver_init = false;
 
 static void InitChassisIkSolver(void)
 {
-  hw_chassis_iksolver::ChassisIkSolver& iksolver = unique_chassis_iksolver;
-  if (iksolver.size() == 0) {
-    hw_chassis_iksolver::WheelParams ik_solver_params[4] = {0};
-    // 左前轮
-    ik_solver_params[0].theta_vel_fdb = 0;
-    ik_solver_params[0].radius = kWheelRadius;
-    ik_solver_params[0].wheel_pos = hw_chassis_iksolver::PosVec(kWheelTrack / 2, kWheelBase / 2);
-    // 左后轮
-    ik_solver_params[1].theta_vel_fdb = 0;
-    ik_solver_params[1].radius = kWheelRadius;
-    ik_solver_params[1].wheel_pos = hw_chassis_iksolver::PosVec(-kWheelTrack / 2, kWheelBase / 2);
-    // 右后轮
-    ik_solver_params[2].theta_vel_fdb = 0;
-    ik_solver_params[2].radius = kWheelRadius;
-    ik_solver_params[2].wheel_pos = hw_chassis_iksolver::PosVec(-kWheelTrack / 2, -kWheelBase / 2);
+  hw_chassis_iksolver::WheelParams ik_solver_params[4] = {kIkSolverParams,
+                                                          kIkSolverParams,
+                                                          kIkSolverParams,
+                                                          kIkSolverParams,};
+    
+  // 左前轮
+  ik_solver_params[0].wheel_pos = hw_chassis_iksolver::PosVec(kWheelTrack / 2, kWheelBase / 2);
 
-    // 右前轮
-    ik_solver_params[3].theta_vel_fdb = 0;
-    ik_solver_params[3].radius = kWheelRadius;
-    ik_solver_params[3].wheel_pos = hw_chassis_iksolver::PosVec(kWheelTrack / 2, -kWheelBase / 2);
+  // 左后轮
+  ik_solver_params[1].wheel_pos = hw_chassis_iksolver::PosVec(-kWheelTrack / 2, kWheelBase / 2);
 
-    for (int i = 0; i < 4; i++) {
-      iksolver.append(hw_chassis_iksolver::WheelType::kSteeredStandard, ik_solver_params[i]);
-    }
+  // 右后轮
+  ik_solver_params[2].wheel_pos = hw_chassis_iksolver::PosVec(-kWheelTrack / 2, -kWheelBase / 2);
+
+  // 右前轮
+  ik_solver_params[3].wheel_pos = hw_chassis_iksolver::PosVec(kWheelTrack / 2, -kWheelBase / 2);
+
+  for (int i = 0; i < 4; i++) {
+    unique_chassis_iksolver.append(hw_chassis_iksolver::WheelType::kSteeredStandard, ik_solver_params[i]);
   }
 }
 

@@ -48,10 +48,10 @@ hw_motor::OptionalParams kSteerMotorParams = {
 //                                     -1.03863168};
 
 //白车
-const float steer_motor_offset[4] = {2.61345506,
-                                     1.07315087,
-                                    -3.13430548,
-                                    -1.55641353};
+const float steer_motor_offset[4] = {-0.52813754,
+                                     -2.06844183,
+                                      0.00728712,
+                                      1.58517917};
 
 const hw_motor::OptionalParams kYawMotorParams = {
     .input_type = hw_motor::InputType::kTorq,
@@ -60,7 +60,7 @@ const hw_motor::OptionalParams kYawMotorParams = {
     /** 是否移除电机自带的减速器 */
     .remove_build_in_reducer = false,
     /** 电机输出端实际角度与规定角度的差值 */
-    .angle_offset = -1.5166986,
+    .angle_offset = 1.53280616,
     /** 电机外置减速器的减速比（额外） */
     // .ex_redu_rat = 14,
 };

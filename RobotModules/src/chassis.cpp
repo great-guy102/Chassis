@@ -255,17 +255,17 @@ void Chassis::revNormCmd()
       }
     }
     // 小陀螺模式下，旋转分量为定值
-    cmd.w = 1.0f * (int8_t)gyro_dir_;
+    cmd.w = config_.gyro_rot_spd * (int8_t)gyro_dir_;
 
   } else if (working_mode_ == WorkingMode::Follow) {
     // 跟随模式下，更新跟随目标
-    float theta_ref[1] = {0.0f};
-    float theta_fdb[1] = {theta_i2r_};
+    float theta_ref = 0.0f;
+    float theta_fdb = theta_i2r_;
+    float omega_feedforward = config_.yaw_sensitivity * omega_feedforward_;
     if (rev_head_flag_) {
-      theta_ref[0] = PI;
+      theta_ref = PI;
     }
-    follow_omega_pid_ptr_->calc(theta_ref, theta_fdb, nullptr, &cmd.w);
-    cmd.w = hello_world::Bound(cmd.w, -1.0f, 1.0f);
+    follow_omega_pid_ptr_->calc(&theta_ref, &theta_fdb, &omega_feedforward, &cmd.w);
   } 
 
   if (working_mode_ != WorkingMode::Gyro) {
@@ -280,7 +280,7 @@ void Chassis::revNormCmd()
   //TODO：修改限幅逻辑，保证限幅后平移速度方向不变
   cmd.v_x = hello_world::Bound(cmd.v_x * config_.normal_trans_vel, -config_.max_trans_vel, config_.max_trans_vel);
   cmd.v_y = hello_world::Bound(cmd.v_y * config_.normal_trans_vel, -config_.max_trans_vel, config_.max_trans_vel);
-  cmd.w = hello_world::Bound(cmd.w * config_.normal_rot_spd, -config_.max_rot_spd, config_.max_rot_spd);
+  cmd.w = hello_world::Bound(cmd.w, -config_.max_rot_spd, config_.max_rot_spd);
 
   setCmdSmoothly(cmd, beta);
 };
@@ -292,7 +292,7 @@ void Chassis::calcMotorsRef()
   HW_ASSERT(ik_solver_ptr_ != nullptr, "pointer to IK solver is nullptr", ik_solver_ptr_);
   hello_world::chassis_ik_solver::MoveVec move_vec(cmd_.v_x, cmd_.v_y, cmd_.w);
   float theta_i2r = theta_i2r_;
-  ik_solver_ptr_->solve(move_vec, theta_i2r, nullptr);
+  ik_solver_ptr_->solve(move_vec, theta_i2r, steer_angle_fdb_);
   ik_solver_ptr_->getRotSpdAll(wheel_speed_ref_);
   ik_solver_ptr_->getThetaVelRefAll(steer_angle_ref_);
 };
