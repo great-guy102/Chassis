@@ -18,9 +18,10 @@
 #include "motor.hpp"
 
 /* Private constants ---------------------------------------------------------*/
-const float kMaxPidOutWheel = 16384.0f;  ///< 3508电流控制的最大输出
-const float kMaxPidOutSteerAngle = 38.0f;  ///< 6020电流控制的角度环限幅
-const float kMaxPidOutSteerVel = 30000.0f;  ///< 速度环限幅
+// const float kMaxPidOutWheel = 16384.0f;   ///< 3508电流控制的最大输出
+const float kMaxPidOutWheel = 8000.0f;       ///< 3508电流控制的最大输出
+const float kMaxPidOutSteerAngle = 38.0f;    ///< 6020电流控制的角度环限幅
+const float kMaxPidOutSteerVel = 30000.0f;   ///< 速度环限幅
 const float kMaxPidOutFollowOmega = 40.0f;
 
 const hw_pid::OutLimit kOutLimitWheel = hw_pid::OutLimit(true, -kMaxPidOutWheel, kMaxPidOutWheel);
@@ -62,7 +63,7 @@ const hw_pid::MultiNodesPid::ParamsList kPidParamsSteer = {
 const hw_pid::MultiNodesPid::ParamsList kPidParamsFollowOmega = {
     {
      .auto_reset = true,
-     .kp = 10.0, //待优化舵轮逻辑后调整
+     .kp = 8.0, 
      .ki = 0,
      .kd = 0.0,
      .setpoint_ramping = hw_pid::SetpointRamping(false, -0.1, 0.1, 0.1),

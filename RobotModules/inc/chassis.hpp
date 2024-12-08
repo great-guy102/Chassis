@@ -251,6 +251,7 @@ class Chassis : public Fsm
   {
     beta = hello_world::Bound(beta, 0.0, 1.0);
     cmd_ = cmd * beta + (1 - beta) * last_cmd_;
+    last_cmd_ = cmd_;
   };
 
   // 配置参数
