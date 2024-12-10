@@ -196,7 +196,7 @@ static void PrivatePointerInit(void)
 static void CommAddReceiver(void)
 {
   HW_ASSERT(can1_rx_mgr_ptr != nullptr, "can1_rx_mgr_ptr is nullptr", can1_rx_mgr_ptr);
-  can1_rx_mgr_ptr->addReceiver(GetCap());
+  // can1_rx_mgr_ptr->addReceiver(GetCap());//TODO调试
   can1_rx_mgr_ptr->addReceiver(GetMotorSteerLeftFront());
   can1_rx_mgr_ptr->addReceiver(GetMotorSteerLeftRear());
   can1_rx_mgr_ptr->addReceiver(GetMotorSteerRightRear());
@@ -220,7 +220,7 @@ static void CommAddReceiver(void)
 static void CommAddTransmitter(void)
 {
   HW_ASSERT(can1_tx_mgr_ptr != nullptr, "can1_tx_mgr_ptr is nullptr", can1_tx_mgr_ptr);
-  can1_tx_mgr_ptr->addTransmitter(GetCap());
+  // can1_tx_mgr_ptr->addTransmitter(GetCap());TODO调试
   can1_tx_mgr_ptr->addTransmitter(GetMotorSteerLeftFront());
   can1_tx_mgr_ptr->addTransmitter(GetMotorSteerLeftRear());
   can1_tx_mgr_ptr->addTransmitter(GetMotorSteerRightRear());

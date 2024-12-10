@@ -1,6 +1,6 @@
 /** 
  *******************************************************************************
- * @file      : ins_buzzer.cpp
+ * @file      :ins_buzzer.cpp
  * @brief     : 
  * @history   :
  *  Version     Date            Author          Note
@@ -22,26 +22,26 @@ const hw_buzzer::TuneListInfo kTuneListInfo = {
     .tune_duration = 100,
     .list =
         {
-               hw_buzzer::kTuneA3,  hw_buzzer::kTuneA3, hw_buzzer::kTuneE4, hw_buzzer::kTuneE4, hw_buzzer::kTuneE4,  hw_buzzer::kTuneE4, hw_buzzer::kTuneE4,
-               hw_buzzer::kTuneE4,  hw_buzzer::kTuneE4, hw_buzzer::kTuneD4, hw_buzzer::kTuneD4, hw_buzzer::kTuneG4,  hw_buzzer::kTuneG4, hw_buzzer::kTuneD4,
-               hw_buzzer::kTuneE4,  hw_buzzer::kTuneE4, hw_buzzer::kTuneE4, hw_buzzer::kTuneE4, hw_buzzer::kTuneE4,  hw_buzzer::kTuneE4, hw_buzzer::kTuneE4,
-               hw_buzzer::kTuneE4,  hw_buzzer::kTuneE4, hw_buzzer::kTuneE4, hw_buzzer::kTuneD4, hw_buzzer::kTuneE4,  hw_buzzer::kTuneG4, hw_buzzer::kTuneG4,
-               hw_buzzer::kTuneG4,  hw_buzzer::kTuneE4, hw_buzzer::kTuneE4, hw_buzzer::kTuneE4, hw_buzzer::kTuneF4S, hw_buzzer::kTuneE4, hw_buzzer::kTuneE4,
-               hw_buzzer::kTuneE4,  hw_buzzer::kTuneE4, hw_buzzer::kTuneE4, hw_buzzer::kTuneE4, hw_buzzer::kTuneE4,  hw_buzzer::kTuneD4, hw_buzzer::kTuneE4,
-               hw_buzzer::kTuneG4,  hw_buzzer::kTuneE4, hw_buzzer::kTuneD4, hw_buzzer::kTuneE4, hw_buzzer::kTuneE4,  hw_buzzer::kTuneD4, hw_buzzer::kTuneG4,
-               hw_buzzer::kTuneD4,  hw_buzzer::kTuneE4, hw_buzzer::kTuneA4, hw_buzzer::kTuneE4, hw_buzzer::kTuneG4,  hw_buzzer::kTuneD5, hw_buzzer::kTuneG4,
-               hw_buzzer::kTuneA4,  hw_buzzer::kTuneE5, hw_buzzer::kTuneA4, hw_buzzer::kTuneD5, hw_buzzer::kTuneE5,  hw_buzzer::kTuneA3, hw_buzzer::kTuneE4,
-               hw_buzzer::kTuneE4,  hw_buzzer::kTuneE4, hw_buzzer::kTuneE4, hw_buzzer::kTuneE4, hw_buzzer::kTuneE4,  hw_buzzer::kTuneE4, hw_buzzer::kTuneE4,
-               hw_buzzer::kTuneE4,  hw_buzzer::kTuneD4, hw_buzzer::kTuneE4, hw_buzzer::kTuneG4, hw_buzzer::kTuneA3,  hw_buzzer::kTuneD4, hw_buzzer::kTuneE4,
-               hw_buzzer::kTuneE4,  hw_buzzer::kTuneE4, hw_buzzer::kTuneE4, hw_buzzer::kTuneE4, hw_buzzer::kTuneE4,  hw_buzzer::kTuneE4, hw_buzzer::kTuneE4,
-               hw_buzzer::kTuneE4,  hw_buzzer::kTuneE4, hw_buzzer::kTuneE4, hw_buzzer::kTuneD4, hw_buzzer::kTuneE4,  hw_buzzer::kTuneG4, hw_buzzer::kTuneA4,
-               hw_buzzer::kTuneE4,  hw_buzzer::kTuneE4, hw_buzzer::kTuneE4, hw_buzzer::kTuneE4, hw_buzzer::kTuneE4,  hw_buzzer::kTuneE4, hw_buzzer::kTuneE4,
-               hw_buzzer::kTuneE4,  hw_buzzer::kTuneE4, hw_buzzer::kTuneE4, hw_buzzer::kTuneE4, hw_buzzer::kTuneE4,  hw_buzzer::kTuneD4, hw_buzzer::kTuneE4,
-               hw_buzzer::kTuneG4,  hw_buzzer::kTuneA3, hw_buzzer::kTuneD4, hw_buzzer::kTuneA3, hw_buzzer::kTuneG3,  hw_buzzer::kTuneG3, hw_buzzer::kTuneC4,
-               hw_buzzer::kTuneC4,  hw_buzzer::kTuneC4, hw_buzzer::kTuneD4, hw_buzzer::kTuneC4, hw_buzzer::kTuneD4,  hw_buzzer::kTuneE4, hw_buzzer::kTuneD4,
-               hw_buzzer::kTuneE4,  hw_buzzer::kTuneG4, hw_buzzer::kTuneE4, hw_buzzer::kTuneG4, hw_buzzer::kTuneA4,  hw_buzzer::kTuneG4, hw_buzzer::kTuneA4,
-               hw_buzzer::kTuneC5,  hw_buzzer::kTuneA4, hw_buzzer::kTuneC5, hw_buzzer::kTuneD5, hw_buzzer::kTuneC5,  hw_buzzer::kTuneD5, hw_buzzer::kTuneE5,
-               hw_buzzer::kTuneD5,  hw_buzzer::kTuneE5, hw_buzzer::kTuneG5, hw_buzzer::kTuneA5, hw_buzzer::kTuneA5,  hw_buzzer::kTuneA5, hw_buzzer::kTuneA5,
+               hw_buzzer::kTuneA3,  hw_buzzer::kTuneA3, hw_buzzer::kTuneE4, hw_buzzer::kTuneE4, hw_buzzer::kTuneE4,  hw_buzzer::kTuneE4, hw_buzzer::kTuneE4,  //TODO（WPY）：待谱曲
+              //  hw_buzzer::kTuneE4,  hw_buzzer::kTuneE4, hw_buzzer::kTuneD4, hw_buzzer::kTuneD4, hw_buzzer::kTuneG4,  hw_buzzer::kTuneG4, hw_buzzer::kTuneD4,
+              //  hw_buzzer::kTuneE4,  hw_buzzer::kTuneE4, hw_buzzer::kTuneE4, hw_buzzer::kTuneE4, hw_buzzer::kTuneE4,  hw_buzzer::kTuneE4, hw_buzzer::kTuneE4,
+              //  hw_buzzer::kTuneE4,  hw_buzzer::kTuneE4, hw_buzzer::kTuneE4, hw_buzzer::kTuneD4, hw_buzzer::kTuneE4,  hw_buzzer::kTuneG4, hw_buzzer::kTuneG4,
+              //  hw_buzzer::kTuneG4,  hw_buzzer::kTuneE4, hw_buzzer::kTuneE4, hw_buzzer::kTuneE4, hw_buzzer::kTuneF4S, hw_buzzer::kTuneE4, hw_buzzer::kTuneE4,
+              //  hw_buzzer::kTuneE4,  hw_buzzer::kTuneE4, hw_buzzer::kTuneE4, hw_buzzer::kTuneE4, hw_buzzer::kTuneE4,  hw_buzzer::kTuneD4, hw_buzzer::kTuneE4,
+              //  hw_buzzer::kTuneG4,  hw_buzzer::kTuneE4, hw_buzzer::kTuneD4, hw_buzzer::kTuneE4, hw_buzzer::kTuneE4,  hw_buzzer::kTuneD4, hw_buzzer::kTuneG4,
+              //  hw_buzzer::kTuneD4,  hw_buzzer::kTuneE4, hw_buzzer::kTuneA4, hw_buzzer::kTuneE4, hw_buzzer::kTuneG4,  hw_buzzer::kTuneD5, hw_buzzer::kTuneG4,
+              //  hw_buzzer::kTuneA4,  hw_buzzer::kTuneE5, hw_buzzer::kTuneA4, hw_buzzer::kTuneD5, hw_buzzer::kTuneE5,  hw_buzzer::kTuneA3, hw_buzzer::kTuneE4,
+              //  hw_buzzer::kTuneE4,  hw_buzzer::kTuneE4, hw_buzzer::kTuneE4, hw_buzzer::kTuneE4, hw_buzzer::kTuneE4,  hw_buzzer::kTuneE4, hw_buzzer::kTuneE4,
+              //  hw_buzzer::kTuneE4,  hw_buzzer::kTuneD4, hw_buzzer::kTuneE4, hw_buzzer::kTuneG4, hw_buzzer::kTuneA3,  hw_buzzer::kTuneD4, hw_buzzer::kTuneE4,
+              //  hw_buzzer::kTuneE4,  hw_buzzer::kTuneE4, hw_buzzer::kTuneE4, hw_buzzer::kTuneE4, hw_buzzer::kTuneE4,  hw_buzzer::kTuneE4, hw_buzzer::kTuneE4,
+              //  hw_buzzer::kTuneE4,  hw_buzzer::kTuneE4, hw_buzzer::kTuneE4, hw_buzzer::kTuneD4, hw_buzzer::kTuneE4,  hw_buzzer::kTuneG4, hw_buzzer::kTuneA4,
+              //  hw_buzzer::kTuneE4,  hw_buzzer::kTuneE4, hw_buzzer::kTuneE4, hw_buzzer::kTuneE4, hw_buzzer::kTuneE4,  hw_buzzer::kTuneE4, hw_buzzer::kTuneE4,
+              //  hw_buzzer::kTuneE4,  hw_buzzer::kTuneE4, hw_buzzer::kTuneE4, hw_buzzer::kTuneE4, hw_buzzer::kTuneE4,  hw_buzzer::kTuneD4, hw_buzzer::kTuneE4,
+              //  hw_buzzer::kTuneG4,  hw_buzzer::kTuneA3, hw_buzzer::kTuneD4, hw_buzzer::kTuneA3, hw_buzzer::kTuneG3,  hw_buzzer::kTuneG3, hw_buzzer::kTuneC4,
+              //  hw_buzzer::kTuneC4,  hw_buzzer::kTuneC4, hw_buzzer::kTuneD4, hw_buzzer::kTuneC4, hw_buzzer::kTuneD4,  hw_buzzer::kTuneE4, hw_buzzer::kTuneD4,
+              //  hw_buzzer::kTuneE4,  hw_buzzer::kTuneG4, hw_buzzer::kTuneE4, hw_buzzer::kTuneG4, hw_buzzer::kTuneA4,  hw_buzzer::kTuneG4, hw_buzzer::kTuneA4,
+              //  hw_buzzer::kTuneC5,  hw_buzzer::kTuneA4, hw_buzzer::kTuneC5, hw_buzzer::kTuneD5, hw_buzzer::kTuneC5,  hw_buzzer::kTuneD5, hw_buzzer::kTuneE5,
+              //  hw_buzzer::kTuneD5,  hw_buzzer::kTuneE5, hw_buzzer::kTuneG5, hw_buzzer::kTuneA5, hw_buzzer::kTuneA5,  hw_buzzer::kTuneA5, hw_buzzer::kTuneA5,
                hw_buzzer::kTuneEnd,
                },
 };
