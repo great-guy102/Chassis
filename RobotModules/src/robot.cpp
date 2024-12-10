@@ -255,10 +255,9 @@ void Robot::genModulesCmdFromRc()
       // * 左上右上
     } else if (r_switch == RcSwitchState::kMid) {
       // * 左上右中
-      gimbal_working_mode = Gimbal::WorkingMode::YawPid;
     } else if (r_switch == RcSwitchState::kDown) {
       // * 左上右下
-      gimbal_working_mode = Gimbal::WorkingMode::PitchPid;
+      gimbal_working_mode = Gimbal::WorkingMode::PidTest;
     }
   } else if (l_switch == RcSwitchState::kMid) {
     // * 左中
@@ -270,10 +269,9 @@ void Robot::genModulesCmdFromRc()
       use_cap_flag = true;
     } else if (r_switch == RcSwitchState::kMid) {
       // * 左中右中
-      gimbal_working_mode = Gimbal::WorkingMode::YawPid;
     } else if (r_switch == RcSwitchState::kDown) {
       // * 左中右下
-      gimbal_working_mode = Gimbal::WorkingMode::PitchPid;
+      gimbal_working_mode = Gimbal::WorkingMode::PidTest;
     }
   } else if (l_switch == RcSwitchState::kDown) {
     // * 左下
