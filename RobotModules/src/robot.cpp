@@ -232,7 +232,7 @@ void Robot::genModulesCmdFromRc()
   Chassis::GyroDir gyro_dir = Chassis::GyroDir::NotRotate;
   bool use_cap_flag = false;
 
-  Chassis::WorkingMode chassis_working_mode = Chassis::WorkingMode::Follow;
+  Chassis::WorkingMode chassis_working_mode = Chassis::WorkingMode::Depart;
 
   CtrlMode gimbal_ctrl_mode = CtrlMode::Manual;
   Gimbal::WorkingMode gimbal_working_mode = Gimbal::WorkingMode::Normal;
@@ -255,8 +255,10 @@ void Robot::genModulesCmdFromRc()
       // * 左上右上
     } else if (r_switch == RcSwitchState::kMid) {
       // * 左上右中
+      gimbal_working_mode = Gimbal::WorkingMode::YawPid;
     } else if (r_switch == RcSwitchState::kDown) {
       // * 左上右下
+      gimbal_working_mode = Gimbal::WorkingMode::PitchPid;
     }
   } else if (l_switch == RcSwitchState::kMid) {
     // * 左中
@@ -268,8 +270,10 @@ void Robot::genModulesCmdFromRc()
       use_cap_flag = true;
     } else if (r_switch == RcSwitchState::kMid) {
       // * 左中右中
+      gimbal_working_mode = Gimbal::WorkingMode::YawPid;
     } else if (r_switch == RcSwitchState::kDown) {
       // * 左中右下
+      gimbal_working_mode = Gimbal::WorkingMode::PitchPid;
     }
   } else if (l_switch == RcSwitchState::kDown) {
     // * 左下
