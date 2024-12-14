@@ -226,7 +226,7 @@ class Chassis : public Fsm
   void calcPwrLimitedCurrentRef();
   void calcWheelCurrentRef();
   void calcWheelCurrentLimited();
-  void calcSteerVoltageRef();
+  void calcSteerCurrentRef();
 
   // 重置数据函数
   void resetDataOnDead();
@@ -276,14 +276,14 @@ class Chassis : public Fsm
 
   // 在 runOnWorking 函数中更新的数据
   Cmd cmd_ = {0}, last_cmd_ = {0};          ///< 控制指令，基于图传坐标系
-  float omega_feedforward_ = 0;             ///< 云台 YAW 轴角速度，单位 rad/s
+  float omega_feedforward_ = 0;             ///< 云台 YAW 轴角速度，用于底盘跟随前馈，单位 rad/s
   float wheel_speed_ref_[4] = {0};          ///< 轮电机的速度参考值 单位 rad/s
   float wheel_speed_ref_limited_[4] = {0};  ///< 轮电机的速度参考值(限幅后) 单位 rad/s
   float wheel_current_ref_[4] = {0};        ///< 轮电机的电流参考值 单位 A [-20, 20]
   float steer_speed_ref_[4] = {0};          ///< 舵电机的速度参考值 单位 rad/s
   float steer_speed_ref_limited_[4] = {0};  ///< 舵电机的速度参考值(限幅后) 单位 rad/s
   float steer_angle_ref_[4] = {0};          ///< 舵电机的角度参考值 单位 rad
-  float steer_voltage_ref_[4] = {0};        ///< 舵电机的电压参考值 单位 待定 [-30000, 30000]  TODO
+  float steer_current_ref_[4] = {0};        ///< 舵电机的电流参考值 单位 A [-3.0, 3.0]
   
   bool rev_head_flag_ = false;              ///< 转向后退标志
   uint32_t last_rev_head_tick_ = 0;         ///< 上一次转向后退的时间戳

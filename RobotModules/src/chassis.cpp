@@ -224,7 +224,7 @@ void Chassis::runOnWorking()
   calcMotorsRef();
   // calcWheelLimitedSpeedRef();
   calcWheelCurrentRef();
-  calcSteerVoltageRef();
+  calcSteerCurrentRef();
   setCommData(true);
 };
 
@@ -353,7 +353,7 @@ void Chassis::calcWheelCurrentRef()
 void Chassis::calcWheelCurrentLimited() {
 };
 
-void Chassis::calcSteerVoltageRef()
+void Chassis::calcSteerCurrentRef()
 {
   SteerPidIdx spis[4] = {
       kSteerPidIdxLeftFront,
@@ -369,7 +369,7 @@ void Chassis::calcSteerVoltageRef()
 
     float steer_motor_fdb[2] = {steer_angle_fdb_[i], steer_speed_fdb_[i]}; //TODO滤波处理速度
 
-    pid_ptr->calc(&steer_angle_ref_[i], steer_motor_fdb, nullptr, &steer_voltage_ref_[i]);
+    pid_ptr->calc(&steer_angle_ref_[i], steer_motor_fdb, nullptr, &steer_current_ref_[i]);
   }
 }
 
@@ -476,7 +476,7 @@ void Chassis::resetMotorsRef(){
   memset(steer_speed_ref_, 0, sizeof(steer_speed_ref_));
   memset(steer_speed_ref_limited_, 0, sizeof(steer_speed_ref_limited_));
   memset(steer_angle_ref_, 0, sizeof(steer_angle_ref_));
-  memset(steer_voltage_ref_, 0, sizeof(steer_voltage_ref_));
+  memset(steer_current_ref_, 0, sizeof(steer_current_ref_));
 }
 
 //重置轮、舵电机反馈数据
@@ -563,7 +563,7 @@ void Chassis::setCommDataMotors(bool working_flag)
       steer_pid_ptr->reset();
       steer_motor_ptr->setInput(0);
     } else {
-      steer_motor_ptr->setInput(steer_voltage_ref_[smi]);
+      steer_motor_ptr->setInput(steer_current_ref_[smi]);
     }
   }
 };
