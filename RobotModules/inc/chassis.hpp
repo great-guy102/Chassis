@@ -209,9 +209,9 @@ class Chassis : public Fsm
  private:
   //  数据更新和工作状态更新，由 update 函数调用
   void updateData();
-  void updateGimbalBoard();
-  void updateMotor();
-  void updateCap();
+  void updateGimbalBoardData();
+  void updateMotorData();
+  void updateCapData();
   void updateIsPowerOn();
   void updatePwrState();
 

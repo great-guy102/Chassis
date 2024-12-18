@@ -42,9 +42,9 @@ void Chassis::update()
 void Chassis::updateData()
 {
   updateWorkTick();
-  updateGimbalBoard();
-  updateMotor();
-  updateCap();
+  updateGimbalBoardData();
+  updateMotorData();
+  updateCapData();
   updateIsPowerOn();
 };
 
@@ -95,7 +95,7 @@ void Chassis::updatePwrState()
   setPwrState(next_state);
 };
 
-void Chassis::updateGimbalBoard()
+void Chassis::updateGimbalBoardData()
 {
   // 当云台板通讯丢失时，认为无云台板
   // 此时，直接认为云台板 IMU 准备就绪，使得可以在无云台板下工作
@@ -107,7 +107,7 @@ void Chassis::updateGimbalBoard()
   }
 };
 
-void Chassis::updateMotor()
+void Chassis::updateMotorData()
 {
   Motor *wheel_motor_ptr = nullptr;
   Motor *steer_motor_ptr = nullptr;
@@ -170,7 +170,7 @@ void Chassis::updateMotor()
   }
 };
 
-void Chassis::updateCap()
+void Chassis::updateCapData()
 {
   HW_ASSERT(cap_ptr_ != nullptr, "pointer to Capacitor is nullptr", cap_ptr_);
   if (cap_ptr_->isOffline()) {
@@ -221,8 +221,8 @@ void Chassis::runOnResurrection()
 void Chassis::runOnWorking()
 {
   revNormCmd();
-  calcMotorsRef();
-  // calcWheelLimitedSpeedRef();
+ calcMotorsRef();
+  // calcWheelLimitedSpeedRef() ;
   calcWheelCurrentRef();
   calcSteerCurrentRef();
   setCommData(true);
