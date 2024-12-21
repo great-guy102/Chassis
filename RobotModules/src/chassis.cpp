@@ -221,10 +221,10 @@ void Chassis::runOnResurrection()
 void Chassis::runOnWorking()
 {
   revNormCmd();
- calcMotorsRef();
-  // calcWheelLimitedSpeedRef() ;
-  calcWheelCurrentRef();
+  calcMotorsRef();
   calcSteerCurrentRef();
+  calcWheelLimitedSpeedRef();
+  calcWheelCurrentRef();
   setCommData(true);
 };
 
@@ -295,7 +295,10 @@ void Chassis::calcMotorsRef()
   ik_solver_ptr_->solve(move_vec, theta_i2r, steer_angle_fdb_);
   ik_solver_ptr_->getRotSpdAll(wheel_speed_ref_);
   ik_solver_ptr_->getThetaVelRefAll(steer_angle_ref_);
-};
+  // for(uint8_t i = 0; i < 4; i++) { //TODO（WPY）:舵电机模型调试用
+  //   steer_angle_ref_[i] = 3.0f * cmd_.v_x;
+  // } 
+}
 
 void Chassis::calcWheelLimitedSpeedRef()
 {
@@ -319,14 +322,25 @@ void Chassis::calcWheelLimitedSpeedRef()
   }
   pwr_limiter_ptr_->PwrLimitUpdateRuntimeParams(runtime_params);  // 更新运行时参数
   // 进行功率限制
-  hello_world::power_limiter::MotorRuntimeParams motor_run_par[4];//(WPY)TODO：补充对于舵电机的功率限制器
+  hello_world::power_limiter::MotorRuntimeParams motor_run_par[8];
   for(uint8_t i = 0; i < 4; i++) {
-    motor_run_par[i].iq_measure = wheel_motor_ptr_[i]->curr();
-    motor_run_par[i].spd_measure_radps = wheel_motor_ptr_[i]->vel();
-    motor_run_par[i].spd_ref_radps = wheel_speed_ref_[i];
-    motor_run_par[i].type = hello_world::power_limiter::kMotor3508;
+    motor_run_par[i].iq_measure = steer_motor_ptr_[i]->curr();
+    motor_run_par[i].spd_measure_radps = steer_motor_ptr_[i]->vel();
+    motor_run_par[i].spd_ref_radps = steer_speed_ref_[i];
+    motor_run_par[i].iq_ref = steer_current_ref_[i];
+    motor_run_par[i].type = hello_world::power_limiter::kMotorSteer;
   };
-  PwrLimiter::MotorRuntimeParamsList motor_run_par_list = {motor_run_par[0], motor_run_par[1], motor_run_par[2], motor_run_par[3]};
+  for(uint8_t i = 4; i < 8; i++) {
+    motor_run_par[i].iq_measure = wheel_motor_ptr_[i-4]->curr();
+    motor_run_par[i].spd_measure_radps = wheel_motor_ptr_[i-4]->vel();
+    motor_run_par[i].spd_ref_radps = wheel_speed_ref_[i-4];
+    motor_run_par[i].type = hello_world::power_limiter::kMotorWheel;
+  };
+  PwrLimiter::MotorRuntimeParamsList motor_run_par_list = {
+    motor_run_par[0], motor_run_par[1], motor_run_par[2], motor_run_par[3], 
+    motor_run_par[4], motor_run_par[5], motor_run_par[6], motor_run_par[7]
+  };
+  // pwr_limiter_ptr_->PwrLimitCalcSpd(motor_run_par_list, nullptr);
   pwr_limiter_ptr_->PwrLimitCalcSpd(motor_run_par_list, wheel_speed_ref_limited_);
 };
 
@@ -346,8 +360,8 @@ void Chassis::calcWheelCurrentRef()
   for (size_t i = 0; i < 4; i++) {
     pid_ptr = wheel_pid_ptr_[wpis[i]];
     HW_ASSERT(pid_ptr != nullptr, "pointer to Wheel PID %d is nullptr", wpis[i]);
-    // pid_ptr->calc(&wheel_speed_ref_limited_[i], &wheel_speed_fdb_[i], nullptr, &wheel_current_ref_[i]);
-    pid_ptr->calc(&wheel_speed_ref_[i], &wheel_speed_fdb_[i], nullptr, &wheel_current_ref_[i]);
+    pid_ptr->calc(&wheel_speed_ref_limited_[i], &wheel_speed_fdb_[i], nullptr, &wheel_current_ref_[i]);
+    // pid_ptr->calc(&wheel_speed_ref_[i], &wheel_speed_fdb_[i], nullptr, &wheel_current_ref_[i]);
   }
 };
 void Chassis::calcWheelCurrentLimited() {
@@ -362,7 +376,7 @@ void Chassis::calcSteerCurrentRef()
       kSteerPidIdxRightFront,
   };
 
-    MultiNodesPid *pid_ptr = nullptr;
+  MultiNodesPid *pid_ptr = nullptr;
   for (size_t i = 0; i < 4; i++) {
     pid_ptr = steer_pid_ptr_[spis[i]];
     HW_ASSERT(pid_ptr != nullptr, "pointer to Steer PID %d is nullptr", spis[i]);
@@ -370,6 +384,8 @@ void Chassis::calcSteerCurrentRef()
     float steer_motor_fdb[2] = {steer_angle_fdb_[i], steer_speed_fdb_[i]}; //TODO滤波处理速度
 
     pid_ptr->calc(&steer_angle_ref_[i], steer_motor_fdb, nullptr, &steer_current_ref_[i]);
+    // // TODO（WPY）:舵电机模型调试用
+    // pid_ptr->calc(&steer_angle_ref_[i], &steer_speed_fdb_[i], nullptr, &steer_current_ref_[i]);
   }
 }
 
@@ -464,7 +480,7 @@ void Chassis::resetCmds()
   last_cmd_.reset();  ///< 上一控制周期的控制指令，基于图传坐标系
 
   rev_head_flag_ = false;       ///< 恢复反转标志位
-  // last_rev_head_tick_ = 0;   ///< 上一次转向后退的时间戳
+  last_rev_head_tick_ = 0;   ///< 上一次转向后退的时间戳
 };
 
 //重置轮、舵电机参考数据

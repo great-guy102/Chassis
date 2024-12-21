@@ -220,7 +220,7 @@ static void CommAddReceiver(void)
 static void CommAddTransmitter(void)
 {
   HW_ASSERT(can1_tx_mgr_ptr != nullptr, "can1_tx_mgr_ptr is nullptr", can1_tx_mgr_ptr);
-  // can1_tx_mgr_ptr->addTransmitter(GetCap());TODO调试
+  // can1_tx_mgr_ptr->addTransmitter(GetCap());//TODO调试
   can1_tx_mgr_ptr->addTransmitter(GetMotorSteerLeftFront());
   can1_tx_mgr_ptr->addTransmitter(GetMotorSteerLeftRear());
   can1_tx_mgr_ptr->addTransmitter(GetMotorSteerRightRear());
