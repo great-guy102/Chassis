@@ -1,7 +1,7 @@
-/** 
+/**
  *******************************************************************************
- * @file      : ins_imu.cpp
- * @brief     : 
+ * @file      :ins_imu.cpp
+ * @brief     :
  * @history   :
  *  Version     Date            Author          Note
  *  V0.9.0      yyyy-mm-dd      <author>        1. <note>
@@ -14,30 +14,30 @@
  */
 /* Includes ------------------------------------------------------------------*/
 #include "ins_imu.hpp"
+#include "spi.h"
+
 /* Private constants ---------------------------------------------------------*/
-const robot::Imu::Config kImuInitConfig = {
-    .offset_max_count = 1000,
-    .acc_threshold = 10.0f,
-    .gyro_threshold = 0.1f,
-    .samp_freq = 1000.0f,
-    .kp = 1.0f,
-    .ki = 0.0f,
-    .bmi088_hw_config_ptr = &robot::Imu::kBmi088DefaultHWConfig,
-    .rot_mat_ptr = robot::Imu::kImuRotMatFlatten,
-    .bmi088_config_ptr = &robot::Imu::kBmi088DefaultConfig,
+static const hw_imu::ImuConfig kImuConfig = {
+    .rot_mat_flatten = {1, 0, 0, 0, 1, 0, 0, 0, 1}, // TODO: 旋转矩阵待标定
+    .bmi088_hw_config =
+        {
+            // C板
+            .hspi = &hspi1,
+            .acc_cs_port = GPIOA,
+            .acc_cs_pin = GPIO_PIN_4,
+            .gyro_cs_port = GPIOB,
+            .gyro_cs_pin = GPIO_PIN_0,
+        },
 };
 /* Private macro -------------------------------------------------------------*/
 /* Private types -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-// (LKY) 不能如下定义全局变量, 因为IMU的初始化(Imu.bmi088_ptr_)依赖于hspi1,
-// (LKY) 必须等hspi1初始化结束(MX_SPI1_Init()完成), 才能初始化unique_imu
-// robot::Imu unique_imu = robot::Imu(kImuInitConfig);
 /* External variables --------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
 /* Exported function definitions ---------------------------------------------*/
-robot::Imu *GetImu(void) {
-    static robot::Imu unique_imu = robot::Imu(kImuInitConfig); 
-    return &unique_imu; 
-};
+hw_imu::Imu *GetImu(void) {
+  static hw_imu::Imu unique_imu = hello_world::imu::Imu(kImuConfig);
+  return &unique_imu;
+}
 
 /* Private function definitions ----------------------------------------------*/

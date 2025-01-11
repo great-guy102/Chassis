@@ -57,6 +57,15 @@ include("${HWC_DIR}/config.cmake") # Default configuration
 set(use_hwcomponents_algorithms_power_limiter ON)
 set(use_prebuilt_hwcomponents_algorithms_power_limiter OFF)
 
+set(use_hwcomponents_tools ON) 
+set(use_prebuilt_hwcomponents_tools OFF)
+
+set(use_hwcomponents_devices_imu ON) 
+set(use_prebuilt_hwcomponents_devices_imu OFF)
+
+set(use_hwcomponents_algorithms_ahrs ON) 
+set(use_prebuilt_hwcomponents_algorithms_ahrs OFF)
+
 # TODO: Add your own `config.cmake` file or set your own configuration here
 
 # Enable preprocessing for assembler files
