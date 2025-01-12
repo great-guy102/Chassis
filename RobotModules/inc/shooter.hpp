@@ -1,7 +1,7 @@
-/** 
+/**
  *******************************************************************************
- * @file      : shooter.hpp
- * @brief     : 
+ * @file      :shooter.hpp
+ * @brief     :
  * @history   :
  *  Version     Date            Author          Note
  *  V0.9.0      yyyy-mm-dd      <author>        1. <note>
@@ -20,37 +20,35 @@
 #include "allocator.hpp"
 #include "module_state.hpp"
 /* Exported macro ------------------------------------------------------------*/
-namespace robot
-{
+namespace robot {
 /* Exported constants --------------------------------------------------------*/
 /* Exported types ------------------------------------------------------------*/
-class Shooter : public hello_world::MemMgr
-{
- public:
+class Shooter : public hello_world::MemMgr {
+public:
   typedef ShooterWorkingMode WorkingMode;
 
-  Shooter(){};
-  ~Shooter(){};
+  Shooter() {};
+  ~Shooter() {};
 
-  // void setCtrlMode(CtrlMode mode) { ctrl_mode_ = mode; }
-  // CtrlMode getCtrlMode() const { return ctrl_mode_; }
+  void setCtrlMode(CtrlMode mode) { ctrl_mode_ = mode; }
+  CtrlMode getCtrlMode() const { return ctrl_mode_; }
 
   void setWorkingMode(WorkingMode mode) { working_mode_ = mode; }
   WorkingMode getWorkingMode() const { return working_mode_; }
 
-  // void setShootFlag(bool flag) { shoot_flag_ = flag; }
-  // void shoot() { setShootFlag(true); };
-  // void clearShootFlag() { setShootFlag(false); }
-  // bool getShootFlag() const { return shoot_flag_; }
+  void setShootFlag(bool flag) { shoot_flag_ = flag; }
+  void shoot() { setShootFlag(true); };
+  void clearShootFlag() { setShootFlag(false); }
+  bool getShootFlag() const { return shoot_flag_; }
 
- private:
+private:
   // 由 robot 设置的数据
-  // bool shoot_flag_ = false;
+  bool shoot_flag_ = false;
 
-  // CtrlMode ctrl_mode_ = CtrlMode::Manual;
+  CtrlMode ctrl_mode_ = CtrlMode::Manual;
   WorkingMode working_mode_ = WorkingMode::Normal;
 };
 /* Exported variables --------------------------------------------------------*/
 /* Exported function prototypes ----------------------------------------------*/
-}  // namespace robot
+} // namespace robot
 #endif /* ROBOT_MODULE_SHOOTER_HPP_ */

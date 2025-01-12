@@ -229,32 +229,33 @@ void Robot::genModulesCmdFromRc() {
   RcSwitchState l_switch = rc_ptr_->rc_l_switch();
   RcSwitchState r_switch = rc_ptr_->rc_r_switch();
   float rc_wheel = rc_ptr_->rc_wheel();
-  Chassis::GyroDir gyro_dir = Chassis::GyroDir::NotRotate;
-  bool use_cap_flag = false;
 
   Chassis::WorkingMode chassis_working_mode = Chassis::WorkingMode::Depart;
+  Chassis::GyroDir gyro_dir = Chassis::GyroDir::NotRotate;
+  Gimbal::WorkingMode gimbal_working_mode = Gimbal::WorkingMode::Normal;
+  Shooter::WorkingMode shooter_working_mode = Shooter::WorkingMode::Stop;
 
   CtrlMode gimbal_ctrl_mode = CtrlMode::Manual;
-  Gimbal::WorkingMode gimbal_working_mode = Gimbal::WorkingMode::Normal;
+  CtrlMode shooter_ctrl_mode = CtrlMode::Manual;
 
-  CtrlMode feed_ctrl_mode = CtrlMode::Manual;
-  Shooter::WorkingMode shooter_working_mode = Shooter::WorkingMode::Stop;
-  Feed::WorkingMode feed_working_mode = Feed::WorkingMode::Normal;
+  bool use_cap_flag = false;
   bool shoot_flag = false;
 
   // TODO: 后续需要加入慢拨模式
   if (l_switch == RcSwitchState::kUp) {
     // * 左上
     chassis_working_mode = Chassis::WorkingMode::Depart;
-    feed_ctrl_mode = CtrlMode::Auto;
-    gimbal_working_mode = Gimbal::WorkingMode::Normal;
-    gimbal_ctrl_mode = CtrlMode::Auto;
-    shoot_flag = (rc_wheel > 0.9f);
-    shooter_working_mode = Shooter::WorkingMode::Normal;
+
     if (r_switch == RcSwitchState::kUp) {
       // * 左上右上
+      use_cap_flag = true;
+      shooter_working_mode = Shooter::WorkingMode::Normal;
+      shoot_flag = (rc_wheel > 0.9f);
     } else if (r_switch == RcSwitchState::kMid) {
       // * 左上右中
+      shooter_working_mode = Shooter::WorkingMode::Normal;
+      gimbal_ctrl_mode = CtrlMode::Auto;
+      shooter_ctrl_mode = CtrlMode::Auto;
     } else if (r_switch == RcSwitchState::kDown) {
       // * 左上右下
       gimbal_working_mode = Gimbal::WorkingMode::PidTest;
@@ -262,13 +263,17 @@ void Robot::genModulesCmdFromRc() {
   } else if (l_switch == RcSwitchState::kMid) {
     // * 左中
     chassis_working_mode = Chassis::WorkingMode::Follow;
-    gimbal_working_mode = Gimbal::WorkingMode::Normal;
-    gimbal_ctrl_mode = CtrlMode::Manual;
+
     if (r_switch == RcSwitchState::kUp) {
       // * 左中右上
+      shooter_working_mode = Shooter::WorkingMode::Normal;
+      shoot_flag = (rc_wheel > 0.9f);
       use_cap_flag = true;
     } else if (r_switch == RcSwitchState::kMid) {
       // * 左中右中
+      shooter_working_mode = Shooter::WorkingMode::Normal;
+      gimbal_ctrl_mode = CtrlMode::Auto;
+      shooter_ctrl_mode = CtrlMode::Auto;
     } else if (r_switch == RcSwitchState::kDown) {
       // * 左中右下
       gimbal_working_mode = Gimbal::WorkingMode::PidTest;
@@ -276,14 +281,15 @@ void Robot::genModulesCmdFromRc() {
   } else if (l_switch == RcSwitchState::kDown) {
     // * 左下
     chassis_working_mode = Chassis::WorkingMode::Gyro;
-    gimbal_working_mode = Gimbal::WorkingMode::Normal;
-    gimbal_ctrl_mode = CtrlMode::Manual;
+
     if (r_switch == RcSwitchState::kUp) {
       // * 左下右上
       use_cap_flag = true;
       gyro_dir = Chassis::GyroDir::Clockwise;
     } else if (r_switch == RcSwitchState::kMid) {
       // * 左下右中
+      gimbal_ctrl_mode = CtrlMode::Auto;
+      shooter_ctrl_mode = CtrlMode::Auto;
       gyro_dir = Chassis::GyroDir::Clockwise;
     } else if (r_switch == RcSwitchState::kDown) {
       // * 左下右下
@@ -314,11 +320,9 @@ void Robot::genModulesCmdFromRc() {
                                       1); // 右手系，z轴竖直向上，左转为正
   gimbal_ptr_->setNormCmdDelta(gimbal_cmd);
 
+  shooter_ptr_->setCtrlMode(shooter_ctrl_mode);
   shooter_ptr_->setWorkingMode(shooter_working_mode);
-
-  feed_ptr_->setCtrlMode(feed_ctrl_mode);
-  feed_ptr_->setWorkingMode(feed_working_mode);
-  feed_ptr_->setShootFlag(shoot_flag);
+  shooter_ptr_->setShootFlag(shoot_flag);
 };
 
 void Robot::genModulesCmdFromKb() {
@@ -397,7 +401,7 @@ void Robot::genModulesCmdFromKb() {
   feed_ptr_->setWorkingMode(feed_working_mode);
   feed_ptr_->setShootFlag(shoot_flag);
 
-  shooter_ptr_->setWorkingMode(shooter_working_mode);
+  shooter_ptr_->setWorkingMode(shooter_working_mode); // TODO键盘设置待同步
 };
 
 #pragma endregion
@@ -451,8 +455,8 @@ void Robot::setGimbalChassisCommData() {
   // shooter
   GimbalChassisComm::ShooterData::ChassisPart &shooter_data =
       gc_comm_ptr_->shooter_data().cp;
-  shooter_data.setShootFlag(feed_ptr_->getShootFlag());
-  shooter_data.ctrl_mode = feed_ptr_->getCtrlMode();
+  shooter_data.setShootFlag(shooter_ptr_->getShootFlag());
+  shooter_data.ctrl_mode = shooter_ptr_->getCtrlMode();
   shooter_data.working_mode = shooter_ptr_->getWorkingMode();
 };
 
