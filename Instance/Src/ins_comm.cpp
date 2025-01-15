@@ -1,7 +1,7 @@
-/** 
+/**
  *******************************************************************************
  * @file      :ins_comm.cpp
- * @brief     : 
+ * @brief     :
  * @history   :
  *  Version     Date            Author          Note
  *  V0.9.0      yyyy-mm-dd      <author>        1. <note>
@@ -32,7 +32,8 @@ typedef hello_world::comm::UartTxMgr UartTxMgr;
 
 /* Private constants ---------------------------------------------------------*/
 
-const size_t kRxRcBufferSize = hello_world::remote_control::DT7::kRcRxDataLen_ + 1;
+const size_t kRxRcBufferSize =
+    hello_world::remote_control::DT7::kRcRxDataLen_ + 1;
 const size_t kRxRfrBufferSize = 64;
 
 /* Private variables ---------------------------------------------------------*/
@@ -62,8 +63,7 @@ static UartRxMgr rc_rx_mgr = UartRxMgr();
 /* Private function prototypes -----------------------------------------------*/
 /* Exported function definitions ---------------------------------------------*/
 
-CanRxMgr* GetCan1RxMgr(void)
-{
+CanRxMgr *GetCan1RxMgr(void) {
   if (!is_can_1_rx_mgr_inited) {
     can_1_rx_mgr.init(&hcan1, CanRxMgr::RxType::kFifo0);
     can_1_rx_mgr.clearReceiver();
@@ -72,8 +72,7 @@ CanRxMgr* GetCan1RxMgr(void)
   return &can_1_rx_mgr;
 };
 
-CanTxMgr* GetCan1TxMgr(void)
-{
+CanTxMgr *GetCan1TxMgr(void) {
   if (!is_can1_tx_mgr_inited) {
     can_1_tx_mgr.init(&hcan1);
     can_1_tx_mgr.clearTransmitter();
@@ -82,8 +81,7 @@ CanTxMgr* GetCan1TxMgr(void)
   return &can_1_tx_mgr;
 };
 
-CanRxMgr* GetCan2RxMgr(void)
-{
+CanRxMgr *GetCan2RxMgr(void) {
   if (!is_can_2_rx_mgr_inited) {
     can_2_rx_mgr.init(&hcan2, CanRxMgr::RxType::kFifo1);
     can_2_rx_mgr.clearReceiver();
@@ -91,8 +89,7 @@ CanRxMgr* GetCan2RxMgr(void)
   }
   return &can_2_rx_mgr;
 };
-CanTxMgr* GetCan2TxMgr(void)
-{
+CanTxMgr *GetCan2TxMgr(void) {
   if (!is_can2_tx_mgr_inited) {
     can_2_tx_mgr.init(&hcan2);
     can_2_tx_mgr.clearTransmitter();
@@ -101,17 +98,16 @@ CanTxMgr* GetCan2TxMgr(void)
   return &can_2_tx_mgr;
 };
 
-UartRxMgr* GetRfrRxMgr(void)
-{
+UartRxMgr *GetRfrRxMgr(void) {
   if (!is_rfr_rx_mgr_inited) {
-    rfr_rx_mgr.init(&huart6, UartRxMgr::EofType::kManual, kRxRfrBufferSize, kRxRfrBufferSize);
+    rfr_rx_mgr.init(&huart6, UartRxMgr::EofType::kManual, kRxRfrBufferSize,
+                    kRxRfrBufferSize);
     rfr_rx_mgr.clearReceiver();
     is_rfr_rx_mgr_inited = true;
   }
   return &rfr_rx_mgr;
 };
-UartTxMgr* GetRfrTxMgr(void)
-{
+UartTxMgr *GetRfrTxMgr(void) {
   if (!is_rfr_tx_mgr_inited) {
     // TODO: 用Rx数据初始化，有点奇怪的
     rfr_tx_mgr.init(&huart6, kRxRfrBufferSize);
@@ -121,10 +117,10 @@ UartTxMgr* GetRfrTxMgr(void)
   return &rfr_tx_mgr;
 };
 
-UartRxMgr* GetRcRxMgr(void)
-{
+UartRxMgr *GetRcRxMgr(void) {
   if (!is_rc_rx_mgr_inited) {
-    rc_rx_mgr.init(&huart3, UartRxMgr::EofType::kIdle, kRxRcBufferSize, kRxRcBufferSize - 1);
+    rc_rx_mgr.init(&huart3, UartRxMgr::EofType::kIdle, kRxRcBufferSize,
+                   kRxRcBufferSize - 1);
     rc_rx_mgr.clearReceiver();
     is_rc_rx_mgr_inited = true;
   }

@@ -1,7 +1,7 @@
-/** 
+/**
  *******************************************************************************
  * @file      : ins_buzzer.hpp
- * @brief     : 
+ * @brief     :
  * @history   :
  *  Version     Date            Author          Note
  *  V0.9.0      yyyy-mm-dd      <author>        1. <note>
@@ -26,5 +26,5 @@ namespace hw_buzzer = hello_world::buzzer;
 /* Exported types ------------------------------------------------------------*/
 /* Exported variables --------------------------------------------------------*/
 /* Exported function prototypes ----------------------------------------------*/
-hw_buzzer::Buzzer* GetBuzzer(void);
+hw_buzzer::Buzzer *GetBuzzer(void);
 #endif /* INSTANCE_INS_BUZZER_HPP_ */

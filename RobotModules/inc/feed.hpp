@@ -1,7 +1,7 @@
-/** 
+/**
  *******************************************************************************
- * @file      : feed.hpp
- * @brief     : 
+ * @file      :feed.hpp
+ * @brief     :
  * @history   :
  *  Version     Date            Author          Note
  *  V0.9.0      yyyy-mm-dd      <author>        1. <note>
@@ -20,14 +20,12 @@
 #include "allocator.hpp"
 #include "module_state.hpp"
 /* Exported macro ------------------------------------------------------------*/
-namespace robot
-{
+namespace robot {
 /* Exported constants --------------------------------------------------------*/
 /* Exported types ------------------------------------------------------------*/
 
-class Feed
-{
- public:
+class Feed {
+public:
   typedef ShooterWorkingMode WorkingMode;
 
   Feed() {};
@@ -43,7 +41,8 @@ class Feed
   void shoot() { setShootFlag(true); }
   void clearShootFlag() { setShootFlag(false); }
   bool getShootFlag() const { return shoot_flag_; }
- private:
+
+private:
   // 由 robot 设置的数据
   bool shoot_flag_ = false;
 
@@ -52,5 +51,5 @@ class Feed
 };
 /* Exported variables --------------------------------------------------------*/
 /* Exported function prototypes ----------------------------------------------*/
-}  // namespace robot
+} // namespace robot
 #endif /* ROBOT_MODULES_FEED_HPP_ */

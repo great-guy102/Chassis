@@ -4,5 +4,5 @@
 
 namespace hw_pwr_limiter = hello_world::power_limiter;
 
-hw_pwr_limiter::PowerLimiter* GetPwrLimiter();
+hw_pwr_limiter::PowerLimiter *GetPwrLimiter();
 #endif

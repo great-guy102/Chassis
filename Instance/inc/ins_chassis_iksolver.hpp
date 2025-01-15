@@ -1,7 +1,7 @@
-/** 
+/**
  *******************************************************************************
- * @file      : ins_chassis_iksolver.hpp
- * @brief     : 
+ * @file      :ins_chassis_iksolver.hpp
+ * @brief     :
  * @history   :
  *  Version     Date            Author          Note
  *  V0.9.0      yyyy-mm-dd      <author>        1. <note>
@@ -25,6 +25,6 @@ namespace hw_chassis_iksolver = hello_world::chassis_ik_solver;
 /* Exported types ------------------------------------------------------------*/
 /* Exported variables --------------------------------------------------------*/
 /* Exported function prototypes ----------------------------------------------*/
-hw_chassis_iksolver::ChassisIkSolver* GetChassisIkSolver(void);
+hw_chassis_iksolver::ChassisIkSolver *GetChassisIkSolver(void);
 
 #endif /* INSTANCE_INS_CHASSIS_IKSOLVER_HPP_ */

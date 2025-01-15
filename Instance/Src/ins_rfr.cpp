@@ -1,7 +1,7 @@
-/** 
+/**
  *******************************************************************************
- * @file      : ins_rfr.cpp
- * @brief     : 
+ * @file      :ins_rfr.cpp
+ * @brief     :
  * @history   :
  *  Version     Date            Author          Note
  *  V0.9.0      yyyy-mm-dd      <author>        1. <note>
@@ -29,11 +29,16 @@ hello_world::referee::Referee unique_referee;
 
 /* Exported function definitions ---------------------------------------------*/
 
-hello_world::referee::RobotPerformancePackage *GetRobotPerformancePackage() { return &unique_robot_performance_package; };
-hello_world::referee::RobotPowerHeatPackage *GetRobotPowerHeatPackage() { return &unique_robot_power_heat_package; };
-hello_world::referee::RobotShooterPackage *GetRobotShooterPackage() { return &unique_robot_shooter_package; };
-hello_world::referee::Referee *GetReferee(void)
-{
+hello_world::referee::RobotPerformancePackage *GetRobotPerformancePackage() {
+  return &unique_robot_performance_package;
+};
+hello_world::referee::RobotPowerHeatPackage *GetRobotPowerHeatPackage() {
+  return &unique_robot_power_heat_package;
+};
+hello_world::referee::RobotShooterPackage *GetRobotShooterPackage() {
+  return &unique_robot_shooter_package;
+};
+hello_world::referee::Referee *GetReferee(void) {
   unique_referee.appendRxPkg(GetRobotPerformancePackage());
   unique_referee.appendRxPkg(GetRobotPowerHeatPackage());
   unique_referee.appendRxPkg(GetRobotShooterPackage());

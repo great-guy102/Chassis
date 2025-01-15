@@ -1,7 +1,7 @@
-/** 
+/**
  *******************************************************************************
  * @file      : ins_rc.hpp
- * @brief     : 
+ * @brief     :
  * @history   :
  *  Version     Date            Author          Note
  *  V0.9.0      yyyy-mm-dd      <author>        1. <note>
@@ -27,6 +27,6 @@ namespace hw_rc = hello_world::remote_control;
 /* Exported types ------------------------------------------------------------*/
 /* Exported variables --------------------------------------------------------*/
 /* Exported function prototypes ----------------------------------------------*/
-hw_rc::DT7* GetRemoteControl(void);
+hw_rc::DT7 *GetRemoteControl(void);
 
 #endif /* INS_RC_HPP_ */

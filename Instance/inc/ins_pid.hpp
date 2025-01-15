@@ -1,7 +1,7 @@
-/** 
+/**
  *******************************************************************************
- * @file      : ins_pid.hpp
- * @brief     : 
+ * @file      :ins_pid.hpp
+ * @brief     :
  * @history   :
  *  Version     Date            Author          Note
  *  V0.9.0      yyyy-mm-dd      <author>        1. <note>
@@ -25,15 +25,15 @@ namespace hw_pid = hello_world::pid;
 /* Exported types ------------------------------------------------------------*/
 /* Exported variables --------------------------------------------------------*/
 /* Exported function prototypes ----------------------------------------------*/
-hw_pid::MultiNodesPid* GetPidMotorWheelLeftFront();
-hw_pid::MultiNodesPid* GetPidMotorWheelLeftRear();
-hw_pid::MultiNodesPid* GetPidMotorWheelRightRear();
-hw_pid::MultiNodesPid* GetPidMotorWheelRightFront();
+hw_pid::MultiNodesPid *GetPidMotorWheelLeftFront();
+hw_pid::MultiNodesPid *GetPidMotorWheelLeftRear();
+hw_pid::MultiNodesPid *GetPidMotorWheelRightRear();
+hw_pid::MultiNodesPid *GetPidMotorWheelRightFront();
 
-hw_pid::MultiNodesPid* GetPidMotorSteerLeftFront();
-hw_pid::MultiNodesPid* GetPidMotorSteerLeftRear();
-hw_pid::MultiNodesPid* GetPidMotorSteerRightRear();
-hw_pid::MultiNodesPid* GetPidMotorSteerRightFront();
+hw_pid::MultiNodesPid *GetPidMotorSteerLeftFront();
+hw_pid::MultiNodesPid *GetPidMotorSteerLeftRear();
+hw_pid::MultiNodesPid *GetPidMotorSteerRightRear();
+hw_pid::MultiNodesPid *GetPidMotorSteerRightFront();
 
-hw_pid::MultiNodesPid* GetPidFollowOmega();
+hw_pid::MultiNodesPid *GetPidFollowOmega();
 #endif /* INSTANCE_INS_PID_HPP_ */

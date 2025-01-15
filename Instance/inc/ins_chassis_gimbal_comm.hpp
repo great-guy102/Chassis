@@ -1,7 +1,7 @@
-/** 
+/**
  *******************************************************************************
- * @file      : ins_chassis_gimbal_comm.hpp
- * @brief     : 
+ * @file      :ins_chassis_gimbal_comm.hpp
+ * @brief     :
  * @history   :
  *  Version     Date            Author          Note
  *  V0.9.0      yyyy-mm-dd      <author>        1. <note>
@@ -23,5 +23,5 @@
 /* Exported types ------------------------------------------------------------*/
 /* Exported variables --------------------------------------------------------*/
 /* Exported function prototypes ----------------------------------------------*/
-robot::GimbalChassisComm* GetGimbalChassisComm(void);
+robot::GimbalChassisComm *GetGimbalChassisComm(void);
 #endif /* INSTANCE_INS_CHASSIS_GIMBAL_COMM_HPP_ */

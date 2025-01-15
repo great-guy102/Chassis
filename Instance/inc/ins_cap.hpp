@@ -1,7 +1,7 @@
-/** 
+/**
  *******************************************************************************
  * @file      : ins_cap.hpp
- * @brief     : 
+ * @brief     :
  * @history   :
  *  Version     Date            Author          Note
  *  V0.9.0      yyyy-mm-dd      <author>        1. <note>
@@ -23,7 +23,7 @@
 /* Exported types ------------------------------------------------------------*/
 /* Exported variables --------------------------------------------------------*/
 
-hello_world::cap::SuperCap* GetCap(void);
+hello_world::cap::SuperCap *GetCap(void);
 /* Exported function prototypes ----------------------------------------------*/
 
 #endif /* INSTANCE_INS_CAP_HPP_ */

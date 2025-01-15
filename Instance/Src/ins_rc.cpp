@@ -1,7 +1,8 @@
-/** 
+
+/**
  *******************************************************************************
  * @file      : ins_rc.cpp
- * @brief     : 
+ * @brief     :
  * @history   :
  *  Version     Date            Author          Note
  *  V0.9.0      yyyy-mm-dd      <author>        1. <note>
@@ -25,6 +26,6 @@ hw_rc::DT7 unique_rc = hw_rc::DT7();
 /* Private function prototypes -----------------------------------------------*/
 /* Exported function definitions ---------------------------------------------*/
 
-hw_rc::DT7* GetRemoteControl() { return &unique_rc; };
+hw_rc::DT7 *GetRemoteControl() { return &unique_rc; };
 
 /* Private function definitions ----------------------------------------------*/

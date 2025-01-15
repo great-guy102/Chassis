@@ -1,7 +1,7 @@
-/** 
+/**
  *******************************************************************************
  * @file      :ins_fsm.cpp
- * @brief     : 
+ * @brief     :
  * @history   :
  *  Version     Date            Author          Note
  *  V0.9.0      yyyy-mm-dd      <author>        1. <note>
@@ -16,11 +16,11 @@
 #include "ins_all.hpp"
 /* Private constants ---------------------------------------------------------*/
 const robot::Chassis::Config kChassisConfig = {
-    .normal_trans_vel = 3.0f,                 ///< 正常平移速度
-    .gyro_rot_spd = 14.0f,                    ///< 小陀螺旋转速度
-    .yaw_sensitivity = 2 * PI,                ///< YAW 轴灵敏度(单位：rad/s)
-    .max_trans_vel = 5.0f,                    ///< 最大平移速度 
-    .max_rot_spd = 14.0f,                     ///< 最大旋转速度
+    .normal_trans_vel = 3.0f,  ///< 正常平移速度
+    .gyro_rot_spd = 14.0f,     ///< 小陀螺旋转速度
+    .yaw_sensitivity = 2 * PI, ///< YAW 轴灵敏度(单位：rad/s)
+    .max_trans_vel = 5.0f,     ///< 最大平移速度
+    .max_rot_spd = 14.0f,      ///< 最大旋转速度
 };
 /* Private macro -------------------------------------------------------------*/
 /* Private types -------------------------------------------------------------*/
@@ -37,23 +37,30 @@ robot::Shooter unique_shooter = robot::Shooter();
 /* External variables --------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
 /* Exported function definitions ---------------------------------------------*/
-robot::Chassis* GetChassis()
-{
+robot::Chassis *GetChassis() {
   if (!is_chassis_inited) {
     // * 1. 无通信功能的组件指针
     // * - 底盘逆解
     unique_chassis.registerIkSolver(GetChassisIkSolver());
     // * - pid
     // 轮组 pid
-    unique_chassis.registerWheelPid(GetPidMotorWheelLeftFront(), robot::Chassis::kWheelPidIdxLeftFront);
-    unique_chassis.registerWheelPid(GetPidMotorWheelLeftRear(), robot::Chassis::kWheelPidIdxLeftRear);
-    unique_chassis.registerWheelPid(GetPidMotorWheelRightRear(), robot::Chassis::kWheelPidIdxRightRear);
-    unique_chassis.registerWheelPid(GetPidMotorWheelRightFront(), robot::Chassis::kWheelPidIdxRightFront);
+    unique_chassis.registerWheelPid(GetPidMotorWheelLeftFront(),
+                                    robot::Chassis::kWheelPidIdxLeftFront);
+    unique_chassis.registerWheelPid(GetPidMotorWheelLeftRear(),
+                                    robot::Chassis::kWheelPidIdxLeftRear);
+    unique_chassis.registerWheelPid(GetPidMotorWheelRightRear(),
+                                    robot::Chassis::kWheelPidIdxRightRear);
+    unique_chassis.registerWheelPid(GetPidMotorWheelRightFront(),
+                                    robot::Chassis::kWheelPidIdxRightFront);
 
-    unique_chassis.registerSteerPid(GetPidMotorSteerLeftFront(), robot::Chassis::kSteerPidIdxLeftFront);
-    unique_chassis.registerSteerPid(GetPidMotorSteerLeftRear(), robot::Chassis::kSteerPidIdxLeftRear);
-    unique_chassis.registerSteerPid(GetPidMotorSteerRightRear(), robot::Chassis::kSteerPidIdxRightRear);
-    unique_chassis.registerSteerPid(GetPidMotorSteerRightFront(), robot::Chassis::kSteerPidIdxRightFront);
+    unique_chassis.registerSteerPid(GetPidMotorSteerLeftFront(),
+                                    robot::Chassis::kSteerPidIdxLeftFront);
+    unique_chassis.registerSteerPid(GetPidMotorSteerLeftRear(),
+                                    robot::Chassis::kSteerPidIdxLeftRear);
+    unique_chassis.registerSteerPid(GetPidMotorSteerRightRear(),
+                                    robot::Chassis::kSteerPidIdxRightRear);
+    unique_chassis.registerSteerPid(GetPidMotorSteerRightFront(),
+                                    robot::Chassis::kSteerPidIdxRightFront);
     // 随动速度
     unique_chassis.registerFollowOmegaPid(GetPidFollowOmega());
     // * - 功率限制
@@ -68,26 +75,33 @@ robot::Chassis* GetChassis()
     // 超级电容
     unique_chassis.registerCap(GetCap());
     // 轮组电机
-    unique_chassis.registerWheelMotor(GetMotorWheelLeftFront(), robot::Chassis::kWheelMotorIdxLeftFront);
-    unique_chassis.registerWheelMotor(GetMotorWheelLeftRear(), robot::Chassis::kWheelMotorIdxLeftRear);
-    unique_chassis.registerWheelMotor(GetMotorWheelRightRear(), robot::Chassis::kWheelMotorIdxRightRear);
-    unique_chassis.registerWheelMotor(GetMotorWheelRightFront(), robot::Chassis::kWheelMotorIdxRightFront);
+    unique_chassis.registerWheelMotor(GetMotorWheelLeftFront(),
+                                      robot::Chassis::kWheelMotorIdxLeftFront);
+    unique_chassis.registerWheelMotor(GetMotorWheelLeftRear(),
+                                      robot::Chassis::kWheelMotorIdxLeftRear);
+    unique_chassis.registerWheelMotor(GetMotorWheelRightRear(),
+                                      robot::Chassis::kWheelMotorIdxRightRear);
+    unique_chassis.registerWheelMotor(GetMotorWheelRightFront(),
+                                      robot::Chassis::kWheelMotorIdxRightFront);
     // 舵机
-    unique_chassis.registerSteerMotor(GetMotorSteerLeftFront(), robot::Chassis::kSteerMotorIdxLeftFront);
-    unique_chassis.registerSteerMotor(GetMotorSteerLeftRear(), robot::Chassis::kSteerMotorIdxLeftRear);
-    unique_chassis.registerSteerMotor(GetMotorSteerRightRear(), robot::Chassis::kSteerMotorIdxRightRear);
-    unique_chassis.registerSteerMotor(GetMotorSteerRightFront(), robot::Chassis::kSteerMotorIdxRightFront);
+    unique_chassis.registerSteerMotor(GetMotorSteerLeftFront(),
+                                      robot::Chassis::kSteerMotorIdxLeftFront);
+    unique_chassis.registerSteerMotor(GetMotorSteerLeftRear(),
+                                      robot::Chassis::kSteerMotorIdxLeftRear);
+    unique_chassis.registerSteerMotor(GetMotorSteerRightRear(),
+                                      robot::Chassis::kSteerMotorIdxRightRear);
+    unique_chassis.registerSteerMotor(GetMotorSteerRightFront(),
+                                      robot::Chassis::kSteerMotorIdxRightFront);
     is_chassis_inited = true;
   }
   return &unique_chassis;
 };
 
-robot::Gimbal* GetGimbal() { return &unique_gimbal; };
-robot::Shooter* GetShooter() { return &unique_shooter; };
-robot::Feed* GetFeed() { return &unique_feed; }
+robot::Gimbal *GetGimbal() { return &unique_gimbal; };
+robot::Shooter *GetShooter() { return &unique_shooter; };
+robot::Feed *GetFeed() { return &unique_feed; }
 
-robot::Robot* GetRobot()
-{
+robot::Robot *GetRobot() {
   if (!is_robot_inited) {
     // main 组件指针注册
     // 主要模块状态机组件指针
@@ -104,17 +118,34 @@ robot::Robot* GetRobot()
     unique_robot.registerRc(GetRemoteControl());
     // 只发送数据的组件指针
     unique_robot.registerCap(GetCap(), GetCan1TxMgr());
-    unique_robot.registerMotorSteers(GetMotorSteerLeftFront(), robot::Robot::kSteerMotorIdxLeftFront, GetCan1TxMgr());
-    unique_robot.registerMotorSteers(GetMotorSteerLeftRear(), robot::Robot::kSteerMotorIdxLeftRear, GetCan1TxMgr());
-    unique_robot.registerMotorSteers(GetMotorSteerRightRear(), robot::Robot::kSteerMotorIdxRightRear, GetCan1TxMgr());
-    unique_robot.registerMotorSteers(GetMotorSteerRightFront(), robot::Robot::kSteerMotorIdxRightFront, GetCan1TxMgr());
+    unique_robot.registerMotorSteers(GetMotorSteerLeftFront(),
+                                     robot::Robot::kSteerMotorIdxLeftFront,
+                                     GetCan1TxMgr());
+    unique_robot.registerMotorSteers(GetMotorSteerLeftRear(),
+                                     robot::Robot::kSteerMotorIdxLeftRear,
+                                     GetCan1TxMgr());
+    unique_robot.registerMotorSteers(GetMotorSteerRightRear(),
+                                     robot::Robot::kSteerMotorIdxRightRear,
+                                     GetCan1TxMgr());
+    unique_robot.registerMotorSteers(GetMotorSteerRightFront(),
+                                     robot::Robot::kSteerMotorIdxRightFront,
+                                     GetCan1TxMgr());
 
-    unique_robot.registerMotorWheels(GetMotorWheelLeftFront(), robot::Robot::kWheelMotorIdxLeftFront, GetCan2TxMgr());
-    unique_robot.registerMotorWheels(GetMotorWheelLeftRear(), robot::Robot::kWheelMotorIdxLeftRear, GetCan2TxMgr());
-    unique_robot.registerMotorWheels(GetMotorWheelRightRear(), robot::Robot::kWheelMotorIdxRightRear, GetCan2TxMgr());
-    unique_robot.registerMotorWheels(GetMotorWheelRightFront(), robot::Robot::kWheelMotorIdxRightFront, GetCan2TxMgr());
+    unique_robot.registerMotorWheels(GetMotorWheelLeftFront(),
+                                     robot::Robot::kWheelMotorIdxLeftFront,
+                                     GetCan2TxMgr());
+    unique_robot.registerMotorWheels(GetMotorWheelLeftRear(),
+                                     robot::Robot::kWheelMotorIdxLeftRear,
+                                     GetCan2TxMgr());
+    unique_robot.registerMotorWheels(GetMotorWheelRightRear(),
+                                     robot::Robot::kWheelMotorIdxRightRear,
+                                     GetCan2TxMgr());
+    unique_robot.registerMotorWheels(GetMotorWheelRightFront(),
+                                     robot::Robot::kWheelMotorIdxRightFront,
+                                     GetCan2TxMgr());
     // 收发数据的组件指针
-    unique_robot.registerGimbalChassisComm(GetGimbalChassisComm(), GetCan2TxMgr());
+    unique_robot.registerGimbalChassisComm(GetGimbalChassisComm(),
+                                           GetCan2TxMgr());
     unique_robot.registerReferee(GetReferee(), GetRfrTxMgr());
 
     unique_robot.registerPerformancePkg(GetRobotPerformancePackage());
