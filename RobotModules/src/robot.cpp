@@ -20,8 +20,8 @@
 namespace robot {
 /* Private constants ---------------------------------------------------------*/
 const hello_world::referee::RobotPerformanceData kDefaultRobotPerformanceData = {
-    .robot_id =
-        hello_world::referee::ids::RobotId::kRobotRedStandard3, ///< 本机器人ID
+    .robot_id = static_cast<uint8_t>(
+        hello_world::referee::ids::RobotId::kRedStandard3), ///< 本机器人ID
 
     .robot_level = 0,  ///< 机器人等级
     .current_hp = 200, ///< 机器人当前血量
@@ -51,13 +51,13 @@ const hello_world::referee::RobotPowerHeatData kDefaultRobotPowerHeatData = {
     .shooter_42mm_barrel_heat = 0,   ///< 42mm发射机构的枪口热量
 };
 const hello_world::referee::RobotShooterData kDefaultRobotShooterData = {
-    .bullet_type =
-        hello_world::referee::BulletType::kBulletType42mm, ///< 弹丸类型，@see
-                                                           ///< BulletType
+    .bullet_type = static_cast<uint8_t>(
+        hello_world::referee::BulletType::k17mm), ///< 弹丸类型，@see
+                                                  ///< BulletType
 
-    .shooter_id =
-        hello_world::referee::ShooterId::kShooterId42mm, ///< 发射机构ID，@see
-                                                         ///< ShooterId
+    .shooter_id = static_cast<uint8_t>(
+        hello_world::referee::ShooterId::k17mm1), ///< 发射机构ID，@see
+                                                  ///< ShooterId
 
     .launching_frequency = 0, ///< 弹丸射频，单位：Hz
     .bullet_speed = 15.5f,    ///< 弹丸初速度，单位：m/s
@@ -248,9 +248,9 @@ void Robot::genModulesCmdFromRc() {
 
     if (r_switch == RcSwitchState::kUp) {
       // * 左上右上
-      use_cap_flag = true;
       shooter_working_mode = Shooter::WorkingMode::Normal;
       shoot_flag = (rc_wheel > 0.9f);
+      use_cap_flag = true;
     } else if (r_switch == RcSwitchState::kMid) {
       // * 左上右中
       shooter_working_mode = Shooter::WorkingMode::Normal;

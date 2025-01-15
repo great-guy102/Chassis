@@ -1,7 +1,7 @@
-/** 
+/**
  *******************************************************************************
  * @file      :comm_task.cpp
- * @brief     : 
+ * @brief     :
  * @history   :
  *  Version     Date            Author          Note
  *  V0.9.0      yyyy-mm-dd      <author>        1. <note>
@@ -31,8 +31,8 @@ using hello_world::comm::CanRxMgr;
 using hello_world::comm::CanTxMgr;
 using hello_world::comm::UartRxMgr;
 using hello_world::comm::UartTxMgr;
-using hello_world::remote_control::DT7;
 using hello_world::referee::Referee;
+using hello_world::remote_control::DT7;
 
 /* Private macro -------------------------------------------------------------*/
 
@@ -42,17 +42,17 @@ using hello_world::referee::Referee;
 
 /* Private variables ---------------------------------------------------------*/
 
-static CanRxMgr* can1_rx_mgr_ptr = nullptr;
-static CanTxMgr* can1_tx_mgr_ptr = nullptr;
+static CanRxMgr *can1_rx_mgr_ptr = nullptr;
+static CanTxMgr *can1_tx_mgr_ptr = nullptr;
 
-static CanRxMgr* can2_rx_mgr_ptr = nullptr;
-static CanTxMgr* can2_tx_mgr_ptr = nullptr;
+static CanRxMgr *can2_rx_mgr_ptr = nullptr;
+static CanTxMgr *can2_tx_mgr_ptr = nullptr;
 
-static UartRxMgr* rc_rx_mgr_ptr = nullptr;
+static UartRxMgr *rc_rx_mgr_ptr = nullptr;
 // static DT7* rc_ptr = nullptr;
 
-static UartRxMgr* rfr_rx_mgr_ptr = nullptr;
-static UartTxMgr* rfr_tx_mgr_ptr = nullptr;
+static UartRxMgr *rfr_rx_mgr_ptr = nullptr;
+static UartTxMgr *rfr_tx_mgr_ptr = nullptr;
 // static Referee* rfr_ptr = nullptr;
 
 /* External variables --------------------------------------------------------*/
@@ -64,66 +64,72 @@ static void CommHardWareInit(void);
 
 /* Exported function definitions ---------------------------------------------*/
 
-void CommTaskInit(void)
-{
+void CommTaskInit(void) {
   PrivatePointerInit();
   CommAddReceiver();
   CommAddTransmitter();
   CommHardWareInit();
 };
 
-void CommTask(void)
-{
-  HW_ASSERT(can1_tx_mgr_ptr != nullptr, "can1_tx_mgr_ptr is nullptr", can1_tx_mgr_ptr);
-  HW_ASSERT(can2_tx_mgr_ptr != nullptr, "can2_tx_mgr_ptr is nullptr", can2_tx_mgr_ptr);
+void CommTask(void) {
+  HW_ASSERT(can1_tx_mgr_ptr != nullptr, "can1_tx_mgr_ptr is nullptr",
+            can1_tx_mgr_ptr);
+  HW_ASSERT(can2_tx_mgr_ptr != nullptr, "can2_tx_mgr_ptr is nullptr",
+            can2_tx_mgr_ptr);
   can1_tx_mgr_ptr->startTransmit();
   can2_tx_mgr_ptr->startTransmit();
 };
 
-void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef* hcan)
-{
-  HW_ASSERT(can1_rx_mgr_ptr != nullptr, "can1_rx_mgr_ptr is nullptr", can1_rx_mgr_ptr);
-  HW_ASSERT(can2_rx_mgr_ptr != nullptr, "can2_rx_mgr_ptr is nullptr", can2_rx_mgr_ptr);
+void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
+  HW_ASSERT(can1_rx_mgr_ptr != nullptr, "can1_rx_mgr_ptr is nullptr",
+            can1_rx_mgr_ptr);
+  HW_ASSERT(can2_rx_mgr_ptr != nullptr, "can2_rx_mgr_ptr is nullptr",
+            can2_rx_mgr_ptr);
   can1_rx_mgr_ptr->rxFifoMsgPendingCallback(hcan);
   can2_rx_mgr_ptr->rxFifoMsgPendingCallback(hcan);
 }
 
-void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef* hcan)
-{
-  HW_ASSERT(can1_rx_mgr_ptr != nullptr, "can1_rx_mgr_ptr is nullptr", can1_rx_mgr_ptr);
-  HW_ASSERT(can2_rx_mgr_ptr != nullptr, "can2_rx_mgr_ptr is nullptr", can2_rx_mgr_ptr);
+void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan) {
+  HW_ASSERT(can1_rx_mgr_ptr != nullptr, "can1_rx_mgr_ptr is nullptr",
+            can1_rx_mgr_ptr);
+  HW_ASSERT(can2_rx_mgr_ptr != nullptr, "can2_rx_mgr_ptr is nullptr",
+            can2_rx_mgr_ptr);
   can1_rx_mgr_ptr->rxFifoMsgPendingCallback(hcan);
   can2_rx_mgr_ptr->rxFifoMsgPendingCallback(hcan);
 }
 
-void HAL_CAN_TxMailbox0CompleteCallback(CAN_HandleTypeDef* hcan)
-{
-  HW_ASSERT(can1_tx_mgr_ptr != nullptr, "can1_tx_mgr_ptr is nullptr", can1_tx_mgr_ptr);
-  HW_ASSERT(can2_tx_mgr_ptr != nullptr, "can2_tx_mgr_ptr is nullptr", can2_tx_mgr_ptr);
+void HAL_CAN_TxMailbox0CompleteCallback(CAN_HandleTypeDef *hcan) {
+  HW_ASSERT(can1_tx_mgr_ptr != nullptr, "can1_tx_mgr_ptr is nullptr",
+            can1_tx_mgr_ptr);
+  HW_ASSERT(can2_tx_mgr_ptr != nullptr, "can2_tx_mgr_ptr is nullptr",
+            can2_tx_mgr_ptr);
   can1_tx_mgr_ptr->txMailboxCompleteCallback(hcan);
   can2_tx_mgr_ptr->txMailboxCompleteCallback(hcan);
 }
 
-void HAL_CAN_TxMailbox1CompleteCallback(CAN_HandleTypeDef* hcan)
-{
-  HW_ASSERT(can1_tx_mgr_ptr != nullptr, "can1_tx_mgr_ptr is nullptr", can1_tx_mgr_ptr);
-  HW_ASSERT(can2_tx_mgr_ptr != nullptr, "can2_tx_mgr_ptr is nullptr", can2_tx_mgr_ptr);
+void HAL_CAN_TxMailbox1CompleteCallback(CAN_HandleTypeDef *hcan) {
+  HW_ASSERT(can1_tx_mgr_ptr != nullptr, "can1_tx_mgr_ptr is nullptr",
+            can1_tx_mgr_ptr);
+  HW_ASSERT(can2_tx_mgr_ptr != nullptr, "can2_tx_mgr_ptr is nullptr",
+            can2_tx_mgr_ptr);
   can1_tx_mgr_ptr->txMailboxCompleteCallback(hcan);
   can2_tx_mgr_ptr->txMailboxCompleteCallback(hcan);
 }
 
-void HAL_CAN_TxMailbox2CompleteCallback(CAN_HandleTypeDef* hcan)
-{
-  HW_ASSERT(can1_tx_mgr_ptr != nullptr, "can1_tx_mgr_ptr is nullptr", can1_tx_mgr_ptr);
-  HW_ASSERT(can2_tx_mgr_ptr != nullptr, "can2_tx_mgr_ptr is nullptr", can2_tx_mgr_ptr);
+void HAL_CAN_TxMailbox2CompleteCallback(CAN_HandleTypeDef *hcan) {
+  HW_ASSERT(can1_tx_mgr_ptr != nullptr, "can1_tx_mgr_ptr is nullptr",
+            can1_tx_mgr_ptr);
+  HW_ASSERT(can2_tx_mgr_ptr != nullptr, "can2_tx_mgr_ptr is nullptr",
+            can2_tx_mgr_ptr);
   can1_tx_mgr_ptr->txMailboxCompleteCallback(hcan);
   can2_tx_mgr_ptr->txMailboxCompleteCallback(hcan);
 }
 
-void HAL_CAN_ErrorCallback(CAN_HandleTypeDef* hcan)
-{
-  HW_ASSERT(can1_tx_mgr_ptr != nullptr, "can1_tx_mgr_ptr is nullptr", can1_tx_mgr_ptr);
-  HW_ASSERT(can2_tx_mgr_ptr != nullptr, "can2_tx_mgr_ptr is nullptr", can2_tx_mgr_ptr);
+void HAL_CAN_ErrorCallback(CAN_HandleTypeDef *hcan) {
+  HW_ASSERT(can1_tx_mgr_ptr != nullptr, "can1_tx_mgr_ptr is nullptr",
+            can1_tx_mgr_ptr);
+  HW_ASSERT(can2_tx_mgr_ptr != nullptr, "can2_tx_mgr_ptr is nullptr",
+            can2_tx_mgr_ptr);
   can1_tx_mgr_ptr->errorCallback(hcan);
   can2_tx_mgr_ptr->errorCallback(hcan);
 }
@@ -139,9 +145,8 @@ uint32_t uart6_rx_cnt = 0;
  * @param   none
  * @retval  none
  * @note    none
-**/
-void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef* huart, uint16_t Size)
-{
+ **/
+void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
   uart_rx_tick = hello_world::tick::GetTickMs();
   uart_rx_cb_in++;
   // 遥控器
@@ -165,8 +170,7 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef* huart, uint16_t Size)
   }
 }
 
-void HAL_UART_ErrorCallback(UART_HandleTypeDef* huart)
-{
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
   // 遥控器
   if (huart == &huart3) {
     rc_rx_mgr_ptr->startReceive();
@@ -179,8 +183,7 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef* huart)
 
 /* Private function definitions ----------------------------------------------*/
 
-static void PrivatePointerInit(void)
-{
+static void PrivatePointerInit(void) {
   can1_rx_mgr_ptr = GetCan1RxMgr();
   can1_tx_mgr_ptr = GetCan1TxMgr();
 
@@ -193,67 +196,75 @@ static void PrivatePointerInit(void)
   rfr_tx_mgr_ptr = GetRfrTxMgr();
 }
 
-static void CommAddReceiver(void)
-{
-  HW_ASSERT(can1_rx_mgr_ptr != nullptr, "can1_rx_mgr_ptr is nullptr", can1_rx_mgr_ptr);
-  // can1_rx_mgr_ptr->addReceiver(GetCap());//TODO调试
+static void CommAddReceiver(void) {
+  HW_ASSERT(can1_rx_mgr_ptr != nullptr, "can1_rx_mgr_ptr is nullptr",
+            can1_rx_mgr_ptr);
+  can1_rx_mgr_ptr->addReceiver(GetCap()); // TODO调试
   can1_rx_mgr_ptr->addReceiver(GetMotorSteerLeftFront());
   can1_rx_mgr_ptr->addReceiver(GetMotorSteerLeftRear());
   can1_rx_mgr_ptr->addReceiver(GetMotorSteerRightRear());
   can1_rx_mgr_ptr->addReceiver(GetMotorSteerRightFront());
 
-  HW_ASSERT(can2_rx_mgr_ptr != nullptr, "can2_rx_mgr_ptr is nullptr", can2_rx_mgr_ptr);
+  HW_ASSERT(can2_rx_mgr_ptr != nullptr, "can2_rx_mgr_ptr is nullptr",
+            can2_rx_mgr_ptr);
   can2_rx_mgr_ptr->addReceiver(GetGimbalChassisComm());
   can2_rx_mgr_ptr->addReceiver(GetMotorWheelLeftFront());
   can2_rx_mgr_ptr->addReceiver(GetMotorWheelLeftRear());
   can2_rx_mgr_ptr->addReceiver(GetMotorWheelRightRear());
   can2_rx_mgr_ptr->addReceiver(GetMotorWheelRightFront());
-  can2_rx_mgr_ptr->addReceiver(GetMotorYaw());  // 用于底盘控制，只接受消息
-  
-  HW_ASSERT(rc_rx_mgr_ptr != nullptr, "rc_rx_mgr_ptr is nullptr", rc_rx_mgr_ptr);
+  can2_rx_mgr_ptr->addReceiver(GetMotorYaw()); // 用于底盘控制，只接受消息
+
+  HW_ASSERT(rc_rx_mgr_ptr != nullptr, "rc_rx_mgr_ptr is nullptr",
+            rc_rx_mgr_ptr);
   rc_rx_mgr_ptr->addReceiver(GetRemoteControl());
 
-  HW_ASSERT(rfr_rx_mgr_ptr != nullptr, "rfr_rx_mgr_ptr is nullptr", rfr_rx_mgr_ptr);
+  HW_ASSERT(rfr_rx_mgr_ptr != nullptr, "rfr_rx_mgr_ptr is nullptr",
+            rfr_rx_mgr_ptr);
   rfr_rx_mgr_ptr->addReceiver(GetReferee());
 }
 
-static void CommAddTransmitter(void)
-{
-  HW_ASSERT(can1_tx_mgr_ptr != nullptr, "can1_tx_mgr_ptr is nullptr", can1_tx_mgr_ptr);
-  // can1_tx_mgr_ptr->addTransmitter(GetCap());//TODO调试
+static void CommAddTransmitter(void) {
+  HW_ASSERT(can1_tx_mgr_ptr != nullptr, "can1_tx_mgr_ptr is nullptr",
+            can1_tx_mgr_ptr);
+  can1_tx_mgr_ptr->addTransmitter(GetCap()); // TODO调试
   can1_tx_mgr_ptr->addTransmitter(GetMotorSteerLeftFront());
   can1_tx_mgr_ptr->addTransmitter(GetMotorSteerLeftRear());
   can1_tx_mgr_ptr->addTransmitter(GetMotorSteerRightRear());
   can1_tx_mgr_ptr->addTransmitter(GetMotorSteerRightFront());
 
-  HW_ASSERT(can2_tx_mgr_ptr != nullptr, "can2_tx_mgr_ptr is nullptr", can2_tx_mgr_ptr);
+  HW_ASSERT(can2_tx_mgr_ptr != nullptr, "can2_tx_mgr_ptr is nullptr",
+            can2_tx_mgr_ptr);
   can2_tx_mgr_ptr->addTransmitter(GetGimbalChassisComm());
   can2_tx_mgr_ptr->addTransmitter(GetMotorWheelLeftFront());
   can2_tx_mgr_ptr->addTransmitter(GetMotorWheelLeftRear());
   can2_tx_mgr_ptr->addTransmitter(GetMotorWheelRightRear());
   can2_tx_mgr_ptr->addTransmitter(GetMotorWheelRightFront());
 
-  HW_ASSERT(rfr_tx_mgr_ptr != nullptr, "rfr_tx_mgr_ptr is nullptr", rfr_tx_mgr_ptr);
+  HW_ASSERT(rfr_tx_mgr_ptr != nullptr, "rfr_tx_mgr_ptr is nullptr",
+            rfr_tx_mgr_ptr);
   rfr_tx_mgr_ptr->addTransmitter(GetReferee());
 }
 
-void CommHardWareInit(void)
-{
+void CommHardWareInit(void) {
   // CAN init
-  HW_ASSERT(can1_rx_mgr_ptr != nullptr, "can1_rx_mgr_ptr is nullptr", can1_rx_mgr_ptr);
+  HW_ASSERT(can1_rx_mgr_ptr != nullptr, "can1_rx_mgr_ptr is nullptr",
+            can1_rx_mgr_ptr);
   can1_rx_mgr_ptr->filterInit();
   can1_rx_mgr_ptr->startReceive();
   HAL_CAN_Start(&hcan1);
 
-  HW_ASSERT(can2_rx_mgr_ptr != nullptr, "can2_rx_mgr_ptr is nullptr", can2_rx_mgr_ptr);
+  HW_ASSERT(can2_rx_mgr_ptr != nullptr, "can2_rx_mgr_ptr is nullptr",
+            can2_rx_mgr_ptr);
   can2_rx_mgr_ptr->filterInit();
   can2_rx_mgr_ptr->startReceive();
   HAL_CAN_Start(&hcan2);
 
   // rc DMA init
-  HW_ASSERT(rc_rx_mgr_ptr != nullptr, "rc_rx_mgr_ptr is nullptr", rc_rx_mgr_ptr);
+  HW_ASSERT(rc_rx_mgr_ptr != nullptr, "rc_rx_mgr_ptr is nullptr",
+            rc_rx_mgr_ptr);
   rc_rx_mgr_ptr->startReceive();
   // rfr DMA Init
-  HW_ASSERT(rfr_rx_mgr_ptr != nullptr, "rfr_rx_mgr_ptr is nullptr", rfr_rx_mgr_ptr);
+  HW_ASSERT(rfr_rx_mgr_ptr != nullptr, "rfr_rx_mgr_ptr is nullptr",
+            rfr_rx_mgr_ptr);
   rfr_rx_mgr_ptr->startReceive();
 };
