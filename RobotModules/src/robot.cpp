@@ -254,7 +254,7 @@ void Robot::genModulesCmdFromRc() {
     } else if (r_switch == RcSwitchState::kMid) {
       // * 左上右中
       shooter_working_mode = Shooter::WorkingMode::Normal;
-      gimbal_ctrl_mode = CtrlMode::Auto;
+      // gimbal_ctrl_mode = CtrlMode::Auto;
       shooter_ctrl_mode = CtrlMode::Auto;
     } else if (r_switch == RcSwitchState::kDown) {
       // * 左上右下
@@ -272,7 +272,7 @@ void Robot::genModulesCmdFromRc() {
     } else if (r_switch == RcSwitchState::kMid) {
       // * 左中右中
       shooter_working_mode = Shooter::WorkingMode::Normal;
-      gimbal_ctrl_mode = CtrlMode::Auto;
+      // gimbal_ctrl_mode = CtrlMode::Auto;
       shooter_ctrl_mode = CtrlMode::Auto;
     } else if (r_switch == RcSwitchState::kDown) {
       // * 左中右下
@@ -288,7 +288,7 @@ void Robot::genModulesCmdFromRc() {
       gyro_dir = Chassis::GyroDir::Clockwise;
     } else if (r_switch == RcSwitchState::kMid) {
       // * 左下右中
-      gimbal_ctrl_mode = CtrlMode::Auto;
+      // gimbal_ctrl_mode = CtrlMode::Auto;
       shooter_ctrl_mode = CtrlMode::Auto;
       gyro_dir = Chassis::GyroDir::Clockwise;
     } else if (r_switch == RcSwitchState::kDown) {
