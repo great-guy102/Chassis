@@ -67,11 +67,13 @@ const hw_pid::MultiNodesPid::ParamsList kPidParamsSteer = {
 const hw_pid::MultiNodesPid::ParamsList kPidParamsFollowOmega = {
     {
         .auto_reset = true,
-        .kp = 10.0f,
-        .ki = 0,
-        .kd = 130.0,
-        .setpoint_ramping = hw_pid::SetpointRamping(true, -0.1, 0.1, 0.2),
+        .kp = 7.5f,  // 8.0
+        .ki = 0.005, // 0.004
+        .kd = 240.0,
+        .setpoint_ramping = hw_pid::SetpointRamping(true, -0.1, 0.1, 0.1),
         .period_sub = hw_pid::PeriodSub(true, 2.0 * PI), // 双向跟随，半圈过零
+        .inte_changing_rate = hw_pid::InteChangingRate(true, 0.01f, 0.5f),
+        .diff_filter = hw_pid::DiffFilter(true, -0.1f, 0.1f, 0.5f),
         .out_limit = kOutLimitFollowOmega,
     },
     //  这个双环不一定有用，拿的是YAW轴电机速度

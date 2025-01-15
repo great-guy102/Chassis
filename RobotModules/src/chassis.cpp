@@ -278,8 +278,8 @@ void Chassis::revNormCmd() {
 
     follow_omega_pid_ptr_->calc(&theta_ref, &theta_fdb, nullptr, &cmd.w);
 
-    if ((0.0001 <= cmd.v_x && cmd.v_x <= 0.2) ||
-        (0.0001 <= cmd.v_y && cmd.v_y <= 0.2)) {
+    if ((0.0001 <= cmd.v_x && cmd.v_x <= 0.1) ||
+        (0.0001 <= cmd.v_y && cmd.v_y <= 0.1)) {
       cmd.w = 0.0f;
     }
     if (fabs(cmd.w) <= 0.10) {

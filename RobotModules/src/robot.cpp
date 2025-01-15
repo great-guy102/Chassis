@@ -39,7 +39,7 @@ const hello_world::referee::RobotPerformanceData kDefaultRobotPerformanceData = 
         1, ///< 电源管理模块 chassis 口输出：0-关闭，1-开启
     .power_management_shooter_output =
         1, ///< 电源管理模块 shooter 口输出：0-关闭，1-开启
-};
+}; // namespace robot
 const hello_world::referee::RobotPowerHeatData kDefaultRobotPowerHeatData = {
     .chassis_voltage = 24000, ///< 电源管理模块的chassis口输出电压，单位：mV
     .chassis_current = 0, ///< 电源管理模块的chassis口输出电流，单位：mA
