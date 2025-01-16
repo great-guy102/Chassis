@@ -131,15 +131,24 @@ void Robot::updateRfrData() {
 
   GimbalChassisComm::RefereeData::ChassisPart &gimbal_rfr_data =
       gc_comm_ptr_->referee_data().cp;
+
+  bool is_new_bullet_shot = false;
+  if (!referee_ptr_->isOffline()) {
+    if (!rfr_shooter_pkg_ptr_->isHandled()) {
+      rfr_shooter_pkg_ptr_->setHandled();
+      is_new_bullet_shot = true;
+    }
+  }
   gimbal_rfr_data.is_rfr_shooter_power_on =
       rpp_data.power_management_shooter_output;
   gimbal_rfr_data.is_rfr_gimbal_power_on =
       rpp_data.power_management_gimbal_output;
+  gimbal_rfr_data.is_new_bullet_shot = is_new_bullet_shot;
   gimbal_rfr_data.robot_id = (RobotId)rpp_data.robot_id;
 
   // TODO: 换成实际的枪口
   gimbal_rfr_data.bullet_speed = rsp_data.bullet_speed;
-  gimbal_rfr_data.shooter_heat = rph_data.shooter_42mm_barrel_heat;
+  gimbal_rfr_data.shooter_heat = rph_data.shooter_17mm_1_barrel_heat;
   gimbal_rfr_data.shooter_cooling = rpp_data.shooter_barrel_cooling_value;
   gimbal_rfr_data.shooter_heat_limit = rpp_data.shooter_barrel_heat_limit;
 };
@@ -440,8 +449,6 @@ void Robot::setGimbalChassisCommData() {
             gc_comm_ptr_);
   HW_ASSERT(gimbal_ptr_ != nullptr, "Gimbal pointer is null", gimbal_ptr_);
   HW_ASSERT(shooter_ptr_ != nullptr, "Shooter pointer is null", shooter_ptr_);
-
-  // main board
 
   // gimbal
   GimbalChassisComm::GimbalData::ChassisPart &gimbal_data =
