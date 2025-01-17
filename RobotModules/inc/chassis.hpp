@@ -112,6 +112,7 @@ public:
   typedef hello_world::chassis_ik_solver::ChassisIkSolver ChassisIkSolver;
   typedef hello_world::cap::SuperCap Cap;
   typedef hello_world::power_limiter::PowerLimiter PwrLimiter;
+
   typedef hello_world::module::PwrState PwrState;
   typedef hello_world::module::CtrlMode CtrlMode;
   typedef hello_world::module::ManualCtrlSrc ManualCtrlSrc;
@@ -164,14 +165,15 @@ public:
   Chassis(const Config &config) { config_ = config; };
   ~Chassis() {};
 
-  virtual void update() override;
+  void update() override;
+
   void runOnDead() override;
   void runOnResurrection() override;
   void runOnWorking() override;
   void runAlways() override;
 
-  virtual void reset() override;
-  virtual void standby() override;
+  void reset() override;
+  void standby() override;
 
   WorkingMode getWorkingMode() const { return working_mode_; }
   WorkingMode getLastWorkingMode() const { return last_working_mode_; }
