@@ -17,7 +17,9 @@
 #define ROBOT_MODULES_GIMBAL_HPP_
 /* Includes ------------------------------------------------------------------*/
 #include "allocator.hpp"
+#include "module_fsm.hpp"
 #include "module_state.hpp"
+
 /* Exported macro ------------------------------------------------------------*/
 
 namespace robot {
@@ -65,7 +67,9 @@ union GimbalCmd {
 class Gimbal : public hello_world::MemMgr {
 public:
   typedef GimbalWorkingMode WorkingMode;
+  typedef hello_world::module::CtrlMode CtrlMode;
   typedef GimbalCmd Cmd;
+
   Gimbal() {};
   ~Gimbal() {};
 
@@ -85,7 +89,7 @@ private:
   // 由 robot 设置的数据
 
   Cmd norm_cmd_delta_ = {0.0, 0.0};                ///< 控制指令的增量
-  CtrlMode ctrl_mode_ = CtrlMode::Manual;          ///< 控制模式
+  CtrlMode ctrl_mode_ = CtrlMode::kManual;         ///< 控制模式
   WorkingMode working_mode_ = WorkingMode::Normal; ///< 工作模式
 
   bool rev_head_flag_ = false;      ///< 翻转头部朝向标志位

@@ -17,23 +17,26 @@
 #define ROBOT_MODULES_ROBOT_HPP_
 
 /* Includes ------------------------------------------------------------------*/
+#include "fsm.hpp"
+#include "tick.hpp"
+
 #include "DT7.hpp"
 #include "buzzer.hpp"
-#include "can_tx_mgr.hpp"
-#include "fsm.hpp"
 #include "imu.hpp"
 #include "motor.hpp"
-#include "referee.hpp"
 #include "super_cap.hpp"
-#include "tick.hpp"
+
+#include "can_tx_mgr.hpp"
+#include "referee.hpp"
 #include "transmitter.hpp"
 #include "uart_rx_mgr.hpp"
 #include "uart_tx_mgr.hpp"
 
+#include "module_fsm.hpp"
+
 #include "gimbal_chassis_comm.hpp"
 
 #include "chassis.hpp"
-#include "feed.hpp"
 #include "gimbal.hpp"
 #include "shooter.hpp"
 
@@ -43,7 +46,7 @@ namespace robot {
 /* Exported constants --------------------------------------------------------*/
 /* Exported types ------------------------------------------------------------*/
 
-class Robot : public Fsm {
+class Robot : public hello_world::module::ModuleFsm {
 public:
   typedef hello_world::buzzer::Buzzer Buzzer;
   typedef hello_world::cap::SuperCap Cap;
@@ -62,10 +65,13 @@ public:
   typedef hello_world::referee::Referee Referee;
   typedef hello_world::referee::ids::RobotId RobotId;
 
+  typedef hello_world::module::PwrState PwrState;
+  typedef hello_world::module::CtrlMode CtrlMode;
+  typedef hello_world::module::ManualCtrlSrc ManualCtrlSrc;
+
   typedef robot::Chassis Chassis;
   typedef robot::Gimbal Gimbal;
   typedef robot::Shooter Shooter;
-  typedef robot::Feed Feed;
 
   class TxDevMgrPair {
   public:
@@ -130,12 +136,16 @@ public:
 
   // 状态机主要接口函数
   void update() override;
-  void run() override;
+
+  void runOnDead() override;
+  void runOnResurrection() override;
+  void runOnWorking() override;
+  void runAlways() override;
+
   void reset() override;
   void standby() override;
 
   void registerChassis(Chassis *ptr);
-  void registerFeed(Feed *ptr);
   void registerGimbal(Gimbal *ptr);
   void registerShooter(Shooter *ptr);
   void registerBuzzer(Buzzer *ptr);
@@ -158,11 +168,6 @@ private:
   void updateRfrData();
   void updateRcData();
   void updatePwrState();
-
-  // 各工作状态任务执行函数
-  void runOnDead();
-  void runOnResurrection();
-  void runOnWorking();
 
   void genModulesCmd();
 
@@ -199,13 +204,12 @@ private:
   bool is_imu_caled_offset_ = false; ///< IMU 数据是否计算完零飘
 
   // RC 数据在 update 函数中更新
-  ManualCtrlSrc manual_ctrl_src_ = ManualCtrlSrc::Rc;      ///< 手动控制源
-  ManualCtrlSrc last_manual_ctrl_src_ = ManualCtrlSrc::Rc; ///< 上一手动控制源
+  ManualCtrlSrc manual_ctrl_src_ = ManualCtrlSrc::kRc; ///< 手动控制源
+  ManualCtrlSrc last_manual_ctrl_src_ = ManualCtrlSrc::kRc; ///< 上一手动控制源
 
   // 主要模块状态机组件指针
   Chassis *chassis_ptr_ = nullptr; ///< 底盘模块指针
   Gimbal *gimbal_ptr_ = nullptr;   ///< 云台模块指针
-  Feed *feed_ptr_ = nullptr;       ///< 送弹模块指针
   Shooter *shooter_ptr_ = nullptr; ///< 发射模块指针
 
   // 无通信功能的组件指针

@@ -30,7 +30,6 @@ static bool is_chassis_inited = false;
 
 robot::Robot unique_robot = robot::Robot();
 robot::Chassis unique_chassis = robot::Chassis(kChassisConfig);
-robot::Feed unique_feed = robot::Feed();
 robot::Gimbal unique_gimbal = robot::Gimbal();
 robot::Shooter unique_shooter = robot::Shooter();
 
@@ -99,7 +98,6 @@ robot::Chassis *GetChassis() {
 
 robot::Gimbal *GetGimbal() { return &unique_gimbal; };
 robot::Shooter *GetShooter() { return &unique_shooter; };
-robot::Feed *GetFeed() { return &unique_feed; }
 
 robot::Robot *GetRobot() {
   if (!is_robot_inited) {
@@ -108,7 +106,6 @@ robot::Robot *GetRobot() {
     unique_robot.registerChassis(GetChassis());
     unique_robot.registerShooter(GetShooter());
     unique_robot.registerGimbal(GetGimbal());
-    unique_robot.registerFeed(GetFeed());
 
     // 无通信功能的组件指针
     unique_robot.registerBuzzer(GetBuzzer());

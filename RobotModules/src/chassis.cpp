@@ -57,18 +57,18 @@ void Chassis::updateData() {
 void Chassis::updatePwrState() {
   // 无论任何状态，断电意味着要切到死亡状态
   if (!is_power_on_) {
-    setPwrState(PwrState::Dead);
+    setPwrState(PwrState::kDead);
     return;
   }
 
   PwrState current_state = pwr_state_;
   PwrState next_state = current_state;
-  if (current_state == PwrState::Dead) {
+  if (current_state == PwrState::kDead) {
     // 死亡状态下，如果上电，则切到复活状态
     if (is_power_on_) {
-      next_state = PwrState::Resurrection;
+      next_state = PwrState::kResurrection;
     }
-  } else if (current_state == PwrState::Resurrection) {
+  } else if (current_state == PwrState::kResurrection) {
     // 1. 为什么要判断云台板准备就绪？
     // 云台板计算零飘完零飘后会告知底盘准备就绪，如果云台板还未准备好，底盘就能够运动会导致云台板的姿态计算结果可能不准确
     // 2. 为什么只要有轮或舵电机上电完毕，就认为底盘就准备好了？
@@ -82,13 +82,13 @@ void Chassis::updatePwrState() {
     // 轴电机上电时，底盘会按照图传坐标系进行解算
     if (is_gimbal_imu_ready_ &&
         (is_any_wheel_online_ || is_any_steer_online_)) {
-      next_state = PwrState::Working;
+      next_state = PwrState::kWorking;
     }
-  } else if (current_state == PwrState::Working) {
+  } else if (current_state == PwrState::kWorking) {
     // 工作状态下，保持当前状态
   } else {
     // 其他状态，认为是死亡状态
-    next_state = PwrState::Dead;
+    next_state = PwrState::kDead;
   }
   setPwrState(next_state);
 };
@@ -193,27 +193,9 @@ void Chassis::updateIsPowerOn() {
 #pragma endregion
 
 #pragma region 执行任务
-void Chassis::run() {
-  if (pwr_state_ == PwrState::Dead) {
-    runOnDead();
-  } else if (pwr_state_ == PwrState::Resurrection) {
-    runOnResurrection();
-  } else if (pwr_state_ == PwrState::Working) {
-    runOnWorking();
-  } else {
-    runOnDead();
-  }
-};
+void Chassis::runOnDead() { resetDataOnDead(); };
 
-void Chassis::runOnDead() {
-  resetDataOnDead();
-  setCommData(false);
-};
-
-void Chassis::runOnResurrection() {
-  resetDataOnResurrection();
-  setCommData(false);
-};
+void Chassis::runOnResurrection() { resetDataOnResurrection(); };
 
 void Chassis::runOnWorking() {
   revNormCmd();
@@ -221,8 +203,9 @@ void Chassis::runOnWorking() {
   calcSteerCurrentRef();
   calcWheelLimitedSpeedRef();
   calcWheelCurrentRef();
-  setCommData(true);
 };
+
+void Chassis::runAlways() { setCommData(pwr_state_ == PwrState::kWorking); };
 
 void Chassis::standby() {
   resetDataOnStandby();
@@ -420,8 +403,8 @@ void Chassis::calcSteerCurrentRef() {
 
 #pragma region 数据重置函数
 void Chassis::reset() {
-  pwr_state_ = PwrState::Dead;      ///< 电源状态
-  last_pwr_state_ = PwrState::Dead; ///< 上一电源状态
+  pwr_state_ = PwrState::kDead;      ///< 电源状态
+  last_pwr_state_ = PwrState::kDead; ///< 上一电源状态
 
   // 由 robot 设置的数据
   use_cap_flag_ = false; ///< 是否使用超级电容

@@ -60,7 +60,7 @@ const hw_motor::OptionalParams kYawMotorParams = {
     /** 电机输出端实际角度与规定角度的差值 */
     .angle_offset = 1.53280616,
     /** 电机外置减速器的减速比（额外） */
-    // .ex_redu_rat = 14,
+    // .ex_redu_rat = 14,   //TODO ：和硬件了解
 };
 
 // TODO: 这里的 MotorId 需要按照实际情况修改

@@ -31,7 +31,6 @@ robot::Chassis *GetChassis();
 robot::Gimbal *GetGimbal();
 robot::Robot *GetRobot();
 robot::Shooter *GetShooter();
-robot::Feed *GetFeed();
 /* Exported function prototypes ----------------------------------------------*/
 
 #endif /* INSTANCE_INS_FSM_HPP_ */

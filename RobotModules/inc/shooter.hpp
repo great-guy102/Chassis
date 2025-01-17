@@ -18,7 +18,9 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "allocator.hpp"
+#include "module_fsm.hpp"
 #include "module_state.hpp"
+
 /* Exported macro ------------------------------------------------------------*/
 namespace robot {
 /* Exported constants --------------------------------------------------------*/
@@ -26,6 +28,7 @@ namespace robot {
 class Shooter : public hello_world::MemMgr {
 public:
   typedef ShooterWorkingMode WorkingMode;
+  typedef hello_world::module::CtrlMode CtrlMode;
 
   Shooter() {};
   ~Shooter() {};
@@ -45,8 +48,8 @@ private:
   // 由 robot 设置的数据
   bool shoot_flag_ = false;
 
-  CtrlMode ctrl_mode_ = CtrlMode::Manual;
-  WorkingMode working_mode_ = WorkingMode::Normal;
+  CtrlMode ctrl_mode_ = CtrlMode::kManual;
+  WorkingMode working_mode_ = WorkingMode::kShoot;
 };
 /* Exported variables --------------------------------------------------------*/
 /* Exported function prototypes ----------------------------------------------*/

@@ -22,12 +22,15 @@
 
 #include "allocator.hpp"
 #include "chassis_iksolver.hpp"
-#include "gimbal_chassis_comm.hpp"
-#include "module_fsm_private.hpp" //TODO待移植组件库
-#include "motor.hpp"
 #include "pid.hpp"
 #include "power_limiter.hpp"
+
+#include "motor.hpp"
 #include "super_cap.hpp"
+
+#include "module_fsm.hpp"
+
+#include "gimbal_chassis_comm.hpp"
 /* Exported macro ------------------------------------------------------------*/
 
 namespace robot {
@@ -102,13 +105,16 @@ struct ChassisConfig {
   float max_rot_spd;      ///< 最大旋转速度
 };
 
-class Chassis : public Fsm {
+class Chassis : public hello_world::module::ModuleFsm {
 public:
   typedef hello_world::motor::Motor Motor;
   typedef hello_world::pid::MultiNodesPid MultiNodesPid;
   typedef hello_world::chassis_ik_solver::ChassisIkSolver ChassisIkSolver;
   typedef hello_world::cap::SuperCap Cap;
   typedef hello_world::power_limiter::PowerLimiter PwrLimiter;
+  typedef hello_world::module::PwrState PwrState;
+  typedef hello_world::module::CtrlMode CtrlMode;
+  typedef hello_world::module::ManualCtrlSrc ManualCtrlSrc;
 
   typedef robot::GimbalChassisComm GimbalChassisComm;
   typedef ChassisWorkingMode WorkingMode;
@@ -159,7 +165,11 @@ public:
   ~Chassis() {};
 
   virtual void update() override;
-  virtual void run() override;
+  void runOnDead() override;
+  void runOnResurrection() override;
+  void runOnWorking() override;
+  void runAlways() override;
+
   virtual void reset() override;
   virtual void standby() override;
 
@@ -214,10 +224,6 @@ private:
   void updateCapData();
   void updateIsPowerOn();
   void updatePwrState();
-
-  void runOnDead();
-  void runOnResurrection();
-  void runOnWorking();
 
   // 工作状态下，获取控制指令的函数
   void revNormCmd();
