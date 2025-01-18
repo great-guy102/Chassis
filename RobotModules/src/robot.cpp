@@ -139,10 +139,6 @@ void Robot::updateRfrData() {
       is_new_bullet_shot = true;
     }
   }
-  gimbal_rfr_data.is_rfr_shooter_power_on =
-      rpp_data.power_management_shooter_output;
-  gimbal_rfr_data.is_rfr_gimbal_power_on =
-      rpp_data.power_management_gimbal_output;
   gimbal_rfr_data.is_new_bullet_shot = is_new_bullet_shot;
   gimbal_rfr_data.robot_id = (RobotId)rpp_data.robot_id;
 
@@ -247,12 +243,13 @@ void Robot::genModulesCmdFromRc() {
     if (r_switch == RcSwitchState::kUp) {
       // * 左上右上
       shooter_working_mode = Shooter::WorkingMode::kShoot;
-      shoot_flag = (rc_wheel > 0.9f);
+      shoot_flag =
+          (rc_wheel > 0.9f); // TODO：待修改判定在外部，自动模式也能手动发弹
       use_cap_flag = true;
     } else if (r_switch == RcSwitchState::kMid) {
       // * 左上右中
       shooter_working_mode = Shooter::WorkingMode::kShoot;
-      // gimbal_ctrl_mode = CtrlMode::kAuto;
+      gimbal_ctrl_mode = CtrlMode::kAuto;
       shooter_ctrl_mode = CtrlMode::kAuto;
     } else if (r_switch == RcSwitchState::kDown) {
       // * 左上右下
@@ -270,7 +267,7 @@ void Robot::genModulesCmdFromRc() {
     } else if (r_switch == RcSwitchState::kMid) {
       // * 左中右中
       shooter_working_mode = Shooter::WorkingMode::kShoot;
-      // gimbal_ctrl_mode = CtrlMode::kAuto;
+      gimbal_ctrl_mode = CtrlMode::kAuto;
       shooter_ctrl_mode = CtrlMode::kAuto;
     } else if (r_switch == RcSwitchState::kDown) {
       // * 左中右下
@@ -286,7 +283,7 @@ void Robot::genModulesCmdFromRc() {
       gyro_dir = Chassis::GyroDir::Clockwise;
     } else if (r_switch == RcSwitchState::kMid) {
       // * 左下右中
-      // gimbal_ctrl_mode = CtrlMode::kAuto;
+      gimbal_ctrl_mode = CtrlMode::kAuto;
       shooter_ctrl_mode = CtrlMode::kAuto;
       gyro_dir = Chassis::GyroDir::Clockwise;
     } else if (r_switch == RcSwitchState::kDown) {

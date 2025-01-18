@@ -63,7 +63,7 @@ public:
   typedef hello_world::referee::RobotPowerHeatPackage PowerHeatPkg;
   typedef hello_world::referee::RobotShooterPackage ShooterPkg;
   typedef hello_world::referee::Referee Referee;
-  typedef hello_world::referee::ids::RobotId RobotId;
+  typedef hello_world::referee::RfrId RobotId;
 
   typedef hello_world::module::PwrState PwrState;
   typedef hello_world::module::CtrlMode CtrlMode;
