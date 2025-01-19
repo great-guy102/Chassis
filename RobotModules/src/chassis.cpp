@@ -599,8 +599,12 @@ void Chassis::setCommDataCap(bool working_flag) {
   } else {
     cap_ptr_->disable();
   }
-  cap_ptr_->setRfrData(rfr_data_.pwr_buffer, rfr_data_.pwr_limit,
-                       rfr_data_.current_hp);
+  if (pwr_state_ != PwrState::kWorking) {
+    cap_ptr_->setRfrData(rfr_data_.pwr_buffer, rfr_data_.pwr_limit, 0);
+  } else {
+    cap_ptr_->setRfrData(rfr_data_.pwr_buffer, rfr_data_.pwr_limit,
+                         rfr_data_.current_hp);
+  }
 };
 
 #pragma endregion
