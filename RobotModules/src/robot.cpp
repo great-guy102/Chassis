@@ -42,9 +42,9 @@ const hello_world::referee::RobotPerformanceData kDefaultRobotPerformanceData = 
 }; // namespace robot
 const hello_world::referee::RobotPowerHeatData kDefaultRobotPowerHeatData = {
     .chassis_voltage = 24000, ///< 电源管理模块的chassis口输出电压，单位：mV
-    .chassis_current = 0, ///< 电源管理模块的chassis口输出电流，单位：mA
-    .chassis_power = 0,  ///< 底盘功率，单位：W
-    .buffer_energy = 60, ///< 缓冲能量，单位：J
+    .chassis_current = 0,     ///< 电源管理模块的chassis口输出电流，单位：mA
+    .chassis_power = 0,       ///< 底盘功率，单位：W
+    .buffer_energy = 60,      ///< 缓冲能量，单位：J
 
     .shooter_17mm_1_barrel_heat = 0, ///< 第一个17mm发射机构的枪口热量
     .shooter_17mm_2_barrel_heat = 0, ///< 第二个17mm发射机构的枪口热量
@@ -218,22 +218,23 @@ void Robot::genModulesCmd() {
 };
 
 void Robot::genModulesCmdFromRc() {
-  // TODO: 这里应该生成各个模块的指令，包括底盘指令、云台指令、底盘状态等等
+  // 这里应该生成各个模块的指令，包括底盘指令、云台指令、底盘状态等等
   // 指令应该通过各个模块的接口发送给各个模块
   RcSwitchState l_switch = rc_ptr_->rc_l_switch();
   RcSwitchState r_switch = rc_ptr_->rc_r_switch();
   float rc_wheel = rc_ptr_->rc_wheel();
 
   Chassis::WorkingMode chassis_working_mode = Chassis::WorkingMode::Depart;
-  Chassis::GyroDir gyro_dir = Chassis::GyroDir::NotRotate;
   Gimbal::WorkingMode gimbal_working_mode = Gimbal::WorkingMode::Normal;
   Shooter::WorkingMode shooter_working_mode = Shooter::WorkingMode::kStop;
+  Chassis::GyroDir gyro_dir = Chassis::GyroDir::Unspecified;
 
   CtrlMode gimbal_ctrl_mode = CtrlMode::kManual;
   CtrlMode shooter_ctrl_mode = CtrlMode::kManual;
 
   bool use_cap_flag = false;
   bool shoot_flag = false;
+  // bool rev_head_flag = false; //TODO:掉头模式
 
   // TODO: 后续需要加入慢拨模式
   if (l_switch == RcSwitchState::kUp) {
@@ -269,6 +270,7 @@ void Robot::genModulesCmdFromRc() {
       shooter_working_mode = Shooter::WorkingMode::kShoot;
       gimbal_ctrl_mode = CtrlMode::kAuto;
       shooter_ctrl_mode = CtrlMode::kAuto;
+      // rev_head_flag = (rc_wheel > 0.9f); // TODO:掉头模式
     } else if (r_switch == RcSwitchState::kDown) {
       // * 左中右下
       gimbal_working_mode = Gimbal::WorkingMode::PidTest;
@@ -286,34 +288,40 @@ void Robot::genModulesCmdFromRc() {
       gimbal_ctrl_mode = CtrlMode::kAuto;
       shooter_ctrl_mode = CtrlMode::kAuto;
       gyro_dir = Chassis::GyroDir::Clockwise;
+      // rev_head_flag = (rc_wheel > 0.9f); // TODO:掉头模式
     } else if (r_switch == RcSwitchState::kDown) {
       // * 左下右下
       gyro_dir = Chassis::GyroDir::AntiClockwise;
+      gimbal_working_mode = Gimbal::WorkingMode::PidTest;
     }
   }
-
-  chassis_ptr_->setWorkingMode(chassis_working_mode);
-  chassis_ptr_->setGyroDir(gyro_dir);
-  chassis_ptr_->setUseCapFlag(use_cap_flag);
 
   ChassisCmd chassis_cmd = {0};
   chassis_cmd.v_x = hello_world::Bound(rc_ptr_->rc_rv(), -1, 1);
   chassis_cmd.v_y = hello_world::Bound(-rc_ptr_->rc_rh(), -1, 1);
   chassis_cmd.w = 0;
   chassis_ptr_->setNormCmd(chassis_cmd);
+  chassis_ptr_->setWorkingMode(chassis_working_mode);
+  chassis_ptr_->setGyroDir(gyro_dir);
+  chassis_ptr_->setUseCapFlag(use_cap_flag);
+  // TODO：掉头模式
+  //  if (rev_head_flag) {
+  //    chassis_ptr_->revHead();
+  //  }
 
-  float omega_feedforward = hello_world::Bound(-rc_ptr_->rc_lh(), -1, 1);
-  ;
-  chassis_ptr_->setOmegaFeedforward(omega_feedforward);
-
-  gimbal_ptr_->setCtrlMode(gimbal_ctrl_mode);
-  gimbal_ptr_->setWorkingMode(gimbal_working_mode);
+  // TODO：跟随模式云台前馈记录
+  // float omega_feedforward = hello_world::Bound(-rc_ptr_->rc_lh(), -1, 1);
+  // ;
+  // chassis_ptr_->setOmegaFeedforward(omega_feedforward);
 
   GimbalCmd gimbal_cmd;
   gimbal_cmd.pitch = hello_world::Bound(rc_ptr_->rc_lv(), -1, 1);
   gimbal_cmd.yaw = hello_world::Bound(-rc_ptr_->rc_lh(), -1,
                                       1); // 右手系，z轴竖直向上，左转为正
   gimbal_ptr_->setNormCmdDelta(gimbal_cmd);
+  gimbal_ptr_->setCtrlMode(gimbal_ctrl_mode);
+  gimbal_ptr_->setWorkingMode(gimbal_working_mode);
+  // gimbal_ptr_->setRevHeadFlag(rev_head_flag); //TODO：掉头模式
 
   shooter_ptr_->setCtrlMode(shooter_ctrl_mode);
   shooter_ptr_->setWorkingMode(shooter_working_mode);
@@ -323,77 +331,67 @@ void Robot::genModulesCmdFromRc() {
 void Robot::genModulesCmdFromKb() {
   // // TODO: 这里应该生成各个模块的指令，包括底盘指令、云台指令、底盘状态等等
   // // 指令应该通过各个模块的接口发送给各个模块
-  // Chassis::WorkingMode chassis_working_mode = chassis_ptr_->getWorkingMode();
+  Chassis::WorkingMode chassis_working_mode = chassis_ptr_->getWorkingMode();
+  Gimbal::WorkingMode gimbal_working_mode = gimbal_ptr_->getWorkingMode();
+  Shooter::WorkingMode shooter_working_mode = Shooter::WorkingMode::kStop;
 
-  // CtrlMode gimbal_ctrl_mode = CtrlMode::kManual;
-  // Gimbal::WorkingMode gimbal_working_mode = Gimbal::WorkingMode::Normal;
-  // bool rev_head_flag = false;
+  CtrlMode gimbal_ctrl_mode = CtrlMode::kManual;
+  CtrlMode shooter_ctrl_mode = CtrlMode::kManual;
 
-  // CtrlMode feed_ctrl_mode = CtrlMode::kManual;
-  // Shooter::WorkingMode shooter_working_mode = Shooter::WorkingMode::kShoot;
-  // bool shoot_flag = false;
+  bool use_cap_flag = false; // TODO待加入超级电容
+  bool shoot_flag = false;
+  // bool rev_head_flag = false; //TODO:掉头模式
 
-  // if (rc_ptr_->key_Q()) {
-  //   chassis_working_mode = Chassis::WorkingMode::Gyro;
-  // } else if (rc_ptr_->key_E()) {
-  //   chassis_working_mode = Chassis::WorkingMode::Follow;
-  // } else if (rc_ptr_->key_X()) {
-  //   // chassis_working_mode = Chassis::WorkingMode::Farshoot;
-  //   // gimbal_working_mode = Gimbal::WorkingMode::Farshoot;
-  // } else {
-  //   // if (chassis_working_mode == Chassis::WorkingMode::Farshoot) {
-  //   //   chassis_working_mode = chassis_ptr_->getLastWorkingMode();
-  //   // } else
-  //   if (chassis_working_mode == Chassis::WorkingMode::Depart) {
-  //     chassis_working_mode = Chassis::WorkingMode::Follow;
-  //   }
-  // }
-  // if (rc_ptr_->key_B()) {
-  //   rev_head_flag = true;
-  // }
-  // if (rc_ptr_->key_Z()) {
-  //   shooter_working_mode = Shooter::WorkingMode::kBackward;
-  // }
-  // // if (rc_ptr_->key_R()) {
-  // //   scope_ctrl_angle_flag = (scope_working_mode ==
-  // //   Scope::WorkingMode::Farshoot);
-  // // }
-  // // if (rc_ptr_->key_F()) {
-  // //   switch_scope_flag = (scope_working_mode ==
-  // Scope::WorkingMode::Farshoot);
-  // // }
+  if (rc_ptr_->key_Q()) {
+    chassis_working_mode = Chassis::WorkingMode::Gyro;
+  } else if (rc_ptr_->key_E()) {
+    chassis_working_mode = Chassis::WorkingMode::Follow;
+  } else if (rc_ptr_->key_C()) {
+    chassis_working_mode = Chassis::WorkingMode::Depart;
+  } else {
+    // if (chassis_working_mode == Chassis::WorkingMode::Depart) {
+    //   chassis_working_mode = Chassis::WorkingMode::Follow;
+    // } //TODO:待优化控制逻辑
+  }
 
-  // if (rc_ptr_->mouse_l_btn()) {
-  //   shoot_flag = true;
-  // }
-  // if (rc_ptr_->mouse_r_btn()) {
-  //   feed_ctrl_mode = CtrlMode::kAuto;
-  //   gimbal_ctrl_mode = CtrlMode::kAuto;
-  // }
+  if (rc_ptr_->key_X()) {
+    // rev_head_flag = true; //TODO：掉头模式
+  }
+  if (rc_ptr_->key_Z()) {
+    shooter_working_mode = Shooter::WorkingMode::kBackward;
+  }
 
-  // ChassisCmd chassis_cmd = {0};
-  // chassis_cmd.v_x = (int8_t)rc_ptr_->key_W() - (int8_t)rc_ptr_->key_S();
-  // chassis_cmd.v_y = (int8_t)rc_ptr_->key_A() - (int8_t)rc_ptr_->key_D();
-  // chassis_cmd.w = 0;
-  // chassis_ptr_->setNormCmd(chassis_cmd);
-  // chassis_ptr_->setWorkingMode(chassis_working_mode);
-  // chassis_ptr_->setUseCapFlag(rc_ptr_->key_SHIFT());
-  // if (rev_head_flag)
-  //   chassis_ptr_->revHead();
+  if (rc_ptr_->mouse_l_btn()) {
+    shoot_flag = true;
+  }
+  if (rc_ptr_->mouse_r_btn()) {
+    gimbal_ctrl_mode = CtrlMode::kAuto;
+    shooter_ctrl_mode = CtrlMode::kAuto;
+  }
 
-  // GimbalCmd gimbal_cmd;
-  // gimbal_cmd.pitch = hello_world::Bound(-0.01 * rc_ptr_->mouse_y(), -1, 1);
-  // gimbal_cmd.yaw = hello_world::Bound(-0.01 * rc_ptr_->mouse_x(), -1, 1);
-  // gimbal_ptr_->setNormCmdDelta(gimbal_cmd);
-  // gimbal_ptr_->setCtrlMode(gimbal_ctrl_mode);
-  // gimbal_ptr_->setWorkingMode(gimbal_working_mode);
-  // gimbal_ptr_->setRevHeadFlag(rev_head_flag);
+  ChassisCmd chassis_cmd = {0};
+  chassis_cmd.v_x = (int8_t)rc_ptr_->key_W() - (int8_t)rc_ptr_->key_S();
+  chassis_cmd.v_y = (int8_t)rc_ptr_->key_A() - (int8_t)rc_ptr_->key_D();
+  chassis_cmd.w = 0;
+  chassis_ptr_->setNormCmd(chassis_cmd);
+  chassis_ptr_->setWorkingMode(chassis_working_mode);
+  chassis_ptr_->setUseCapFlag(rc_ptr_->key_SHIFT());
+  // TODO：掉头模式
+  //  if (rev_head_flag)
+  //    chassis_ptr_->revHead();
 
-  // feed_ptr_->setCtrlMode(feed_ctrl_mode);
-  // feed_ptr_->setWorkingMode(feed_working_mode);
-  // feed_ptr_->setShootFlag(shoot_flag);
+  GimbalCmd gimbal_cmd;
+  gimbal_cmd.pitch = hello_world::Bound(-0.01 * rc_ptr_->mouse_y(), -1, 1);
+  gimbal_cmd.yaw = hello_world::Bound(-0.01 * rc_ptr_->mouse_x(), -1, 1);
+  gimbal_ptr_->setNormCmdDelta(gimbal_cmd);
+  gimbal_ptr_->setCtrlMode(gimbal_ctrl_mode);
+  gimbal_ptr_->setWorkingMode(gimbal_working_mode);
+  // TODO：掉头模式
+  //  gimbal_ptr_->setRevHeadFlag(rev_head_flag);
 
-  // shooter_ptr_->setWorkingMode(shooter_working_mode); // TODO键盘设置待同步
+  shooter_ptr_->setCtrlMode(shooter_ctrl_mode);
+  shooter_ptr_->setWorkingMode(shooter_working_mode);
+  shooter_ptr_->setShootFlag(shoot_flag);
 };
 
 #pragma endregion
@@ -436,7 +434,8 @@ void Robot::setGimbalChassisCommData() {
   // gimbal
   GimbalChassisComm::GimbalData::ChassisPart &gimbal_data =
       gc_comm_ptr_->gimbal_data().cp;
-  gimbal_data.turn_back_flag = gimbal_ptr_->getRevHeadFlag();
+  // gimbal_data.turn_back_flag = gimbal_ptr_->getRevHeadFlag();
+  // //TODO：掉头模式
   gimbal_data.yaw_delta = gimbal_ptr_->getNormCmdDelta().yaw;
   gimbal_data.pitch_delta = gimbal_ptr_->getNormCmdDelta().pitch;
   gimbal_data.ctrl_mode = gimbal_ptr_->getCtrlMode();
@@ -526,15 +525,16 @@ void Robot::sendCommData() {
   sendUsartData();
 };
 void Robot::sendCanData() {
-  sendSteersMotorData();
   if (work_tick_ % 10 == 0) {
     sendCapData();
   }
-  if (work_tick_ % 2 == 0) {
-    sendWheelsMotorData();
-  } else if (work_tick_ % 2 == 1) {
-    if (work_tick_ > 1000) {
-      sendGimbalChassisCommData();
+  if (work_tick_ > 1000 && work_tick_ % 2 == 1) {
+    sendGimbalChassisCommData();
+  }
+  if (work_tick_ > 2000) {
+    sendSteersMotorData();
+    if (work_tick_ % 2 == 0) {
+      sendWheelsMotorData();
     }
   }
 };
@@ -767,5 +767,6 @@ void Robot::registerShooterPkg(ShooterPkg *ptr) {
   rfr_shooter_pkg_ptr_ = ptr;
 };
 #pragma endregion
-/* Private function definitions ----------------------------------------------*/
+/* Private function definitions
+ * ----------------------------------------------*/
 } // namespace robot

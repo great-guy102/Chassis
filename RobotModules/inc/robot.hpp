@@ -204,7 +204,7 @@ private:
   bool is_imu_caled_offset_ = false; ///< IMU 数据是否计算完零飘
 
   // RC 数据在 update 函数中更新
-  ManualCtrlSrc manual_ctrl_src_ = ManualCtrlSrc::kRc; ///< 手动控制源
+  ManualCtrlSrc manual_ctrl_src_ = ManualCtrlSrc::kRc;      ///< 手动控制源
   ManualCtrlSrc last_manual_ctrl_src_ = ManualCtrlSrc::kRc; ///< 上一手动控制源
 
   // 主要模块状态机组件指针
@@ -229,7 +229,7 @@ private:
 
   // 收发数据的组件指针
   GimbalChassisComm *gc_comm_ptr_ = nullptr; ///< 云台底盘通信模块指针 收发数据
-  Referee *referee_ptr_ = nullptr; ///< 裁判系统指针 收发数据
+  Referee *referee_ptr_ = nullptr;           ///< 裁判系统指针 收发数据
   PerformancePkg *rfr_performance_pkg_ptr_ =
       nullptr; ///< 裁判系统性能包指针 收发数据
   PowerHeatPkg *rfr_power_heat_pkg_ptr_ =

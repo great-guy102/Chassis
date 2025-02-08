@@ -87,13 +87,13 @@ union ChassisCmd {
 struct ChassisRfrData {
   bool is_rfr_on = false; ///< 裁判系统是否在线
   bool is_pwr_on =
-      false; ///< 机器人底盘电源是否开启【裁判系统告知，离线时默认开启】
+      false;     ///< 机器人底盘电源是否开启【裁判系统告知，离线时默认开启】
   float pwr = 0; ///< 机器人底盘功率【裁判系统告知，离线时默认0】
   uint16_t pwr_limit =
       80; ///< 机器人底盘功率限制【裁判系统告知，离线时采用默认值】
   uint16_t pwr_buffer =
       60; ///< 机器人底盘缓冲能量【裁判系统告知，离线时采用默认值】
-  uint16_t voltage = 24; ///< 底盘电压【裁判系统告知，离线时采用默认值】
+  uint16_t voltage = 24;     ///< 底盘电压【裁判系统告知，离线时采用默认值】
   uint16_t current_hp = 100; ///< 底盘血量【裁判系统告知，离线时采用默认值】
 };
 
@@ -126,7 +126,7 @@ public:
 
   enum class GyroDir : int8_t {
     Clockwise = -1,    ///< 顺时针
-    NotRotate = 0,     ///< 静止
+    Unspecified = 0,   ///< 静止
     AntiClockwise = 1, ///< 逆时针
   };
 
@@ -266,7 +266,7 @@ private:
   // 由 robot 设置的数据
   bool use_cap_flag_ = false; ///< 是否使用超级电容
   GyroDir gyro_dir_ =
-      GyroDir::NotRotate; ///< 小陀螺方向，正为绕 Z 轴逆时针，负为顺时针，
+      GyroDir::Unspecified; ///< 小陀螺方向，正为绕 Z 轴逆时针，负为顺时针，
   Cmd norm_cmd_ = {0};      ///< 原始控制指令，基于图传坐标系
   ChassisRfrData rfr_data_; ///< 底盘 RFR 数据
 
@@ -289,12 +289,12 @@ private:
       0; ///< 云台 YAW 轴角速度，用于底盘跟随前馈，单位 rad/s
   float wheel_speed_ref_[4] = {0}; ///< 轮电机的速度参考值 单位 rad/s
   float wheel_speed_ref_limited_[4] = {
-      0}; ///< 轮电机的速度参考值(限幅后) 单位 rad/s
+      0};                            ///< 轮电机的速度参考值(限幅后) 单位 rad/s
   float wheel_current_ref_[4] = {0}; ///< 轮电机的电流参考值 单位 A [-20, 20]
-  float steer_speed_ref_[4] = {0}; ///< 舵电机的速度参考值 单位 rad/s
+  float steer_speed_ref_[4] = {0};   ///< 舵电机的速度参考值 单位 rad/s
   float steer_speed_ref_limited_[4] = {
-      0}; ///< 舵电机的速度参考值(限幅后) 单位 rad/s
-  float steer_angle_ref_[4] = {0}; ///< 舵电机的角度参考值 单位 rad
+      0};                            ///< 舵电机的速度参考值(限幅后) 单位 rad/s
+  float steer_angle_ref_[4] = {0};   ///< 舵电机的角度参考值 单位 rad
   float steer_current_ref_[4] = {0}; ///< 舵电机的电流参考值 单位 A [-3.0, 3.0]
 
   bool rev_head_flag_ = false;      ///< 转向后退标志
@@ -324,14 +324,14 @@ private:
 
   // 各组件指针
   // 无通信功能的组件指针
-  ChassisIkSolver *ik_solver_ptr_ = nullptr; ///< 逆解算器指针
+  ChassisIkSolver *ik_solver_ptr_ = nullptr;               ///< 逆解算器指针
   MultiNodesPid *wheel_pid_ptr_[kWheelPidNum] = {nullptr}; ///< 轮电机 PID 指针
   MultiNodesPid *steer_pid_ptr_[kSteerPidNum] = {nullptr}; ///< 舵电机 PID 指针
   MultiNodesPid *follow_omega_pid_ptr_ = nullptr; ///< 跟随模式下角速度 PID 指针
   PwrLimiter *pwr_limiter_ptr_ = nullptr;
   // 只接收数据的组件指针
   GimbalChassisComm *gc_comm_ptr_ = nullptr; ///< 云台底盘通信器指针 只接收数据
-  Motor *yaw_motor_ptr_ = nullptr; ///< 云台电机指针 接收、发送数据
+  Motor *yaw_motor_ptr_ = nullptr;           ///< 云台电机指针 接收、发送数据
   // 接收、发送数据的组件指针
   Cap *cap_ptr_ = nullptr; ///< 超电指针 接收、发送数据
   Motor *wheel_motor_ptr_[kWheelMotorNum] = {

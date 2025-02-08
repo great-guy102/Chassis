@@ -220,16 +220,20 @@ void Chassis::revNormCmd() {
   static bool first_follow_flag = true;
   Cmd cmd = norm_cmd_;
 
-  if (working_mode_ == WorkingMode::Depart) {
+  switch (working_mode_) {
+  case WorkingMode::Depart: {
     // 分离模式不对 norm_cmd_ 进行额外处理
-    gyro_dir_ = GyroDir::NotRotate;
+    gyro_dir_ = GyroDir::Unspecified;
     first_follow_flag = true;
-  } else if (working_mode_ == WorkingMode::Gyro) {
+    break;
+  }
+
+  case WorkingMode::Gyro: {
     // 陀螺模式下，如果外部没有设置陀螺旋转方向，
     // 则每次进入陀螺模式时，随机选择一个方向
     first_follow_flag = true;
 
-    if (gyro_dir_ == GyroDir::NotRotate) {
+    if (gyro_dir_ == GyroDir::Unspecified) {
       if (rand() % 2 == 0) {
         gyro_dir_ = GyroDir::Clockwise;
       } else {
@@ -238,18 +242,25 @@ void Chassis::revNormCmd() {
     }
     // 小陀螺模式下，旋转分量为定值
     cmd.w = config_.gyro_rot_spd * (int8_t)gyro_dir_;
+    break;
+  }
 
-  } else if (working_mode_ == WorkingMode::Follow) {
+  case WorkingMode::Follow: {
+    gyro_dir_ = GyroDir::Unspecified;
+    // TODO：掉头模式
+    // //  在转头过程中，底盘不响应跟随转动指令
+    // if (work_tick_ - last_rev_head_tick_ < 800) {
+    //   break;
+    // }
+
     // 跟随模式下，更新跟随目标
     float theta_fdb = theta_i2r_;
     float theta_ref = 0.0f;
+    // TODO：跟随模式云台前馈记录
     // float omega_feedforward = config_.yaw_sensitivity * omega_feedforward_;
-    // if (rev_head_flag_) {
-    //   theta_ref = PI;
-    // }
     // follow_omega_pid_ptr_->calc(&theta_ref, &theta_fdb, &omega_feedforward,
     //                             &cmd.w);
-    // follow_omega_pid_ptr_->calc(&theta_ref, &theta_fdb, nullptr, &cmd.w);
+
     if (first_follow_flag) {
       first_follow_flag = false;
       if (fabs(theta_fdb) < PI / 2) {
@@ -268,10 +279,11 @@ void Chassis::revNormCmd() {
     if (fabs(cmd.w) <= 0.10) {
       cmd.w = 0.0f;
     }
+    break;
   }
-
-  if (working_mode_ != WorkingMode::Gyro) {
-    gyro_dir_ = GyroDir::NotRotate;
+  default: {
+    break;
+  }
   }
 
   if (is_high_spd_enabled_) {
@@ -307,9 +319,9 @@ void Chassis::calcMotorsRef() {
 void Chassis::calcWheelLimitedSpeedRef() {
   hello_world::power_limiter::PwrLimitRuntimeParams runtime_params = {
       .is_referee_online = rfr_data_.is_rfr_on, // 裁判系统是否在线
-      .p_rfr_max = rfr_data_.pwr_limit, // 裁判系统给出功率上限
-      .z_rfr_measure = rfr_data_.pwr_buffer, // 裁判系统给出剩余缓冲能量值
-      .p_rfr_measure = rfr_data_.pwr,        // 裁判系统给出实际功率
+      .p_rfr_max = rfr_data_.pwr_limit,         // 裁判系统给出功率上限
+      .z_rfr_measure = rfr_data_.pwr_buffer,    // 裁判系统给出剩余缓冲能量值
+      .p_rfr_measure = rfr_data_.pwr,           // 裁判系统给出实际功率
       .p_dummy_max =
           rfr_data_.pwr_limit, // TODO: 这个参数和p_rfr_max有什么区别？
   };
@@ -409,7 +421,7 @@ void Chassis::reset() {
   // 由 robot 设置的数据
   use_cap_flag_ = false; ///< 是否使用超级电容
   gyro_dir_ =
-      GyroDir::NotRotate; ///< 小陀螺方向，正为绕 Z 轴逆时针，负为顺时针，
+      GyroDir::Unspecified; ///< 小陀螺方向，正为绕 Z 轴逆时针，负为顺时针，
   norm_cmd_.reset();
   rfr_data_ = RfrData(); ///< 底盘 RFR 数据
 
