@@ -25,7 +25,9 @@ const hw_chassis_iksolver::PosVec kCenterPos =
 const hw_chassis_iksolver::WheelParams kIkSolverParams = {
     .opt_mask =
         hw_chassis_iksolver::SteeredStandardWheel::kOptMaskCosRotSpd |
-        hw_chassis_iksolver::SteeredStandardWheel::kOptMaskMinThetaVelDelta,
+        hw_chassis_iksolver::SteeredStandardWheel::kOptMaskMinThetaVelDelta |
+        hw_chassis_iksolver::SteeredStandardWheel::
+            kOptMaskKeepLastThetaVelRefWhen0,
     .radius = kWheelRadius,
 };
 /* Private macro -------------------------------------------------------------*/

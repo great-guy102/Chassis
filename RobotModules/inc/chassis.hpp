@@ -230,7 +230,7 @@ private:
   // 工作状态下，获取控制指令的函数
   void revNormCmd();
   void calcMotorsRef();
-  void calcWheelLimitedSpeedRef();
+  void calcMotorsLimitedRef();
   void calcPwrLimitedCurrentRef();
   void calcWheelCurrentRef();
   void calcWheelCurrentLimited();
@@ -291,11 +291,13 @@ private:
   float wheel_speed_ref_limited_[4] = {
       0};                            ///< 轮电机的速度参考值(限幅后) 单位 rad/s
   float wheel_current_ref_[4] = {0}; ///< 轮电机的电流参考值 单位 A [-20, 20]
-  float steer_speed_ref_[4] = {0};   ///< 舵电机的速度参考值 单位 rad/s
-  float steer_speed_ref_limited_[4] = {
-      0};                            ///< 舵电机的速度参考值(限幅后) 单位 rad/s
-  float steer_angle_ref_[4] = {0};   ///< 舵电机的角度参考值 单位 rad
+  float wheel_current_ref_limited_[4] = {0}; ///< 轮电机的电流参考值(限幅后)
+                                             ///< 单位 A [-20, 20]
+  float steer_speed_ref_[4] = {0};           ///< 舵电机的速度参考值 单位 rad/s
+  float steer_angle_ref_[4] = {0};           ///< 舵电机的角度参考值 单位 rad
   float steer_current_ref_[4] = {0}; ///< 舵电机的电流参考值 单位 A [-3.0, 3.0]
+  float steer_current_ref_limited_[4] = {
+      0}; ///< 舵电机的电流参考值(限幅后) 单位 rad/s
 
   bool rev_head_flag_ = false;      ///< 转向后退标志
   uint32_t last_rev_head_tick_ = 0; ///< 上一次转向后退的时间戳

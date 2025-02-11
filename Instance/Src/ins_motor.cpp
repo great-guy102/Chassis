@@ -27,18 +27,18 @@ const hw_motor::OptionalParams kWheelMotorParams = {
     /** 电机外置减速器的减速比（额外） */
     .ex_redu_rat = 14,
     .max_raw_input_lim = 16384.0, // 报文输入限制
-    .max_curr_input_lim = 20.0,   // 电流输入限制为3.0A
+    .max_curr_input_lim = 20.0,   // 电流输入限制为20.0A
 };
 
 // 舵电机通用参数配置
 hw_motor::OptionalParams kSteerMotorParams = {
-    .input_type = hw_motor::InputType::kCurr, // 输入类型为电流控制
+    .input_type = hw_motor::InputType::kCurr,           // 输入类型为电流控制
     .angle_range = hw_motor::AngleRange::kNegPiToPosPi, // 角度范围为[-π, π)
     .dir = hw_motor::kDirRev,                           // 方向为正向
-    .remove_build_in_reducer = false, // 不移除内置减速器
-    .ex_redu_rat = 1,                 // 外置减速器的减速比为1
-    .max_raw_input_lim = 16384.0,     // 报文输入限制
-    .max_curr_input_lim = 3.0,        // 电流输入限制为3.0A
+    .remove_build_in_reducer = false,                   // 不移除内置减速器
+    .ex_redu_rat = 1,                                   // 外置减速器的减速比为1
+    .max_raw_input_lim = 16384.0,                       // 报文输入限制
+    .max_curr_input_lim = 3.0,                          // 电流输入限制为3.0A
 };
 
 // //舵电机零位设置

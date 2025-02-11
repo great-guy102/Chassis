@@ -201,7 +201,7 @@ void Chassis::runOnWorking() {
   revNormCmd();
   calcMotorsRef();
   calcSteerCurrentRef();
-  calcWheelLimitedSpeedRef();
+  calcMotorsLimitedRef();
   calcWheelCurrentRef();
 };
 
@@ -316,53 +316,69 @@ void Chassis::calcMotorsRef() {
   // }
 }
 
-void Chassis::calcWheelLimitedSpeedRef() {
-  hello_world::power_limiter::PwrLimitRuntimeParams runtime_params = {
-      .is_referee_online = rfr_data_.is_rfr_on, // 裁判系统是否在线
-      .p_rfr_max = rfr_data_.pwr_limit,         // 裁判系统给出功率上限
-      .z_rfr_measure = rfr_data_.pwr_buffer,    // 裁判系统给出剩余缓冲能量值
-      .p_rfr_measure = rfr_data_.pwr,           // 裁判系统给出实际功率
-      .p_dummy_max =
-          rfr_data_.pwr_limit, // TODO: 这个参数和p_rfr_max有什么区别？
+void Chassis::calcSteerCurrentRef() {
+  SteerPidIdx spis[4] = {
+      kSteerPidIdxLeftFront,
+      kSteerPidIdxLeftRear,
+      kSteerPidIdxRightRear,
+      kSteerPidIdxRightFront,
   };
+
+  MultiNodesPid *pid_ptr = nullptr;
+  for (size_t i = 0; i < 4; i++) {
+    pid_ptr = steer_pid_ptr_[spis[i]];
+    HW_ASSERT(pid_ptr != nullptr, "pointer to Steer PID %d is nullptr",
+              spis[i]);
+
+    float steer_motor_fdb[2] = {steer_angle_fdb_[i],
+                                steer_speed_fdb_[i]}; // TODO：滤波处理速度
+    pid_ptr->calc(&steer_angle_ref_[i], steer_motor_fdb, nullptr,
+                  &steer_current_ref_[i]);
+
+    // // TODO：功限调试
+    // pid_ptr->calc(&steer_angle_ref_[i], &steer_angle_fdb_[i], nullptr,
+    //               &steer_current_ref_[i]);
+  }
+}
+
+float rfr_pwr = 0.0f; // TODO:功限调试
+void Chassis::calcMotorsLimitedRef() {
+  hello_world::power_limiter::PowerLimiterRuntimeParams runtime_params = {
+      /* 期望功率上限，可以根据模式设置（低速/高速），单位：W */
+      .p_ref_max = 1.2f * rfr_data_.pwr_limit, // 60.0f,
+      /* 裁判系统给出的底盘功率限制，单位：W */
+      .p_referee_max = static_cast<float>(rfr_data_.pwr_limit),
+      /* 期望功率下限，建议设为当前 p_referee_max 乘一个 0 ~ 1
+         的比例系数，单位：W */
+      .p_ref_min = 0.8f * rfr_data_.pwr_limit, // 50.0f,
+      /* 剩余能量：采用裁判系统控制时为裁判系统缓冲能量 buffer_energy，单位：J
+       */
+      .remaining_energy = static_cast<float>(rfr_data_.pwr_buffer),
+      /* 剩余能量收敛值，当剩余能量到达该值时，期望功率等于裁判系统给出的底盘功率上限
+         p_referee_max */
+      .energy_converge = 30.0f,
+      /* 期望功率随当前剩余能量线性变化的斜率 */
+      .p_slope = 1.6f,
+      /* 危险能量值，若剩余能量低于该值，p_ref_ 设为 0 */
+      .danger_energy = 5.0f,
+  };
+  rfr_pwr = rfr_data_.pwr;
   if (!cap_ptr_->isOffline()) {
-    runtime_params.is_super_cap_online = true;
-    runtime_params.super_cap_mode =
-        hello_world::power_limiter::kPwrLimitSuperCapNormal;
-    runtime_params.z_dummy_measure = cap_ptr_->getRemainingPower();
-    runtime_params.p_cap_measure = cap_ptr_->getOutputPower();
+    runtime_params.remaining_energy = cap_ptr_->getRemainingPower();
   }
 
-  if (is_high_spd_enabled_) {
-    runtime_params.p_rfr_max += 800.0f;
-    runtime_params.z_rfr_measure = 60.0f;
-  }
-  pwr_limiter_ptr_->PwrLimitUpdateRuntimeParams(
-      runtime_params); // 更新运行时参数
-  // 进行功率限制
-  hello_world::power_limiter::MotorRuntimeParams motor_run_par[8];
-  for (uint8_t i = 0; i < 4; i++) {
-    motor_run_par[i].iq_measure = steer_motor_ptr_[i]->curr();
-    motor_run_par[i].spd_measure_radps = steer_motor_ptr_[i]->vel();
-    motor_run_par[i].spd_ref_radps = steer_speed_ref_[i];
-    motor_run_par[i].iq_ref = steer_current_ref_[i];
-    motor_run_par[i].type = hello_world::power_limiter::kMotorSteer;
-  };
-  for (uint8_t i = 4; i < 8; i++) {
-    motor_run_par[i].iq_measure = wheel_motor_ptr_[i - 4]->curr();
-    motor_run_par[i].spd_measure_radps = wheel_motor_ptr_[i - 4]->vel();
-    motor_run_par[i].spd_ref_radps = wheel_speed_ref_[i - 4];
-    motor_run_par[i].type = hello_world::power_limiter::kMotorWheel;
-  };
-  PwrLimiter::MotorRuntimeParamsList motor_run_par_list = {
-      motor_run_par[0], motor_run_par[1], motor_run_par[2], motor_run_par[3],
-      motor_run_par[4], motor_run_par[5], motor_run_par[6], motor_run_par[7]};
-  // pwr_limiter_ptr_->PwrLimitCalcSpd(motor_run_par_list, nullptr);
-  pwr_limiter_ptr_->PwrLimitCalcSpd(motor_run_par_list,
-                                    wheel_speed_ref_limited_);
+  // TODO:待适配
+  // if (is_high_spd_enabled_) {
+  //   runtime_params.p_rfr_max += 800.0f;
+  //   runtime_params.z_rfr_measure = 60.0f;
+  // }
+  pwr_limiter_ptr_->updateSteeringModel(steer_speed_fdb_, steer_current_ref_,
+                                        nullptr);
+  pwr_limiter_ptr_->updateWheelModel(wheel_speed_ref_, wheel_speed_fdb_,
+                                     nullptr, nullptr);
+  pwr_limiter_ptr_->calc(runtime_params, wheel_speed_ref_limited_,
+                         steer_current_ref_limited_); // 更新运行时参数
 };
-
-void Chassis::calcPwrLimitedCurrentRef() {};
 
 void Chassis::calcWheelCurrentRef() {
   // 计算每个轮子的期望转速
@@ -379,37 +395,11 @@ void Chassis::calcWheelCurrentRef() {
     HW_ASSERT(pid_ptr != nullptr, "pointer to Wheel PID %d is nullptr",
               wpis[i]);
     pid_ptr->calc(&wheel_speed_ref_limited_[i], &wheel_speed_fdb_[i], nullptr,
-                  &wheel_current_ref_[i]);
+                  &wheel_current_ref_limited_[i]);
     // pid_ptr->calc(&wheel_speed_ref_[i], &wheel_speed_fdb_[i], nullptr,
-    // &wheel_current_ref_[i]);
+    //               &wheel_current_ref_[i]); // TODO: 功限调试
   }
 };
-void Chassis::calcWheelCurrentLimited() {};
-
-void Chassis::calcSteerCurrentRef() {
-  SteerPidIdx spis[4] = {
-      kSteerPidIdxLeftFront,
-      kSteerPidIdxLeftRear,
-      kSteerPidIdxRightRear,
-      kSteerPidIdxRightFront,
-  };
-
-  MultiNodesPid *pid_ptr = nullptr;
-  for (size_t i = 0; i < 4; i++) {
-    pid_ptr = steer_pid_ptr_[spis[i]];
-    HW_ASSERT(pid_ptr != nullptr, "pointer to Steer PID %d is nullptr",
-              spis[i]);
-
-    float steer_motor_fdb[2] = {steer_angle_fdb_[i],
-                                steer_speed_fdb_[i]}; // TODO滤波处理速度
-
-    pid_ptr->calc(&steer_angle_ref_[i], steer_motor_fdb, nullptr,
-                  &steer_current_ref_[i]);
-    // // TODO（WPY）:舵电机模型调试用
-    // pid_ptr->calc(&steer_angle_ref_[i], &steer_speed_fdb_[i], nullptr,
-    // &steer_current_ref_[i]);
-  }
-}
 
 #pragma endregion
 
@@ -508,11 +498,12 @@ void Chassis::resetMotorsRef() {
   memset(wheel_speed_ref_, 0, sizeof(wheel_speed_ref_));
   memset(wheel_speed_ref_limited_, 0, sizeof(wheel_speed_ref_limited_));
   memset(wheel_current_ref_, 0, sizeof(wheel_current_ref_));
+  memset(wheel_current_ref_limited_, 0, sizeof(wheel_current_ref_limited_));
 
   memset(steer_speed_ref_, 0, sizeof(steer_speed_ref_));
-  memset(steer_speed_ref_limited_, 0, sizeof(steer_speed_ref_limited_));
   memset(steer_angle_ref_, 0, sizeof(steer_angle_ref_));
   memset(steer_current_ref_, 0, sizeof(steer_current_ref_));
+  memset(steer_current_ref_limited_, 0, sizeof(steer_current_ref_limited_));
 }
 
 // 重置轮、舵电机反馈数据
@@ -590,15 +581,18 @@ void Chassis::setCommDataMotors(bool working_flag) {
       wheel_pid_ptr->reset();
       wheel_motor_ptr->setInput(0);
     } else {
-      // wheel_motor_ptr->setInput(0); //TODO调试
-      wheel_motor_ptr->setInput(wheel_current_ref_[wmi]);
+      // wheel_motor_ptr->setInput(0); // TODO：调试
+      // wheel_motor_ptr->setInput(wheel_current_ref_[wmi]); // TODO：功限调试
+      wheel_motor_ptr->setInput(wheel_current_ref_limited_[wmi]);
     }
 
     if (!working_flag || steer_motor_ptr->isOffline()) {
       steer_pid_ptr->reset();
       steer_motor_ptr->setInput(0);
     } else {
-      steer_motor_ptr->setInput(steer_current_ref_[smi]);
+      // steer_motor_ptr->setInput(0); // TODO调试
+      // steer_motor_ptr->setInput(steer_current_ref_[smi]); // TODO：功限调试
+      steer_motor_ptr->setInput(steer_current_ref_limited_[smi]);
     }
   }
 };
