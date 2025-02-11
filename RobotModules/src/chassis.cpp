@@ -256,8 +256,9 @@ void Chassis::revNormCmd() {
     // 跟随模式下，更新跟随目标
     float theta_fdb = theta_i2r_;
     float theta_ref = 0.0f;
+
     // TODO：跟随模式云台前馈记录
-    // float omega_feedforward = config_.yaw_sensitivity * omega_feedforward_;
+    float omega_feedforward = config_.yaw_sensitivity * omega_feedforward_;
     // follow_omega_pid_ptr_->calc(&theta_ref, &theta_fdb, &omega_feedforward,
     //                             &cmd.w);
 
@@ -272,13 +273,36 @@ void Chassis::revNormCmd() {
 
     follow_omega_pid_ptr_->calc(&theta_ref, &theta_fdb, nullptr, &cmd.w);
 
-    if ((0.0001 <= cmd.v_x && cmd.v_x <= 0.1) ||
-        (0.0001 <= cmd.v_y && cmd.v_y <= 0.1)) {
+    // 解决跟随模式的低速底盘抖动问题
+    // if ((cmd.v_x * cmd.v_x + cmd.v_y * cmd.v_y) >= 0.00000001f) {
+    //   float w_max = fabsf(cmd.w);
+    //   if ((cmd.v_x * cmd.v_x + cmd.v_y * cmd.v_y) <= 0.0001f) {
+    //     w_max = sqrtf(cmd.v_x * cmd.v_x + cmd.v_y * cmd.v_y);
+    //   } else if ((cmd.v_x * cmd.v_x + cmd.v_y * cmd.v_y) <= 0.01f) {
+    //     w_max = 10.0f * sqrtf(cmd.v_x * cmd.v_x + cmd.v_y * cmd.v_y);
+    //   }
+    //   cmd.w = hello_world::Bound(cmd.w, -w_max, w_max);
+    // }
+
+    // 大小死区处理,优化低速震荡问题
+    const float theta_dead_upper = PI / 24.0f;
+    const float theta_dead_lower = PI / 72.0f;
+    static float theta_dead_limit = theta_dead_upper;
+    static bool dead_cross_flag = false;
+    if (!dead_cross_flag && fabs(theta_fdb) > theta_dead_upper) {
+      theta_dead_limit = theta_dead_lower;
+      dead_cross_flag = true;
+    } else if (dead_cross_flag && fabs(theta_fdb) < theta_dead_lower) {
+      theta_dead_limit = theta_dead_upper;
+      dead_cross_flag = false;
+    }
+
+    if (fabs(theta_fdb) < theta_dead_limit) {
       cmd.w = 0.0f;
     }
-    if (fabs(cmd.w) <= 0.10) {
-      cmd.w = 0.0f;
-    }
+
+    // TODO：跟随模式云台前馈记录
+    cmd.w += omega_feedforward;
     break;
   }
   default: {

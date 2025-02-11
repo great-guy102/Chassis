@@ -311,9 +311,8 @@ void Robot::genModulesCmdFromRc() {
   //  }
 
   // TODO：跟随模式云台前馈记录
-  // float omega_feedforward = hello_world::Bound(-rc_ptr_->rc_lh(), -1, 1);
-  // ;
-  // chassis_ptr_->setOmegaFeedforward(omega_feedforward);
+  float omega_feedforward = hello_world::Bound(-rc_ptr_->rc_lh(), -1, 1);
+  chassis_ptr_->setOmegaFeedforward(omega_feedforward);
 
   GimbalCmd gimbal_cmd;
   gimbal_cmd.pitch = hello_world::Bound(rc_ptr_->rc_lv(), -1, 1);
@@ -527,7 +526,7 @@ void Robot::sendCommData() {
 };
 void Robot::sendCanData() {
   if (work_tick_ % 10 == 0) {
-    sendCapData();
+    // sendCapData();
   }
   if (work_tick_ > 1000 && work_tick_ % 2 == 1) {
     sendGimbalChassisCommData();
