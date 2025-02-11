@@ -182,7 +182,8 @@ void Robot::runOnResurrection() {
 };
 
 void Robot::runOnWorking() {
-  if (buzzer_ptr_ != nullptr) {
+  HW_ASSERT(buzzer_ptr_ != nullptr, "buzzer pointer is null", buzzer_ptr_);
+  if (buzzer_ptr_->is_playing()) {
     buzzer_ptr_->play();
   }
   genModulesCmd();

@@ -83,5 +83,4 @@ static void HardWareInit(void) {
   imu_ptr->initHardware();
   // buzzer init
   // TODO: 等后续组件更新
-  // buzzer_ptr->initHardware();
 };
