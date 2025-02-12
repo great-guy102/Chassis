@@ -526,7 +526,7 @@ void Robot::sendCommData() {
 };
 void Robot::sendCanData() {
   if (work_tick_ % 10 == 0) {
-    // sendCapData();
+    sendCapData();
   }
   if (work_tick_ > 1000 && work_tick_ % 2 == 1) {
     sendGimbalChassisCommData();
