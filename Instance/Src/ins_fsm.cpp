@@ -16,7 +16,7 @@
 #include "ins_all.hpp"
 /* Private constants ---------------------------------------------------------*/
 const robot::Chassis::Config kChassisConfig = {
-    .normal_trans_vel = 3.0f,  ///< 正常平移速度
+    .normal_trans_vel = 3.6f,  ///< 正常平移速度
     .gyro_rot_spd = 14.0f,     ///< 小陀螺旋转速度
     .yaw_sensitivity = 2 * PI, ///< YAW 轴灵敏度(单位：rad/s)
     .max_trans_vel = 5.0f,     ///< 最大平移速度
@@ -110,6 +110,8 @@ robot::Robot *GetRobot() {
     // 无通信功能的组件指针
     unique_robot.registerBuzzer(GetBuzzer());
     unique_robot.registerImu(GetImu());
+    unique_robot.registerRampCmdVx(GetRampCmdVx());
+    unique_robot.registerRampCmdVy(GetRampCmdVy());
 
     // 只接收数据的组件指针
     unique_robot.registerRc(GetRemoteControl());

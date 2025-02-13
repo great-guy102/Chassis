@@ -297,10 +297,13 @@ void Robot::genModulesCmdFromRc() {
     }
   }
 
+  ChassisCmd chassis_cmd_raw = {0};
   ChassisCmd chassis_cmd = {0};
-  chassis_cmd.v_x = hello_world::Bound(rc_ptr_->rc_rv(), -1, 1);
-  chassis_cmd.v_y = hello_world::Bound(-rc_ptr_->rc_rh(), -1, 1);
-  chassis_cmd.w = 0;
+  chassis_cmd_raw.v_x = hello_world::Bound(rc_ptr_->rc_rv(), -1, 1);
+  chassis_cmd_raw.v_y = hello_world::Bound(-rc_ptr_->rc_rh(), -1, 1);
+  ramp_cmd_vx_ptr_->calc(&(chassis_cmd_raw.v_x), &(chassis_cmd.v_x));
+  ramp_cmd_vy_ptr_->calc(&(chassis_cmd_raw.v_y), &(chassis_cmd.v_y));
+  chassis_cmd.w = 0.0f;
   chassis_ptr_->setNormCmd(chassis_cmd);
   chassis_ptr_->setWorkingMode(chassis_working_mode);
   chassis_ptr_->setGyroDir(gyro_dir);
@@ -369,10 +372,15 @@ void Robot::genModulesCmdFromKb() {
     shooter_ctrl_mode = CtrlMode::kAuto;
   }
 
+  ChassisCmd chassis_cmd_raw = {0};
   ChassisCmd chassis_cmd = {0};
-  chassis_cmd.v_x = (int8_t)rc_ptr_->key_W() - (int8_t)rc_ptr_->key_S();
-  chassis_cmd.v_y = (int8_t)rc_ptr_->key_A() - (int8_t)rc_ptr_->key_D();
-  chassis_cmd.w = 0;
+  chassis_cmd_raw.v_x = hello_world::Bound(
+      ((int8_t)rc_ptr_->key_W() - (int8_t)rc_ptr_->key_S()), -1, 1);
+  chassis_cmd_raw.v_y = hello_world::Bound(
+      ((int8_t)rc_ptr_->key_A() - (int8_t)rc_ptr_->key_D()), -1, 1);
+  ramp_cmd_vx_ptr_->calc(&(chassis_cmd_raw.v_x), &(chassis_cmd.v_x));
+  ramp_cmd_vy_ptr_->calc(&(chassis_cmd_raw.v_y), &(chassis_cmd.v_y));
+  chassis_cmd.w = 0.0f;
   chassis_ptr_->setNormCmd(chassis_cmd);
   chassis_ptr_->setWorkingMode(chassis_working_mode);
   chassis_ptr_->setUseCapFlag(rc_ptr_->key_SHIFT());
@@ -631,6 +639,14 @@ void Robot::registerGimbal(Gimbal *ptr) {
 void Robot::registerShooter(Shooter *ptr) {
   HW_ASSERT(ptr != nullptr, "Shooter pointer is null", ptr);
   shooter_ptr_ = ptr;
+};
+void Robot::registerRampCmdVx(Ramp *ptr) {
+  HW_ASSERT(ptr != nullptr, "RampCmdVx pointer is null", ptr);
+  ramp_cmd_vx_ptr_ = ptr;
+};
+void Robot::registerRampCmdVy(Ramp *ptr) {
+  HW_ASSERT(ptr != nullptr, "RampCmdVy pointer is null", ptr);
+  ramp_cmd_vy_ptr_ = ptr;
 };
 void Robot::registerBuzzer(Buzzer *ptr) {
   HW_ASSERT(ptr != nullptr, "Buzzer pointer is null", ptr);

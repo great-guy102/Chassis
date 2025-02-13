@@ -18,6 +18,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "fsm.hpp"
+#include "ramp.hpp"
 #include "tick.hpp"
 
 #include "DT7.hpp"
@@ -48,14 +49,15 @@ namespace robot {
 
 class Robot : public hello_world::module::ModuleFsm {
 public:
+  typedef hello_world::filter::Ramp Ramp;
   typedef hello_world::buzzer::Buzzer Buzzer;
   typedef hello_world::cap::SuperCap Cap;
   typedef hello_world::imu::Imu Imu;
+  typedef hello_world::motor::Motor Motor;
   typedef hello_world::comm::Transmitter Transmitter;
   typedef hello_world::comm::CanTxMgr CanTxMgr;
   typedef hello_world::comm::UartTxMgr UartTxMgr;
   typedef hello_world::comm::TxMgr TxMgr;
-  typedef hello_world::motor::Motor Motor;
   typedef hello_world::remote_control::DT7 DT7;
   typedef hello_world::remote_control::SwitchState RcSwitchState;
 
@@ -148,11 +150,14 @@ public:
   void registerChassis(Chassis *ptr);
   void registerGimbal(Gimbal *ptr);
   void registerShooter(Shooter *ptr);
+
+  void registerRampCmdVx(Ramp *ptr);
+  void registerRampCmdVy(Ramp *ptr);
   void registerBuzzer(Buzzer *ptr);
+  void registerCap(Cap *ptr, CanTxMgr *tx_mgr_ptr);
   void registerImu(Imu *ptr);
   void registerMotorWheels(Motor *motor_ptr, uint8_t idx, CanTxMgr *tx_mgr_ptr);
   void registerMotorSteers(Motor *motor_ptr, uint8_t idx, CanTxMgr *tx_mgr_ptr);
-  void registerCap(Cap *ptr, CanTxMgr *tx_mgr_ptr);
   void registerGimbalChassisComm(GimbalChassisComm *ptr, CanTxMgr *tx_mgr_ptr);
   void registerReferee(Referee *ptr, UartTxMgr *tx_mgr_ptr);
   void registerRc(DT7 *ptr);
@@ -215,6 +220,8 @@ private:
   // 无通信功能的组件指针
   Buzzer *buzzer_ptr_ = nullptr; ///< 蜂鸣器指针
   Imu *imu_ptr_ = nullptr;       ///< 底盘 IMU 指针
+  Ramp *ramp_cmd_vx_ptr_ = nullptr; ///< Vx斜坡滤波指针
+  Ramp *ramp_cmd_vy_ptr_ = nullptr; ///< Vy斜坡滤波指针
 
   // 只接收数据的组件指针
   DT7 *rc_ptr_ = nullptr; ///< DT7 指针 只接收数据

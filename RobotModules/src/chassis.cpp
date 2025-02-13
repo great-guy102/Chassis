@@ -215,6 +215,10 @@ void Chassis::standby() {
 
 #pragma region 工作状态下，获取控制指令的函数
 
+ // TODO:调试1
+hello_world::pid::MultiNodesPid::Datas pid_data; // TODO:PID调试数据
+// 使用示例：pid_data = pid_ptr->getPidAt(0).datas();
+
 void Chassis::revNormCmd() {
   float beta = 0.5;
   static bool first_follow_flag = true;
@@ -255,7 +259,7 @@ void Chassis::revNormCmd() {
 
     // 跟随模式下，更新跟随目标
     float theta_fdb = theta_i2r_;
-    float theta_ref = 0.0f;
+    float theta_ref = 0.0f; 
 
     // TODO：跟随模式云台前馈记录
     // float omega_feedforward = config_.yaw_sensitivity * omega_feedforward_;
@@ -272,19 +276,19 @@ void Chassis::revNormCmd() {
     }
 
     follow_omega_pid_ptr_->calc(&theta_ref, &theta_fdb, nullptr, &cmd.w);
-
+    pid_data = follow_omega_pid_ptr_->getPidAt(0).datas();
     // 解决跟随模式的低速底盘抖动问题
     if ((cmd.v_x * cmd.v_x + cmd.v_y * cmd.v_y) >= 0.000001f) {
       float w_max = fabsf(cmd.w);
       if ((cmd.v_x * cmd.v_x + cmd.v_y * cmd.v_y) <= 0.0001f) {
         w_max = sqrtf(cmd.v_x * cmd.v_x + cmd.v_y * cmd.v_y);
       } else if ((cmd.v_x * cmd.v_x + cmd.v_y * cmd.v_y) <= 0.01f) {
-        w_max = 10.0f * sqrtf(cmd.v_x * cmd.v_x + cmd.v_y * cmd.v_y);
+        w_max = 10.0f * sqrtf(cmd.v_x * cmd.v_x + cmd.v_y * cmd.v_y) - 0.09f;
       }
       cmd.w = hello_world::Bound(cmd.w, -w_max, w_max);
       if(fabs(theta_fdb) < (PI / 90.0f)) {
-      cmd.w = 0.0f;
-    }
+        cmd.w = 0.0f;
+      }
     }
 
     // TODO:大小死区处理,优化低速震荡问题
@@ -358,10 +362,6 @@ void Chassis::calcSteerCurrentRef() {
                                 steer_speed_fdb_[i]}; // TODO：滤波处理速度
     pid_ptr->calc(&steer_angle_ref_[i], steer_motor_fdb, nullptr,
                   &steer_current_ref_[i]);
-
-    // // TODO：功限调试
-    // pid_ptr->calc(&steer_angle_ref_[i], &steer_angle_fdb_[i], nullptr,
-    //               &steer_current_ref_[i]);
   }
 }
 
@@ -369,24 +369,28 @@ float rfr_pwr = 0.0f; // TODO:功限调试
 void Chassis::calcMotorsLimitedRef() {
   hello_world::power_limiter::PowerLimiterRuntimeParams runtime_params = {
       /* 期望功率上限，可以根据模式设置（低速/高速），单位：W */
-      .p_ref_max = 1.2f * rfr_data_.pwr_limit, // 60.0f,
+      .p_ref_max = 1.2f * rfr_data_.pwr_limit, // 60.0f, 1.2f*, 2.0f*
       /* 裁判系统给出的底盘功率限制，单位：W */
       .p_referee_max = static_cast<float>(rfr_data_.pwr_limit),
       /* 期望功率下限，建议设为当前 p_referee_max 乘一个 0 ~ 1
          的比例系数，单位：W */
-      .p_ref_min = 0.8f * rfr_data_.pwr_limit, // 50.0f,
+      .p_ref_min = 0.8f * rfr_data_.pwr_limit, // 50.0f, 
       /* 剩余能量：采用裁判系统控制时为裁判系统缓冲能量 buffer_energy，单位：J
        */
       .remaining_energy = static_cast<float>(rfr_data_.pwr_buffer),
       /* 剩余能量收敛值，当剩余能量到达该值时，期望功率等于裁判系统给出的底盘功率上限
          p_referee_max */
-      .energy_converge = 30.0f,
-      /* 期望功率随当前剩余能量线性变化的斜率 */
+      .energy_converge = 40.0f,
+      /* 期望功率随当前剩余能量线性变化的斜率 
+      >= (p_ref_max - p_referee_max) / (remaining_energy - energy_converge) 
+      开启超电时 remaining_energy 可取 100 */
       .p_slope = 1.6f,
       /* 危险能量值，若剩余能量低于该值，p_ref_ 设为 0 */
       .danger_energy = 5.0f,
   };
   rfr_pwr = rfr_data_.pwr;
+  
+  // TODO:关闭超电时需一并注释掉，防止间断通信误入本分支
   if (!cap_ptr_->isOffline()) {
     runtime_params.remaining_energy = cap_ptr_->getRemainingPower();
   }
