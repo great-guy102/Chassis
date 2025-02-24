@@ -564,9 +564,7 @@ void Robot::sendWheelsMotorData() {
     WheelMotorIdx midx = motor_idx[i];
     dev_ptr = motor_wheels_ptr_[midx];
     HW_ASSERT(dev_ptr != nullptr, "Wheel Motor pointer %d is null", midx);
-    if (dev_ptr == nullptr) {
-      continue;
-    }
+
     tx_dev_mgr_pairs_[(uint32_t)tx_dev_idx[i]].setTransmitterNeedToTransmit();
   }
 };
@@ -589,26 +587,20 @@ void Robot::sendSteersMotorData() {
     SteerMotorIdx midx = motor_idx[i];
     dev_ptr = motor_steers_ptr_[midx];
     HW_ASSERT(dev_ptr != nullptr, "Steer Motor pointer %d is null", midx);
-    if (dev_ptr == nullptr) {
-      continue;
-    }
+
     tx_dev_mgr_pairs_[(uint32_t)tx_dev_idx[i]].setTransmitterNeedToTransmit();
   }
 }
 
 void Robot::sendCapData() {
   HW_ASSERT(cap_ptr_ != nullptr, "Cap pointer is null", cap_ptr_);
-  if (cap_ptr_ == nullptr) {
-    return;
-  }
+
   tx_dev_mgr_pairs_[(uint32_t)TxDevIdx::kCap].setTransmitterNeedToTransmit();
 };
 void Robot::sendGimbalChassisCommData() {
   HW_ASSERT(gc_comm_ptr_ != nullptr, "GimbalChassisComm pointer is null",
             gc_comm_ptr_);
-  if (gc_comm_ptr_ == nullptr) {
-    return;
-  }
+
   tx_dev_mgr_pairs_[(uint32_t)TxDevIdx::kGimbalChassis]
       .setTransmitterNeedToTransmit();
 };
@@ -660,10 +652,10 @@ void Robot::registerImu(Imu *ptr) {
 void Robot::registerMotorWheels(Motor *dev_ptr, uint8_t idx,
                                 CanTxMgr *tx_mgr_ptr) {
   HW_ASSERT(dev_ptr != nullptr, "Wheel Motor pointer is null", dev_ptr);
+  HW_ASSERT(tx_mgr_ptr != nullptr, "CanTxMgr pointer is null", tx_mgr_ptr);
   HW_ASSERT(idx >= 0 && idx < kWheelMotorNum,
             "Wheel Motor index is out of range", idx);
-  if (dev_ptr == nullptr || idx >= kWheelMotorNum ||
-      motor_wheels_ptr_[idx] == dev_ptr || tx_mgr_ptr == nullptr) {
+  if (idx >= kWheelMotorNum || motor_wheels_ptr_[idx] == dev_ptr) {
     return;
   }
   WheelMotorIdx midx[4] = {
@@ -686,10 +678,10 @@ void Robot::registerMotorWheels(Motor *dev_ptr, uint8_t idx,
 void Robot::registerMotorSteers(Motor *dev_ptr, uint8_t idx,
                                 CanTxMgr *tx_mgr_ptr) {
   HW_ASSERT(dev_ptr != nullptr, "Steer Motor pointer is null", dev_ptr);
+  HW_ASSERT(tx_mgr_ptr != nullptr, "CanTxMgr pointer is null", tx_mgr_ptr);
   HW_ASSERT(idx >= 0 && idx < kSteerMotorNum,
             "Steer Motor index is out of range", idx);
-  if (dev_ptr == nullptr || idx >= kSteerMotorNum ||
-      motor_steers_ptr_[idx] == dev_ptr || tx_mgr_ptr == nullptr) {
+  if (idx >= kSteerMotorNum || motor_steers_ptr_[idx] == dev_ptr) {
     return;
   }
   SteerMotorIdx midx[4] = {
@@ -712,7 +704,7 @@ void Robot::registerMotorSteers(Motor *dev_ptr, uint8_t idx,
 void Robot::registerCap(Cap *dev_ptr, CanTxMgr *tx_mgr_ptr) {
   HW_ASSERT(dev_ptr != nullptr, "Cap pointer is null", dev_ptr);
   HW_ASSERT(tx_mgr_ptr != nullptr, "CanTxMgr pointer is null", tx_mgr_ptr);
-  if (dev_ptr == nullptr || cap_ptr_ == dev_ptr || tx_mgr_ptr == nullptr) {
+  if (cap_ptr_ == dev_ptr) {
     return;
   }
 
@@ -725,7 +717,7 @@ void Robot::registerGimbalChassisComm(GimbalChassisComm *dev_ptr,
                                       CanTxMgr *tx_mgr_ptr) {
   HW_ASSERT(dev_ptr != nullptr, "GimbalChassisComm pointer is null", dev_ptr);
   HW_ASSERT(tx_mgr_ptr != nullptr, "CanTxMgr pointer is null", tx_mgr_ptr);
-  if (dev_ptr == nullptr || gc_comm_ptr_ == dev_ptr || tx_mgr_ptr == nullptr) {
+  if (gc_comm_ptr_ == dev_ptr) {
     return;
   }
 
@@ -739,7 +731,7 @@ void Robot::registerGimbalChassisComm(GimbalChassisComm *dev_ptr,
 void Robot::registerReferee(Referee *dev_ptr, UartTxMgr *tx_mgr_ptr) {
   HW_ASSERT(dev_ptr != nullptr, "Referee pointer is null", dev_ptr);
   HW_ASSERT(tx_mgr_ptr != nullptr, "UartRxMgr pointer is null", tx_mgr_ptr);
-  if (dev_ptr == nullptr || referee_ptr_ == dev_ptr || tx_mgr_ptr == nullptr) {
+  if (referee_ptr_ == dev_ptr) {
     return;
   }
 
@@ -754,7 +746,7 @@ void Robot::registerReferee(Referee *dev_ptr, UartTxMgr *tx_mgr_ptr) {
 
 void Robot::registerRc(DT7 *ptr) {
   HW_ASSERT(ptr != nullptr, "DT7 pointer is null", ptr);
-  if (ptr == nullptr || rc_ptr_ == ptr) {
+  if (rc_ptr_ == ptr) {
     return;
   }
   rc_ptr_ = ptr;
@@ -762,7 +754,7 @@ void Robot::registerRc(DT7 *ptr) {
 
 void Robot::registerPerformancePkg(PerformancePkg *ptr) {
   HW_ASSERT(ptr != nullptr, "PerformancePkg pointer is null", ptr);
-  if (ptr == nullptr || rfr_performance_pkg_ptr_ == ptr) {
+  if (rfr_performance_pkg_ptr_ == ptr) {
     return;
   }
 
@@ -770,14 +762,14 @@ void Robot::registerPerformancePkg(PerformancePkg *ptr) {
 };
 void Robot::registerPowerHeatPkg(PowerHeatPkg *ptr) {
   HW_ASSERT(ptr != nullptr, "PowerHeatPkg pointer is null", ptr);
-  if (ptr == nullptr || rfr_power_heat_pkg_ptr_ == ptr) {
+  if (rfr_power_heat_pkg_ptr_ == ptr) {
     return;
   }
   rfr_power_heat_pkg_ptr_ = ptr;
 };
 void Robot::registerShooterPkg(ShooterPkg *ptr) {
   HW_ASSERT(ptr != nullptr, "ShooterPkg pointer is null", ptr);
-  if (ptr == nullptr || rfr_shooter_pkg_ptr_ == ptr) {
+  if (rfr_shooter_pkg_ptr_ == ptr) {
     return;
   }
   rfr_shooter_pkg_ptr_ = ptr;
