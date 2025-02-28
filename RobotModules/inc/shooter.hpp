@@ -30,6 +30,12 @@ public:
   typedef ShooterWorkingMode WorkingMode;
   typedef hello_world::module::CtrlMode CtrlMode;
 
+  static std::string WorkingModeToStr(WorkingMode mode) {
+    if (mode == WorkingMode::kShoot)
+      return "kShoot";
+    return "ErrGWM";
+  };
+
   Shooter() {};
   ~Shooter() {};
 

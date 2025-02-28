@@ -28,10 +28,11 @@
 #include "super_cap.hpp"
 
 #include "can_tx_mgr.hpp"
-#include "referee.hpp"
 #include "transmitter.hpp"
 #include "uart_rx_mgr.hpp"
 #include "uart_tx_mgr.hpp"
+#include "referee.hpp"
+#include "ui_drawer.hpp"
 
 #include "module_fsm.hpp"
 
@@ -65,7 +66,7 @@ public:
   typedef hello_world::referee::RobotPowerHeatPackage PowerHeatPkg;
   typedef hello_world::referee::RobotShooterPackage ShooterPkg;
   typedef hello_world::referee::Referee Referee;
-  typedef hello_world::referee::RfrId RobotId;
+  typedef hello_world::referee::ids::RobotId RobotId;
 
   typedef hello_world::module::PwrState PwrState;
   typedef hello_world::module::CtrlMode CtrlMode;
@@ -74,6 +75,7 @@ public:
   typedef robot::Chassis Chassis;
   typedef robot::Gimbal Gimbal;
   typedef robot::Shooter Shooter;
+  typedef robot::UiDrawer UiDrawer;
 
   class TxDevMgrPair {
   public:
@@ -212,6 +214,10 @@ private:
   ManualCtrlSrc manual_ctrl_src_ = ManualCtrlSrc::kRc;      ///< 手动控制源
   ManualCtrlSrc last_manual_ctrl_src_ = ManualCtrlSrc::kRc; ///< 上一手动控制源
 
+  RobotId robot_id_ = RobotId::kBlueStandard3;
+  UiDrawer ui_drawer_ ; 
+  uint8_t rfr_tx_data_[255] = {0};  ///< 机器人交互数据包发送缓存
+  size_t rfr_tx_data_len_ = 0;      ///< 机器人交互数据包发送缓存长度
   // 主要模块状态机组件指针
   Chassis *chassis_ptr_ = nullptr; ///< 底盘模块指针
   Gimbal *gimbal_ptr_ = nullptr;   ///< 云台模块指针

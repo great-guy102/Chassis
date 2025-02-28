@@ -14,14 +14,14 @@
  */
 /* Includes ------------------------------------------------------------------*/
 #include "robot.hpp"
-
+#include "usart.h"
 /* Private macro -------------------------------------------------------------*/
 
 namespace robot {
 /* Private constants ---------------------------------------------------------*/
 const hello_world::referee::RobotPerformanceData kDefaultRobotPerformanceData = {
-    .robot_id = static_cast<uint8_t>(
-        hello_world::referee::ids::RobotId::kRedStandard3), ///< 本机器人ID
+    .robot_id =
+        static_cast<uint8_t>(Robot::RobotId::kBlueStandard3), ///< 本机器人ID
 
     .robot_level = 0,  ///< 机器人等级
     .current_hp = 200, ///< 机器人当前血量
@@ -41,10 +41,7 @@ const hello_world::referee::RobotPerformanceData kDefaultRobotPerformanceData = 
         1, ///< 电源管理模块 shooter 口输出：0-关闭，1-开启
 }; // namespace robot
 const hello_world::referee::RobotPowerHeatData kDefaultRobotPowerHeatData = {
-    .chassis_voltage = 24000, ///< 电源管理模块的chassis口输出电压，单位：mV
-    .chassis_current = 0,     ///< 电源管理模块的chassis口输出电流，单位：mA
-    .chassis_power = 0,       ///< 底盘功率，单位：W
-    .buffer_energy = 60,      ///< 缓冲能量，单位：J
+    .buffer_energy = 60, ///< 缓冲能量，单位：J
 
     .shooter_17mm_1_barrel_heat = 0, ///< 第一个17mm发射机构的枪口热量
     .shooter_17mm_2_barrel_heat = 0, ///< 第二个17mm发射机构的枪口热量
@@ -113,34 +110,39 @@ void Robot::updateRfrData() {
   PerformancePkg::Data rpp_data = kDefaultRobotPerformanceData;
   PowerHeatPkg::Data rph_data = kDefaultRobotPowerHeatData;
   ShooterPkg::Data rsp_data = kDefaultRobotShooterData;
-
+  bool is_new_bullet_shot = false;
   if (!referee_ptr_->isOffline()) {
     rpp_data = rfr_performance_pkg_ptr_->getData();
     rph_data = rfr_power_heat_pkg_ptr_->getData();
     rsp_data = rfr_shooter_pkg_ptr_->getData();
+
+    if (!referee_ptr_->isOffline()) {
+      if (!rfr_shooter_pkg_ptr_->isHandled()) {
+        rfr_shooter_pkg_ptr_->setHandled();
+        is_new_bullet_shot = true;
+      }
+    }
   }
+
+  if (!referee_ptr_->isOffline()) {
+    robot_id_ = (RobotId)rpp_data.robot_id;
+  } else {
+    robot_id_ = Robot::RobotId::kBlueStandard3;
+  }
+  ui_drawer_.setSenderId(robot_id_);
 
   chassis_rfr_data.is_rfr_on = (!referee_ptr_->isOffline());
   chassis_rfr_data.is_pwr_on = rpp_data.power_management_chassis_output;
   chassis_rfr_data.pwr_limit = rpp_data.chassis_power_limit;
-  chassis_rfr_data.voltage = rph_data.chassis_voltage;
   chassis_rfr_data.pwr_buffer = rph_data.buffer_energy;
-  chassis_rfr_data.pwr = rph_data.chassis_power;
   chassis_rfr_data.current_hp = rpp_data.current_hp;
   chassis_ptr_->setRfrData(chassis_rfr_data);
 
   GimbalChassisComm::RefereeData::ChassisPart &gimbal_rfr_data =
       gc_comm_ptr_->referee_data().cp;
 
-  bool is_new_bullet_shot = false;
-  if (!referee_ptr_->isOffline()) {
-    if (!rfr_shooter_pkg_ptr_->isHandled()) {
-      rfr_shooter_pkg_ptr_->setHandled();
-      is_new_bullet_shot = true;
-    }
-  }
   gimbal_rfr_data.is_new_bullet_shot = is_new_bullet_shot;
-  gimbal_rfr_data.robot_id = (RobotId)rpp_data.robot_id;
+  gimbal_rfr_data.robot_id = (hello_world::referee::RfrId)rpp_data.robot_id;
 
   // TODO: 换成实际的枪口
   gimbal_rfr_data.bullet_speed = rsp_data.bullet_speed;
@@ -251,11 +253,17 @@ void Robot::genModulesCmdFromRc() {
     } else if (r_switch == RcSwitchState::kMid) {
       // * 左上右中
       shooter_working_mode = Shooter::WorkingMode::kShoot;
+      shoot_flag =
+          (rc_wheel > 0.9f); // TODO：待修改判定在外部，自动模式也能手动发弹
       gimbal_ctrl_mode = CtrlMode::kAuto;
-      shooter_ctrl_mode = CtrlMode::kAuto;
+      shooter_ctrl_mode = CtrlMode::kManual;
     } else if (r_switch == RcSwitchState::kDown) {
       // * 左上右下
-      gimbal_working_mode = Gimbal::WorkingMode::PidTest;
+      // gimbal_working_mode = Gimbal::WorkingMode::PidTest;
+      // //TODO：云台PID测试模式
+      shooter_working_mode = Shooter::WorkingMode::kShoot;
+      gimbal_ctrl_mode = CtrlMode::kAuto;
+      shooter_ctrl_mode = CtrlMode::kAuto;
     }
   } else if (l_switch == RcSwitchState::kMid) {
     // * 左中
@@ -269,12 +277,18 @@ void Robot::genModulesCmdFromRc() {
     } else if (r_switch == RcSwitchState::kMid) {
       // * 左中右中
       shooter_working_mode = Shooter::WorkingMode::kShoot;
+      shoot_flag =
+          (rc_wheel > 0.9f); // TODO：待修改判定在外部，自动模式也能手动发弹
       gimbal_ctrl_mode = CtrlMode::kAuto;
-      shooter_ctrl_mode = CtrlMode::kAuto;
+      shooter_ctrl_mode = CtrlMode::kManual;
       // rev_head_flag = (rc_wheel > 0.9f); // TODO:掉头模式
     } else if (r_switch == RcSwitchState::kDown) {
       // * 左中右下
-      gimbal_working_mode = Gimbal::WorkingMode::PidTest;
+      // gimbal_working_mode = Gimbal::WorkingMode::PidTest;
+      // //TODO：云台PID测试模式
+      shooter_working_mode = Shooter::WorkingMode::kShoot;
+      gimbal_ctrl_mode = CtrlMode::kAuto;
+      shooter_ctrl_mode = CtrlMode::kAuto;
     }
   } else if (l_switch == RcSwitchState::kDown) {
     // * 左下
@@ -286,23 +300,33 @@ void Robot::genModulesCmdFromRc() {
       gyro_dir = Chassis::GyroDir::Clockwise;
     } else if (r_switch == RcSwitchState::kMid) {
       // * 左下右中
+      shooter_working_mode = Shooter::WorkingMode::kShoot;
+      shoot_flag =
+          (rc_wheel > 0.9f); // TODO：待修改判定在外部，自动模式也能手动发弹
       gimbal_ctrl_mode = CtrlMode::kAuto;
-      shooter_ctrl_mode = CtrlMode::kAuto;
+      shooter_ctrl_mode = CtrlMode::kManual;
       gyro_dir = Chassis::GyroDir::Clockwise;
       // rev_head_flag = (rc_wheel > 0.9f); // TODO:掉头模式
     } else if (r_switch == RcSwitchState::kDown) {
       // * 左下右下
       gyro_dir = Chassis::GyroDir::AntiClockwise;
-      gimbal_working_mode = Gimbal::WorkingMode::PidTest;
+      // gimbal_working_mode = Gimbal::WorkingMode::PidTest;
+      // //TODO：云台PID测试模式
+      shooter_working_mode = Shooter::WorkingMode::kShoot;
+      gimbal_ctrl_mode = CtrlMode::kAuto;
+      shooter_ctrl_mode = CtrlMode::kAuto;
     }
   }
 
-  ChassisCmd chassis_cmd_raw = {0};
   ChassisCmd chassis_cmd = {0};
-  chassis_cmd_raw.v_x = hello_world::Bound(rc_ptr_->rc_rv(), -1, 1);
-  chassis_cmd_raw.v_y = hello_world::Bound(-rc_ptr_->rc_rh(), -1, 1);
-  ramp_cmd_vx_ptr_->calc(&(chassis_cmd_raw.v_x), &(chassis_cmd.v_x));
-  ramp_cmd_vy_ptr_->calc(&(chassis_cmd_raw.v_y), &(chassis_cmd.v_y));
+  chassis_cmd.v_x = hello_world::Bound(rc_ptr_->rc_rv(), -1, 1);
+  chassis_cmd.v_y = hello_world::Bound(-rc_ptr_->rc_rh(), -1, 1);
+  // TODO：斜坡优化待调整
+  //  ChassisCmd chassis_cmd_raw = {0};
+  //  chassis_cmd_raw.v_x = hello_world::Bound(rc_ptr_->rc_rv(), -1, 1);
+  //  chassis_cmd_raw.v_y = hello_world::Bound(-rc_ptr_->rc_rh(), -1, 1);
+  //  ramp_cmd_vx_ptr_->calc(&(chassis_cmd_raw.v_x), &(chassis_cmd.v_x));
+  //  ramp_cmd_vy_ptr_->calc(&(chassis_cmd_raw.v_y), &(chassis_cmd.v_y));
   chassis_cmd.w = 0.0f;
   chassis_ptr_->setNormCmd(chassis_cmd);
   chassis_ptr_->setWorkingMode(chassis_working_mode);
@@ -336,7 +360,8 @@ void Robot::genModulesCmdFromKb() {
   // // 指令应该通过各个模块的接口发送给各个模块
   Chassis::WorkingMode chassis_working_mode = chassis_ptr_->getWorkingMode();
   Gimbal::WorkingMode gimbal_working_mode = gimbal_ptr_->getWorkingMode();
-  Shooter::WorkingMode shooter_working_mode = Shooter::WorkingMode::kStop;
+  // Shooter::WorkingMode shooter_working_mode = shooter_ptr_->getWorkingMode();
+  Shooter::WorkingMode shooter_working_mode = Shooter::WorkingMode::kShoot;
 
   CtrlMode gimbal_ctrl_mode = CtrlMode::kManual;
   CtrlMode shooter_ctrl_mode = CtrlMode::kManual;
@@ -363,6 +388,13 @@ void Robot::genModulesCmdFromKb() {
   if (rc_ptr_->key_Z()) {
     shooter_working_mode = Shooter::WorkingMode::kBackward;
   }
+  // if (rc_ptr_->key_B()) {
+  //   if (shooter_working_mode == Shooter::WorkingMode::kStop) {
+  //     shooter_working_mode = Shooter::WorkingMode::kShoot;
+  //   } else if(shooter_working_mode == Shooter::WorkingMode::kShoot) {
+  //     shooter_working_mode = Shooter::WorkingMode::kStop;
+  //   }
+  // }
 
   if (rc_ptr_->mouse_l_btn()) {
     shoot_flag = true;
@@ -458,70 +490,60 @@ void Robot::setGimbalChassisCommData() {
 };
 
 void Robot::setUiDrawerData() {
-  // // Chassis
-  // HW_ASSERT(chassis_fsm_ptr_ != nullptr, "Chassis FSM pointer is null",
-  // chassis_fsm_ptr_);
-  // ui_drawer_.setChassisPwrState(chassis_fsm_ptr_->pwr_state());
-  // ui_drawer_.setChassisCtrlMode(chassis_fsm_ptr_->ctrl_mode());
-  // ui_drawer_.setChassisWorkingMode(chassis_fsm_ptr_->working_mode());
-  // ui_drawer_.setChassisManualCtrlSrc(chassis_fsm_ptr_->manual_ctrl_src());
-  // ui_drawer_.setChassisHeadDir(chassis_fsm_ptr_->theta_i2r());
+  // ui_drawer_.setSenderId(RobotId::kRedStandard3);
+  // Chassis
+  HW_ASSERT(chassis_ptr_ != nullptr, "Chassis FSM pointer is null",
+            chassis_ptr_);
+  ui_drawer_.setChassisWorkState(chassis_ptr_->getPwrState());
+  // ui_drawer_.setChassisCtrlMode();
+  ui_drawer_.setChassisWorkingMode(chassis_ptr_->getWorkingMode());
+  // ui_drawer_.setChassisManualCtrlSrc(chassis_ptr_->getManualCtrlSrc());
+  ui_drawer_.setChassisHeadDir(chassis_ptr_->getThetaI2r());
 
-  // // Gimbal
-  // HW_ASSERT(gimbal_fsm_ptr_ != nullptr, "Gimbal FSM pointer is null",
-  // gimbal_fsm_ptr_);
-  // ui_drawer_.setGimbalPwrState(gimbal_fsm_ptr_->pwr_state());
-  // ui_drawer_.setGimbalCtrlMode(gimbal_fsm_ptr_->ctrl_mode());
-  // ui_drawer_.setGimbalWorkingMode(gimbal_fsm_ptr_->working_mode());
-  // ui_drawer_.setGimbalManualCtrlSrc(gimbal_fsm_ptr_->manual_ctrl_src());
-  // ui_drawer_.setGimbalJointAngPitchFdb(gc_comm_ptr_->gimbal_data().pitch_fdb);
-  // ui_drawer_.setGimbalJointAngPitchRef(gc_comm_ptr_->gimbal_data().pitch_ref);
-  // ui_drawer_.setGimbalJointAngYawFdb(gc_comm_ptr_->gimbal_data().yaw_fdb);
-  // ui_drawer_.setGimbalJointAngYawRef(gc_comm_ptr_->gimbal_data().yaw_ref);
+  // Gimbal
+  HW_ASSERT(gimbal_ptr_ != nullptr, "Gimbal FSM pointer is null", gimbal_ptr_);
+  // ui_drawer_.setGimbalWorkState(chassis_ptr_->getPwrState());
+  ui_drawer_.setGimbalCtrlMode(gimbal_ptr_->getCtrlMode());
+  ui_drawer_.setGimbalWorkingMode(gimbal_ptr_->getWorkingMode());
+  // ui_drawer_.setGimbalManualCtrlSrc(manual_ctrl_src_);
+  ui_drawer_.setGimbalJointAngPitchFdb(
+      gc_comm_ptr_->gimbal_data().gp.pitch_fdb);
+  // ui_drawer_.setGimbalJointAngPitchRef(gc_comm_ptr_->gimbal_data().gp.pitch_ref);
+  // ui_drawer_.setGimbalJointAngYawFdb(gc_comm_ptr_->gimbal_data().gp.yaw_fdb);
+  // ui_drawer_.setGimbalJointAngYawRef(gc_comm_ptr_->gimbal_data().gp.yaw_ref);
 
-  // // Shooter
-  // HW_ASSERT(shooter_fsm_ptr_ != nullptr, "Shooter FSM pointer is null",
-  // shooter_fsm_ptr_);
-  // ui_drawer_.setShooterPwrState(shooter_fsm_ptr_->pwr_state());
-  // ui_drawer_.setShooterCtrlMode(shooter_fsm_ptr_->ctrl_mode());
-  // ui_drawer_.setShooterWorkingMode(shooter_fsm_ptr_->working_mode());
-  // ui_drawer_.setShooterManualCtrlSrc(shooter_fsm_ptr_->manual_ctrl_src());
-  // ui_drawer_.setHeat(shooter_fsm_ptr_->heat());
-  // ui_drawer_.setHeatLimit(shooter_fsm_ptr_->heat_limit());
+  // Shooter
+  HW_ASSERT(shooter_ptr_ != nullptr, "Shooter FSM pointer is null",
+            shooter_ptr_);
+  ui_drawer_.setShooterWorkState(chassis_ptr_->getPwrState());
+  ui_drawer_.setShooterCtrlMode(shooter_ptr_->getCtrlMode());
+  ui_drawer_.setShooterWorkingMode(shooter_ptr_->getWorkingMode());
+  // ui_drawer_.setShooterManualCtrlSrc(chassis_ptr_->ge);
+  ui_drawer_.setHeat(gc_comm_ptr_->referee_data().cp.shooter_heat);
+  ui_drawer_.setHeatLimit(gc_comm_ptr_->referee_data().cp.shooter_heat_limit);
 
-  // ui_drawer_.setFeedAngFdb(shooter_fsm_ptr_->feed_ang_fdb());
-  // ui_drawer_.setFeedAngRef(shooter_fsm_ptr_->feed_ang_ref());
-  // ui_drawer_.setFeedStuckFlag(shooter_fsm_ptr_->is_feed_stuck());
-  // ui_drawer_.setFricSpdFdb(gc_comm_ptr_->shooter_data().fric_spd_fdb);
-  // ui_drawer_.setFricSpdRef(shooter_fsm_ptr_->fric_spd_ref());
-  // ui_drawer_.setFricStuckFlag(shooter_fsm_ptr_->is_fric_stuck());
+  // ui_drawer_.setFeedAngFdb(gc_comm_ptr_->shooter_data().gp.feed_ang_fdb);
+  // ui_drawer_.setFeedAngRef(gc_comm_ptr_->shooter_data().gp.feed_ang_ref);
+  ui_drawer_.setFeedStuckFlag(gc_comm_ptr_->shooter_data().gp.feed_stuck_state);
+  // ui_drawer_.setFricSpdFdb(gc_comm_ptr_->shooter_data().gp.fric_spd_fdb);
+  // ui_drawer_.setFricSpdRef(gc_comm_ptr_->shooter_data().gp.fric_spd_ref);
+  ui_drawer_.setFricStuckFlag(gc_comm_ptr_->shooter_data().gp.is_fric_stuck_);
 
-  // // MiniGimbal
-  // HW_ASSERT(mini_gimbal_fsm_ptr_ != nullptr, "MiniGimbal FSM pointer is
-  // null", mini_gimbal_fsm_ptr_);
-  // ui_drawer_.setMiniGimbalPwrState(mini_gimbal_fsm_ptr_->pwr_state());
-  // ui_drawer_.setMiniGimbalCtrlMode(mini_gimbal_fsm_ptr_->ctrl_mode());
-  // ui_drawer_.setMiniGimbalWorkingMode(mini_gimbal_fsm_ptr_->working_mode());
-  // ui_drawer_.setMiniGimbalManualCtrlSrc(mini_gimbal_fsm_ptr_->manual_ctrl_src());
-  // ui_drawer_.setMiniPitchAngNow(gc_comm_ptr_->gimbal_data().mini_pitch_);
-  // // ui_drawer_.setMiniPitchPreSet();
+  // Cap
+  HW_ASSERT(cap_ptr_ != nullptr, "Cap pointer is null", cap_ptr_);
+  ui_drawer_.setCapPwrPercent(cap_ptr_->getRemainingPower());
 
-  // // Cap
-  // HW_ASSERT(cap_ptr_ != nullptr, "Cap pointer is null", cap_ptr_);
-  // ui_drawer_.setCapPwrPercent(cap_ptr_->getRemainingPowerPercent());
+  // vision
+  HW_ASSERT(gc_comm_ptr_ != nullptr, "GimbalChassisComm pointer is null",
+            gc_comm_ptr_);
+  bool is_vision_valid = gc_comm_ptr_->vision_data().gp.is_enemy_detected;
+  ui_drawer_.setVisTgtX(gc_comm_ptr_->vision_data().gp.vtm_x, is_vision_valid);
+  ui_drawer_.setVisTgtY(gc_comm_ptr_->vision_data().gp.vtm_y, is_vision_valid);
+  ui_drawer_.setisvisionvalid(is_vision_valid);
 
-  // // vision
-  // HW_ASSERT(gc_comm_ptr_ != nullptr, "GimbalChassisComm pointer is null",
-  // gc_comm_ptr_);
-  // bool is_vision_valid = gc_comm_ptr_->vision_data().detected_targets != 0;
-  // ui_drawer_.setVisTgtX(gc_comm_ptr_->vision_data().vtm_x, is_vision_valid);
-  // ui_drawer_.setVisTgtY(gc_comm_ptr_->vision_data().vtm_y, is_vision_valid);
-
-  // if (rc_ptr_->key_V()) {
-  //   ui_drawer_.refresh();
-  // }
-
-  // ui_drawer_.setVisTgtX();
+  if (rc_ptr_->key_V()) {
+    ui_drawer_.refresh();
+  }
 };
 
 #pragma endregion
@@ -609,12 +631,15 @@ void Robot::sendUsartData() {
     sendRefereeData();
   }
 };
+uint32_t debug_tick[3] = {0};
 void Robot::sendRefereeData() {
-  // if (ui_drawer_.encode(rfr_tx_data_, rfr_tx_data_len_)) {
-  //   HAL_UART_Transmit_DMA(&huart6, rfr_tx_data_, rfr_tx_data_len_);
-  // }
-  tx_dev_mgr_pairs_[(uint32_t)TxDevIdx::kReferee]
-      .setTransmitterNeedToTransmit();
+  debug_tick[0]++;
+  if (ui_drawer_.encode(rfr_tx_data_, rfr_tx_data_len_)) {
+    HAL_UART_Transmit_DMA(&huart6, rfr_tx_data_, rfr_tx_data_len_);
+    debug_tick[1]++;
+  }
+  // tx_dev_mgr_pairs_[(uint32_t)TxDevIdx::kReferee]
+  //     .setTransmitterNeedToTransmit();
 };
 #pragma endregion
 

@@ -220,7 +220,7 @@ hello_world::pid::MultiNodesPid::Datas pid_data; // TODO:PID调试数据
 // 使用示例：pid_data = pid_ptr->getPidAt(0).datas();
 
 void Chassis::revNormCmd() {
-  float beta = 0.5;
+  float beta = 0.01f;
   static bool first_follow_flag = true;
   Cmd cmd = norm_cmd_;
 
@@ -388,7 +388,6 @@ void Chassis::calcMotorsLimitedRef() {
       /* 危险能量值，若剩余能量低于该值，p_ref_ 设为 0 */
       .danger_energy = 5.0f,
   };
-  rfr_pwr = rfr_data_.pwr;
   
   // TODO:关闭超电时需一并注释掉，防止间断通信误入本分支
   if (!cap_ptr_->isOffline()) {

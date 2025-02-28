@@ -88,12 +88,10 @@ struct ChassisRfrData {
   bool is_rfr_on = false; ///< 裁判系统是否在线
   bool is_pwr_on =
       false;     ///< 机器人底盘电源是否开启【裁判系统告知，离线时默认开启】
-  float pwr = 0; ///< 机器人底盘功率【裁判系统告知，离线时默认0】
   uint16_t pwr_limit =
       80; ///< 机器人底盘功率限制【裁判系统告知，离线时采用默认值】
   uint16_t pwr_buffer =
       60; ///< 机器人底盘缓冲能量【裁判系统告知，离线时采用默认值】
-  uint16_t voltage = 24;     ///< 底盘电压【裁判系统告知，离线时采用默认值】
   uint16_t current_hp = 100; ///< 底盘血量【裁判系统告知，离线时采用默认值】
 };
 
@@ -123,6 +121,14 @@ public:
   typedef ChassisCmd Cmd;
   typedef ChassisRfrData RfrData;
   typedef ChassisConfig Config;
+
+  static std::string WorkingModeToStr(WorkingMode mode)
+  {
+    if (mode == Chassis::WorkingMode::Depart) return "Depart";
+    if (mode == Chassis::WorkingMode::Follow) return "Follow";
+    if (mode == Chassis::WorkingMode::Gyro) return "Gyro";
+    return "ErrCWM";
+  };
 
   enum class GyroDir : int8_t {
     Clockwise = -1,    ///< 顺时针

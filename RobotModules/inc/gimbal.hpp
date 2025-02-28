@@ -70,6 +70,12 @@ public:
   typedef hello_world::module::CtrlMode CtrlMode;
   typedef GimbalCmd Cmd;
 
+  static std::string WorkingModeToStr(WorkingMode mode) {
+    if (mode == WorkingMode::Normal)
+      return "Normal";
+    return "ErrGWM";
+  };
+  
   Gimbal() {};
   ~Gimbal() {};
 
