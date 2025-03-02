@@ -19,7 +19,6 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "rfr_encoder.hpp"
-
 #include "rfr_crc.hpp"
 
 namespace hello_world

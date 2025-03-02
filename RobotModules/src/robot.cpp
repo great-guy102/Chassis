@@ -229,14 +229,15 @@ void Robot::genModulesCmdFromRc() {
 
   Chassis::WorkingMode chassis_working_mode = Chassis::WorkingMode::Depart;
   Gimbal::WorkingMode gimbal_working_mode = Gimbal::WorkingMode::Normal;
-  Shooter::WorkingMode shooter_working_mode = Shooter::WorkingMode::kStop;
+  Shooter::WorkingMode shooter_working_mode = Shooter::WorkingMode::kShoot;
   Chassis::GyroDir gyro_dir = Chassis::GyroDir::Unspecified;
 
   CtrlMode gimbal_ctrl_mode = CtrlMode::kManual;
   CtrlMode shooter_ctrl_mode = CtrlMode::kManual;
 
   bool use_cap_flag = false;
-  bool shoot_flag = false;
+  bool shoot_flag =
+      (rc_wheel > 0.9f); // 自动模式也能手动发弹;
   // bool rev_head_flag = false; //TODO:掉头模式
 
   // TODO: 后续需要加入慢拨模式
@@ -246,22 +247,15 @@ void Robot::genModulesCmdFromRc() {
 
     if (r_switch == RcSwitchState::kUp) {
       // * 左上右上
-      shooter_working_mode = Shooter::WorkingMode::kShoot;
-      shoot_flag =
-          (rc_wheel > 0.9f); // TODO：待修改判定在外部，自动模式也能手动发弹
       use_cap_flag = true;
     } else if (r_switch == RcSwitchState::kMid) {
       // * 左上右中
-      shooter_working_mode = Shooter::WorkingMode::kShoot;
-      shoot_flag =
-          (rc_wheel > 0.9f); // TODO：待修改判定在外部，自动模式也能手动发弹
       gimbal_ctrl_mode = CtrlMode::kAuto;
       shooter_ctrl_mode = CtrlMode::kManual;
     } else if (r_switch == RcSwitchState::kDown) {
       // * 左上右下
       // gimbal_working_mode = Gimbal::WorkingMode::PidTest;
       // //TODO：云台PID测试模式
-      shooter_working_mode = Shooter::WorkingMode::kShoot;
       gimbal_ctrl_mode = CtrlMode::kAuto;
       shooter_ctrl_mode = CtrlMode::kAuto;
     }
@@ -271,14 +265,9 @@ void Robot::genModulesCmdFromRc() {
 
     if (r_switch == RcSwitchState::kUp) {
       // * 左中右上
-      shooter_working_mode = Shooter::WorkingMode::kShoot;
-      shoot_flag = (rc_wheel > 0.9f);
       use_cap_flag = true;
     } else if (r_switch == RcSwitchState::kMid) {
       // * 左中右中
-      shooter_working_mode = Shooter::WorkingMode::kShoot;
-      shoot_flag =
-          (rc_wheel > 0.9f); // TODO：待修改判定在外部，自动模式也能手动发弹
       gimbal_ctrl_mode = CtrlMode::kAuto;
       shooter_ctrl_mode = CtrlMode::kManual;
       // rev_head_flag = (rc_wheel > 0.9f); // TODO:掉头模式
@@ -286,7 +275,6 @@ void Robot::genModulesCmdFromRc() {
       // * 左中右下
       // gimbal_working_mode = Gimbal::WorkingMode::PidTest;
       // //TODO：云台PID测试模式
-      shooter_working_mode = Shooter::WorkingMode::kShoot;
       gimbal_ctrl_mode = CtrlMode::kAuto;
       shooter_ctrl_mode = CtrlMode::kAuto;
     }
@@ -300,9 +288,6 @@ void Robot::genModulesCmdFromRc() {
       gyro_dir = Chassis::GyroDir::Clockwise;
     } else if (r_switch == RcSwitchState::kMid) {
       // * 左下右中
-      shooter_working_mode = Shooter::WorkingMode::kShoot;
-      shoot_flag =
-          (rc_wheel > 0.9f); // TODO：待修改判定在外部，自动模式也能手动发弹
       gimbal_ctrl_mode = CtrlMode::kAuto;
       shooter_ctrl_mode = CtrlMode::kManual;
       gyro_dir = Chassis::GyroDir::Clockwise;
@@ -312,7 +297,6 @@ void Robot::genModulesCmdFromRc() {
       gyro_dir = Chassis::GyroDir::AntiClockwise;
       // gimbal_working_mode = Gimbal::WorkingMode::PidTest;
       // //TODO：云台PID测试模式
-      shooter_working_mode = Shooter::WorkingMode::kShoot;
       gimbal_ctrl_mode = CtrlMode::kAuto;
       shooter_ctrl_mode = CtrlMode::kAuto;
     }
