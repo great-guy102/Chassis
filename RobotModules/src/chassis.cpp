@@ -198,11 +198,13 @@ void Chassis::runOnDead() { resetDataOnDead(); };
 void Chassis::runOnResurrection() { resetDataOnResurrection(); };
 
 void Chassis::runOnWorking() {
+  calcChassisState();
   revNormCmd();
   calcMotorsRef();
   calcSteerCurrentRef();
   calcMotorsLimitedRef();
   calcWheelCurrentRef();
+  // calcChassisState(); // TODO:调试
 };
 
 void Chassis::runAlways() { setCommData(pwr_state_ == PwrState::kWorking); };
@@ -214,15 +216,97 @@ void Chassis::standby() {
 #pragma endregion
 
 #pragma region 工作状态下，获取控制指令的函数
+/**
+ * @brief 计算舵轮底盘的正运动学解算器
+ */
+void Chassis::calcChassisState() {
+  // 初始化底盘状态
+  const float length = 0.334f;
+  const float width = 0.334f;
+  const float wheel_radius = 66 * 0.001f;
+  // 计算轮子到底盘中心的距离平方
+  const float r_square = (length * length + width * width) / 4.0f;
 
- // TODO:调试1
+  float theta_i2r = 0.0f;
+  State chassis_state_raw = {0.0f};
+
+  if (is_all_wheel_online_ && is_all_steer_online_) {
+    float steer_angle[4] = {0.0f}, wheel_speed[4] = {0.0f};
+    for (size_t i = 0; i < 4; i++) {
+      steer_angle[i] = steer_angle_fdb_[i];
+      // steer_angle[i] = steer_angle_ref_[i]; // TODO:调试
+      wheel_speed[i] = wheel_speed_fdb_[i];
+      // wheel_speed[i] = wheel_speed_ref_[i]; // TODO:调试
+    }
+    theta_i2r = theta_i2r_; // 正解算遵循右手定则
+
+    // 四个轮子的x和y分量速度
+    float v_x[4] = {0.0f}, v_y[4] = {0.0f};
+
+    // 计算四个轮子的线速度分量
+    for (int i = 0; i < 4; i++) {
+      // 将轮子角速度转换为线速度
+      float linear_speed = wheel_speed[i] * wheel_radius;
+      v_x[i] = linear_speed * cosf(steer_angle[i]);
+      v_y[i] = linear_speed * sinf(steer_angle[i]);
+    }
+
+    // 左前轮贡献
+    chassis_state_raw.v_x += v_x[0];
+    chassis_state_raw.v_y += v_y[0];
+    chassis_state_raw.w +=
+        (-v_y[0] * length + v_x[0] * width) / (2.0f * r_square);
+
+    // 左后轮贡献
+    chassis_state_raw.v_x += v_x[1];
+    chassis_state_raw.v_y += v_y[1];
+    chassis_state_raw.w +=
+        (-v_y[1] * (-length) + v_x[1] * width) / (2.0f * r_square);
+
+    // 右后轮贡献
+    chassis_state_raw.v_x += v_x[2];
+    chassis_state_raw.v_y += v_y[2];
+    chassis_state_raw.w +=
+        (-v_y[2] * (-length) + v_x[2] * (-width)) / (2.0f * r_square);
+
+    // 右前轮贡献
+    chassis_state_raw.v_x += v_x[3];
+    chassis_state_raw.v_y += v_y[3];
+    chassis_state_raw.w +=
+        (-v_y[3] * length + v_x[3] * (-width)) / (2.0f * r_square);
+
+    // 计算平均值
+    chassis_state_raw *= 0.25f;
+  }
+
+  // 坐标系转换 - 底盘坐标系 -> 云台坐标系
+  // 右手系旋转矩阵: R(θ) = [cos(θ) -sin(θ); sin(θ) cos(θ)]
+  float sin_theta = sinf(theta_i2r);
+  float cos_theta = cosf(theta_i2r);
+
+  // 计算云台坐标系下的速度
+  chassis_state_.v_x =
+      chassis_state_raw.v_x * cos_theta - chassis_state_raw.v_y * sin_theta;
+  chassis_state_.v_y =
+      chassis_state_raw.v_x * sin_theta +
+      chassis_state_raw.v_y *
+          cos_theta; // 遥控器遥杆向左，指令为负数，指令体系遵循左手系，所以这里取反
+  chassis_state_.w = chassis_state_raw.w; // 角速度不受坐标系旋转影响
+
+  //线性滤波
+  float beta = 0.1f;
+  chassis_state_ = chassis_state_ * beta + (1 - beta) * last_chassis_state_;
+  last_chassis_state_ = chassis_state_;
+};
+
+// TODO:调试1
 hello_world::pid::MultiNodesPid::Datas pid_data; // TODO:PID调试数据
 // 使用示例：pid_data = pid_ptr->getPidAt(0).datas();
 
 void Chassis::revNormCmd() {
-  float beta = 0.01f;
+  float beta = 0.5f;
   static bool first_follow_flag = true;
-  Cmd cmd = norm_cmd_;
+  State cmd = norm_cmd_;
 
   switch (working_mode_) {
   case WorkingMode::Depart: {
@@ -259,7 +343,7 @@ void Chassis::revNormCmd() {
 
     // 跟随模式下，更新跟随目标
     float theta_fdb = theta_i2r_;
-    float theta_ref = 0.0f; 
+    float theta_ref = 0.0f;
 
     // TODO：跟随模式云台前馈记录
     // float omega_feedforward = config_.yaw_sensitivity * omega_feedforward_;
@@ -286,7 +370,7 @@ void Chassis::revNormCmd() {
         w_max = 10.0f * sqrtf(cmd.v_x * cmd.v_x + cmd.v_y * cmd.v_y) - 0.09f;
       }
       cmd.w = hello_world::Bound(cmd.w, -w_max, w_max);
-      if(fabs(theta_fdb) < (PI / 90.0f)) {
+      if (fabs(theta_fdb) < (PI / 90.0f)) {
         cmd.w = 0.0f;
       }
     }
@@ -374,21 +458,21 @@ void Chassis::calcMotorsLimitedRef() {
       .p_referee_max = static_cast<float>(rfr_data_.pwr_limit),
       /* 期望功率下限，建议设为当前 p_referee_max 乘一个 0 ~ 1
          的比例系数，单位：W */
-      .p_ref_min = 0.8f * rfr_data_.pwr_limit, // 50.0f, 
+      .p_ref_min = 0.8f * rfr_data_.pwr_limit, // 50.0f,
       /* 剩余能量：采用裁判系统控制时为裁判系统缓冲能量 buffer_energy，单位：J
        */
       .remaining_energy = static_cast<float>(rfr_data_.pwr_buffer),
       /* 剩余能量收敛值，当剩余能量到达该值时，期望功率等于裁判系统给出的底盘功率上限
          p_referee_max */
       .energy_converge = 40.0f,
-      /* 期望功率随当前剩余能量线性变化的斜率 
-      >= (p_ref_max - p_referee_max) / (remaining_energy - energy_converge) 
+      /* 期望功率随当前剩余能量线性变化的斜率
+      >= (p_ref_max - p_referee_max) / (remaining_energy - energy_converge)
       开启超电时 remaining_energy 可取 100 */
       .p_slope = 1.6f,
       /* 危险能量值，若剩余能量低于该值，p_ref_ 设为 0 */
       .danger_energy = 5.0f,
   };
-  
+
   // TODO:关闭超电时需一并注释掉，防止间断通信误入本分支
   if (!cap_ptr_->isOffline()) {
     runtime_params.remaining_energy = cap_ptr_->getRemainingPower();
@@ -421,10 +505,11 @@ void Chassis::calcWheelCurrentRef() {
     pid_ptr = wheel_pid_ptr_[wpis[i]];
     HW_ASSERT(pid_ptr != nullptr, "pointer to Wheel PID %d is nullptr",
               wpis[i]);
-    pid_ptr->calc(&wheel_speed_ref_limited_[i], &wheel_speed_fdb_[i], nullptr,
-                  &wheel_current_ref_limited_[i]);
-    // pid_ptr->calc(&wheel_speed_ref_[i], &wheel_speed_fdb_[i], nullptr,
-    //               &wheel_current_ref_[i]); // TODO: 功限调试
+    // pid_ptr->calc(&wheel_speed_ref_limited_[i], &wheel_speed_fdb_[i],
+    // nullptr,
+    //               &wheel_current_ref_limited_[i]);
+    pid_ptr->calc(&wheel_speed_ref_[i], &wheel_speed_fdb_[i], nullptr,
+                  &wheel_current_ref_[i]); // TODO: 功限调试
   }
 };
 

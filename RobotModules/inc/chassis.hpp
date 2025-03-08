@@ -37,7 +37,7 @@ namespace robot {
 /* Exported constants --------------------------------------------------------*/
 /* Exported types ------------------------------------------------------------*/
 
-union ChassisCmd {
+union ChassisState {
   struct {
     float v_x;
     float v_y;
@@ -49,45 +49,46 @@ union ChassisCmd {
     v_y = 0;
     w = 0;
   }
-  ChassisCmd operator+(const ChassisCmd &other) const {
+  ChassisState operator+(const ChassisState &other) const {
     return {v_x + other.v_x, v_y + other.v_y, w + other.w};
   }
 
-  ChassisCmd operator-(const ChassisCmd &other) const {
+  ChassisState operator-(const ChassisState &other) const {
     return {v_x - other.v_x, v_y - other.v_y, w - other.w};
   }
 
-  ChassisCmd operator*(float scalar) const {
+  ChassisState operator*(float scalar) const {
     return {v_x * scalar, v_y * scalar, w * scalar};
   }
 
-  ChassisCmd operator+=(const ChassisCmd &other) {
+  ChassisState operator+=(const ChassisState &other) {
     v_x += other.v_x;
     v_y += other.v_y;
     w += other.w;
     return *this;
   }
 
-  ChassisCmd operator-=(const ChassisCmd &other) {
+  ChassisState operator-=(const ChassisState &other) {
     v_x -= other.v_x;
     v_y -= other.v_y;
     w -= other.w;
     return *this;
   }
 
-  ChassisCmd operator*=(float scalar) {
+  ChassisState operator*=(float scalar) {
     v_x *= scalar;
     v_y *= scalar;
     w *= scalar;
     return *this;
   }
 
-  friend ChassisCmd operator*(float scalar, const ChassisCmd &cmd);
+  friend ChassisState operator*(float scalar, const ChassisState &state);
 };
+
 struct ChassisRfrData {
   bool is_rfr_on = false; ///< 裁判系统是否在线
   bool is_pwr_on =
-      false;     ///< 机器人底盘电源是否开启【裁判系统告知，离线时默认开启】
+      false; ///< 机器人底盘电源是否开启【裁判系统告知，离线时默认开启】
   uint16_t pwr_limit =
       80; ///< 机器人底盘功率限制【裁判系统告知，离线时采用默认值】
   uint16_t pwr_buffer =
@@ -118,15 +119,17 @@ public:
   typedef robot::GimbalChassisComm GimbalChassisComm;
   typedef ChassisWorkingMode WorkingMode;
 
-  typedef ChassisCmd Cmd;
+  typedef ChassisState State;
   typedef ChassisRfrData RfrData;
   typedef ChassisConfig Config;
 
-  static std::string WorkingModeToStr(WorkingMode mode)
-  {
-    if (mode == Chassis::WorkingMode::Depart) return "Depart";
-    if (mode == Chassis::WorkingMode::Follow) return "Follow";
-    if (mode == Chassis::WorkingMode::Gyro) return "Gyro";
+  static std::string WorkingModeToStr(WorkingMode mode) {
+    if (mode == Chassis::WorkingMode::Depart)
+      return "Depart";
+    if (mode == Chassis::WorkingMode::Follow)
+      return "Follow";
+    if (mode == Chassis::WorkingMode::Gyro)
+      return "Gyro";
     return "ErrCWM";
   };
 
@@ -189,7 +192,7 @@ public:
       working_mode_ = mode;
     }
   }
-  void setNormCmd(const Cmd &cmd) { norm_cmd_ = cmd; }
+  void setNormCmd(const State &cmd) { norm_cmd_ = cmd; }
   void setRfrData(const RfrData &data) { rfr_data_ = data; }
   float getThetaI2r(bool actual_head_dir = true) const {
     if (actual_head_dir == true) {
@@ -234,6 +237,7 @@ private:
   void updatePwrState();
 
   // 工作状态下，获取控制指令的函数
+  void calcChassisState();
   void revNormCmd();
   void calcMotorsRef();
   void calcMotorsLimitedRef();
@@ -260,7 +264,7 @@ private:
   void setCommDataCap(bool is_working);
 
   // 工具函数
-  void setCmdSmoothly(const Cmd &cmd, float beta = 0.9) {
+  void setCmdSmoothly(const State &cmd, float beta = 0.9) {
     beta = hello_world::Bound(beta, 0.0, 1.0);
     cmd_ = cmd * beta + (1 - beta) * last_cmd_;
     last_cmd_ = cmd_;
@@ -273,7 +277,7 @@ private:
   bool use_cap_flag_ = false; ///< 是否使用超级电容
   GyroDir gyro_dir_ =
       GyroDir::Unspecified; ///< 小陀螺方向，正为绕 Z 轴逆时针，负为顺时针，
-  Cmd norm_cmd_ = {0};      ///< 原始控制指令，基于图传坐标系
+  State norm_cmd_ = {0};      ///< 原始控制指令，基于图传坐标系
   ChassisRfrData rfr_data_; ///< 底盘 RFR 数据
 
   WorkingMode working_mode_ = WorkingMode::Depart;      ///< 工作模式
@@ -290,7 +294,7 @@ private:
          ///< ms，实际上是作为上电瞬间的记录
 
   // 在 runOnWorking 函数中更新的数据
-  Cmd cmd_ = {0}, last_cmd_ = {0}; ///< 控制指令，基于图传坐标系
+  State cmd_ = {0}, last_cmd_ = {0}; ///< 控制指令，基于图传坐标系
   float omega_feedforward_ =
       0; ///< 云台 YAW 轴角速度，用于底盘跟随前馈，单位 rad/s
   float wheel_speed_ref_[4] = {0}; ///< 轮电机的速度参考值 单位 rad/s
@@ -303,7 +307,8 @@ private:
   float steer_angle_ref_[4] = {0};           ///< 舵电机的角度参考值 单位 rad
   float steer_current_ref_[4] = {0}; ///< 舵电机的电流参考值 单位 A [-3.0, 3.0]
   float steer_current_ref_limited_[4] = {
-      0}; ///< 舵电机的电流参考值(限幅后) 单位 rad/s
+      0};                      ///< 舵电机的电流参考值(限幅后) 单位 rad/s
+  State chassis_state_ = {0}, last_chassis_state_ = {0}; ///< 底盘状态
 
   bool rev_head_flag_ = false;      ///< 转向后退标志
   uint32_t last_rev_head_tick_ = 0; ///< 上一次转向后退的时间戳
@@ -352,7 +357,7 @@ private:
 
 /* Exported function prototypes ----------------------------------------------*/
 
-inline ChassisCmd operator*(float scalar, const ChassisCmd &cmd) {
+inline ChassisState operator*(float scalar, const ChassisState &cmd) {
   return cmd * scalar;
 };
 

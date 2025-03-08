@@ -305,11 +305,11 @@ void Robot::genModulesCmdFromRc() {
     }
   }
 
-  ChassisCmd chassis_cmd = {0};
+  ChassisState chassis_cmd = {0};
   chassis_cmd.v_x = hello_world::Bound(rc_ptr_->rc_rv(), -1, 1);
   chassis_cmd.v_y = hello_world::Bound(-rc_ptr_->rc_rh(), -1, 1);
   // TODO：斜坡优化待调整
-  //  ChassisCmd chassis_cmd_raw = {0};
+  //  ChassisState chassis_cmd_raw = {0};
   //  chassis_cmd_raw.v_x = hello_world::Bound(rc_ptr_->rc_rv(), -1, 1);
   //  chassis_cmd_raw.v_y = hello_world::Bound(-rc_ptr_->rc_rh(), -1, 1);
   //  ramp_cmd_vx_ptr_->calc(&(chassis_cmd_raw.v_x), &(chassis_cmd.v_x));
@@ -391,8 +391,8 @@ void Robot::genModulesCmdFromKb() {
     shooter_ctrl_mode = CtrlMode::kAuto;
   }
 
-  ChassisCmd chassis_cmd_raw = {0};
-  ChassisCmd chassis_cmd = {0};
+  ChassisState chassis_cmd_raw = {0};
+  ChassisState chassis_cmd = {0};
   chassis_cmd_raw.v_x = hello_world::Bound(
       ((int8_t)rc_ptr_->key_W() - (int8_t)rc_ptr_->key_S()), -1, 1);
   chassis_cmd_raw.v_y = hello_world::Bound(
