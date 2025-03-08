@@ -110,7 +110,7 @@ void Robot::updateRfrData() {
   PerformancePkg::Data rpp_data = kDefaultRobotPerformanceData;
   PowerHeatPkg::Data rph_data = kDefaultRobotPowerHeatData;
   ShooterPkg::Data rsp_data = kDefaultRobotShooterData;
-  bool is_new_bullet_shot = false;
+  static uint8_t rfr_bullet_shot_cnt = 0;
   if (!referee_ptr_->isOffline()) {
     rpp_data = rfr_performance_pkg_ptr_->getData();
     rph_data = rfr_power_heat_pkg_ptr_->getData();
@@ -119,7 +119,10 @@ void Robot::updateRfrData() {
     if (!referee_ptr_->isOffline()) {
       if (!rfr_shooter_pkg_ptr_->isHandled()) {
         rfr_shooter_pkg_ptr_->setHandled();
-        is_new_bullet_shot = true;
+        rfr_bullet_shot_cnt++;
+        if(rfr_bullet_shot_cnt >= 4) {
+          rfr_bullet_shot_cnt = 0;
+        }
       }
     }
   }
@@ -141,7 +144,7 @@ void Robot::updateRfrData() {
   GimbalChassisComm::RefereeData::ChassisPart &gimbal_rfr_data =
       gc_comm_ptr_->referee_data().cp;
 
-  gimbal_rfr_data.is_new_bullet_shot = is_new_bullet_shot;
+  gimbal_rfr_data.rfr_bullet_shot_cnt = rfr_bullet_shot_cnt; //is_new_bullet_shot
   gimbal_rfr_data.robot_id = (hello_world::referee::RfrId)rpp_data.robot_id;
 
   // TODO: 换成实际的枪口
