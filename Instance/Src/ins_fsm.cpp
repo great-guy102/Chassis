@@ -41,6 +41,9 @@ robot::Chassis *GetChassis() {
     // * 1. 无通信功能的组件指针
     // * - 底盘逆解
     unique_chassis.registerIkSolver(GetChassisIkSolver());
+    // * - 斜坡
+    unique_chassis.registerRampCmdVx(GetRampCmdVx());
+    unique_chassis.registerRampCmdVy(GetRampCmdVy());
     // * - pid
     // 轮组 pid
     unique_chassis.registerWheelPid(GetPidMotorWheelLeftFront(),
@@ -110,8 +113,6 @@ robot::Robot *GetRobot() {
     // 无通信功能的组件指针
     unique_robot.registerBuzzer(GetBuzzer());
     unique_robot.registerImu(GetImu());
-    unique_robot.registerRampCmdVx(GetRampCmdVx());
-    unique_robot.registerRampCmdVy(GetRampCmdVy());
 
     // 只接收数据的组件指针
     unique_robot.registerRc(GetRemoteControl());

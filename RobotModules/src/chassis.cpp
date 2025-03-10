@@ -21,8 +21,8 @@ float wheel_speed_ref_debug = 0;
 // float steer_speed_fdb_debug = 0;
 // float steer_speed_ref_debug = 0;
 
-// TODO: norm_cmd_和cmd_好像没有关联起来，非常奇怪
-// Robot的runOnWorking里产生各个模块的norm_cmd_
+// TODO: cmd_norm_和cmd_好像没有关联起来，非常奇怪
+// Robot的runOnWorking里产生各个模块的cmd_norm_
 namespace robot {
 /* Private constants ---------------------------------------------------------*/
 /* Private types -------------------------------------------------------------*/
@@ -293,7 +293,7 @@ void Chassis::calcChassisState() {
           cos_theta; // 遥控器遥杆向左，指令为负数，指令体系遵循左手系，所以这里取反
   chassis_state_.w = chassis_state_raw.w; // 角速度不受坐标系旋转影响
 
-  //线性滤波
+  // 线性滤波
   float beta = 0.1f;
   chassis_state_ = chassis_state_ * beta + (1 - beta) * last_chassis_state_;
   last_chassis_state_ = chassis_state_;
@@ -302,15 +302,18 @@ void Chassis::calcChassisState() {
 // TODO:调试1
 hello_world::pid::MultiNodesPid::Datas pid_data; // TODO:PID调试数据
 // 使用示例：pid_data = pid_ptr->getPidAt(0).datas();
-
+Chassis::State cmd_state_raw = {0.0f}, cmd_state = {0.0f}; // TODO:调试
+float cnt = 0;                                             // TODO:调试
+bool flag = true;                                          // TODO:调试
 void Chassis::revNormCmd() {
   float beta = 0.5f;
   static bool first_follow_flag = true;
-  State cmd = norm_cmd_;
+  State cmd_raw = cmd_norm_;
+  // State cmd_raw = cmd_norm_, cmd_state_raw = {0.0f}, cmd_state = {0.0f};
 
   switch (working_mode_) {
   case WorkingMode::Depart: {
-    // 分离模式不对 norm_cmd_ 进行额外处理
+    // 分离模式不对 cmd_norm_ 进行额外处理
     gyro_dir_ = GyroDir::Unspecified;
     first_follow_flag = true;
     break;
@@ -329,7 +332,7 @@ void Chassis::revNormCmd() {
       }
     }
     // 小陀螺模式下，旋转分量为定值
-    cmd.w = config_.gyro_rot_spd * (int8_t)gyro_dir_;
+    cmd_raw.w = config_.gyro_rot_spd * (int8_t)gyro_dir_;
     break;
   }
 
@@ -343,12 +346,12 @@ void Chassis::revNormCmd() {
 
     // 跟随模式下，更新跟随目标
     float theta_fdb = theta_i2r_;
-    float theta_ref = 0.0f;
+    static float theta_ref = 0.0f;
 
     // TODO：跟随模式云台前馈记录
     // float omega_feedforward = config_.yaw_sensitivity * omega_feedforward_;
     // follow_omega_pid_ptr_->calc(&theta_ref, &theta_fdb, &omega_feedforward,
-    //                             &cmd.w);
+    //                             &cmd_raw.w);
 
     if (first_follow_flag) {
       first_follow_flag = false;
@@ -359,19 +362,22 @@ void Chassis::revNormCmd() {
       }
     }
 
-    follow_omega_pid_ptr_->calc(&theta_ref, &theta_fdb, nullptr, &cmd.w);
+    follow_omega_pid_ptr_->calc(&theta_ref, &theta_fdb, nullptr, &cmd_raw.w);
     pid_data = follow_omega_pid_ptr_->getPidAt(0).datas();
     // 解决跟随模式的低速底盘抖动问题
-    if ((cmd.v_x * cmd.v_x + cmd.v_y * cmd.v_y) >= 0.000001f) {
-      float w_max = fabsf(cmd.w);
-      if ((cmd.v_x * cmd.v_x + cmd.v_y * cmd.v_y) <= 0.0001f) {
-        w_max = sqrtf(cmd.v_x * cmd.v_x + cmd.v_y * cmd.v_y);
-      } else if ((cmd.v_x * cmd.v_x + cmd.v_y * cmd.v_y) <= 0.01f) {
-        w_max = 10.0f * sqrtf(cmd.v_x * cmd.v_x + cmd.v_y * cmd.v_y) - 0.09f;
+    if ((cmd_raw.v_x * cmd_raw.v_x + cmd_raw.v_y * cmd_raw.v_y) >= 0.000001f) {
+      float w_max = fabsf(cmd_raw.w);
+      if ((cmd_raw.v_x * cmd_raw.v_x + cmd_raw.v_y * cmd_raw.v_y) <= 0.0001f) {
+        w_max = sqrtf(cmd_raw.v_x * cmd_raw.v_x + cmd_raw.v_y * cmd_raw.v_y);
+      } else if ((cmd_raw.v_x * cmd_raw.v_x + cmd_raw.v_y * cmd_raw.v_y) <=
+                 0.01f) {
+        w_max = 10.0f * sqrtf(cmd_raw.v_x * cmd_raw.v_x +
+                              cmd_raw.v_y * cmd_raw.v_y) -
+                0.09f;
       }
-      cmd.w = hello_world::Bound(cmd.w, -w_max, w_max);
+      cmd_raw.w = hello_world::Bound(cmd_raw.w, -w_max, w_max);
       if (fabs(theta_fdb) < (PI / 90.0f)) {
-        cmd.w = 0.0f;
+        cmd_raw.w = 0.0f;
       }
     }
 
@@ -388,7 +394,7 @@ void Chassis::revNormCmd() {
     //   dead_cross_flag = false;
     // }
     // if (fabs(theta_fdb) < theta_dead_limit) {
-    //   cmd.w = 0.0f;
+    //   cmd_raw.w = 0.0f;
     // }
 
     break;
@@ -399,18 +405,34 @@ void Chassis::revNormCmd() {
   }
 
   if (is_high_spd_enabled_) {
-    cmd *= 1.5;
+    cmd_raw *= 1.5;
     beta = 1.0;
   }
 
-  // TODO：修改限幅逻辑，保证限幅后平移速度方向不变
-  cmd.v_x = hello_world::Bound(cmd.v_x * config_.normal_trans_vel,
-                               -config_.max_trans_vel, config_.max_trans_vel);
-  cmd.v_y = hello_world::Bound(cmd.v_y * config_.normal_trans_vel,
-                               -config_.max_trans_vel, config_.max_trans_vel);
-  cmd.w = hello_world::Bound(cmd.w, -config_.max_rot_spd, config_.max_rot_spd);
+  cmd_state_raw.v_x = cmd_raw.v_x * config_.normal_trans_vel;
+  cmd_state_raw.v_y = cmd_raw.v_y * config_.normal_trans_vel;
+  // TODO：预期限幅式斜坡优化
+  // if (is_all_wheel_online_ && is_all_steer_online_) {
+  //   cmd_state_raw.v_x =
+  //       hello_world::Bound(cmd_state_raw.v_x, chassis_state_.v_x - 0.5f,
+  //                          chassis_state_.v_x + 0.5f);
+  //   cmd_state_raw.v_y =
+  //       hello_world::Bound(cmd_state_raw.v_y, chassis_state_.v_y - 0.5f,
+  //                          chassis_state_.v_y + 0.5f);
+  // }
+  ramp_cmd_vx_ptr_->calc(&(cmd_state_raw.v_x), &(cmd_state.v_x));
+  ramp_cmd_vy_ptr_->calc(&(cmd_state_raw.v_y), &(cmd_state.v_y));
+  // cmd_state.v_x = cmd_state_raw.v_x; //TODO:调试
+  // cmd_state.v_y = cmd_state_raw.v_y; //TODO:调试
 
-  setCmdSmoothly(cmd, beta);
+  cmd_state.v_x = hello_world::Bound(
+      cmd_state.v_x, -config_.max_trans_vel, config_.max_trans_vel);
+  cmd_state.v_y = hello_world::Bound(
+      cmd_state.v_y, -config_.max_trans_vel, config_.max_trans_vel);
+  cmd_state.w =
+      hello_world::Bound(cmd_raw.w, -config_.max_rot_spd, config_.max_rot_spd);
+  //必要的设置函数，作为cmd_的唯一赋值接口
+  setCmdSmoothly(cmd_state, beta);
 };
 
 void Chassis::calcMotorsRef() {
@@ -479,10 +501,10 @@ void Chassis::calcMotorsLimitedRef() {
   }
 
   // TODO:待适配
-  // if (is_high_spd_enabled_) {
-  //   runtime_params.p_rfr_max += 800.0f;
-  //   runtime_params.z_rfr_measure = 60.0f;
-  // }
+  if (is_high_spd_enabled_) {
+    runtime_params.p_ref_max += 800.0f;
+    runtime_params.remaining_energy = 60.0f;
+  }
   pwr_limiter_ptr_->updateSteeringModel(steer_speed_fdb_, steer_current_ref_,
                                         nullptr);
   pwr_limiter_ptr_->updateWheelModel(wheel_speed_ref_, wheel_speed_fdb_,
@@ -505,8 +527,7 @@ void Chassis::calcWheelCurrentRef() {
     pid_ptr = wheel_pid_ptr_[wpis[i]];
     HW_ASSERT(pid_ptr != nullptr, "pointer to Wheel PID %d is nullptr",
               wpis[i]);
-    // pid_ptr->calc(&wheel_speed_ref_limited_[i], &wheel_speed_fdb_[i],
-    // nullptr,
+    // pid_ptr->calc(&wheel_speed_ref_limited_[i], &wheel_speed_fdb_[i], nullptr,
     //               &wheel_current_ref_limited_[i]);
     pid_ptr->calc(&wheel_speed_ref_[i], &wheel_speed_fdb_[i], nullptr,
                   &wheel_current_ref_[i]); // TODO: 功限调试
@@ -524,7 +545,7 @@ void Chassis::reset() {
   use_cap_flag_ = false; ///< 是否使用超级电容
   gyro_dir_ =
       GyroDir::Unspecified; ///< 小陀螺方向，正为绕 Z 轴逆时针，负为顺时针，
-  norm_cmd_.reset();
+  cmd_norm_.reset();
   rfr_data_ = RfrData(); ///< 底盘 RFR 数据
 
   working_mode_ = WorkingMode::Depart;      ///< 工作模式
@@ -694,8 +715,8 @@ void Chassis::setCommDataMotors(bool working_flag) {
       wheel_motor_ptr->setInput(0);
     } else {
       // wheel_motor_ptr->setInput(0); // TODO：调试
-      // wheel_motor_ptr->setInput(wheel_current_ref_[wmi]); // TODO：功限调试
-      wheel_motor_ptr->setInput(wheel_current_ref_limited_[wmi]);
+      wheel_motor_ptr->setInput(wheel_current_ref_[wmi]); // TODO：功限调试
+      // wheel_motor_ptr->setInput(wheel_current_ref_limited_[wmi]);
     }
 
     if (!working_flag || steer_motor_ptr->isOffline()) {
@@ -709,7 +730,7 @@ void Chassis::setCommDataMotors(bool working_flag) {
   }
 };
 
-void Chassis::setCommDataCap(bool working_flag) {
+void Chassis::setCommDataCap(bool working_flag = true) {
   // 电容根据电容充电状态发送数据
   HW_ASSERT(cap_ptr_ != nullptr, "pointer to Capacitor is nullptr", cap_ptr_);
   if (working_flag && use_cap_flag_) {
@@ -776,7 +797,14 @@ void Chassis::registerPwrLimiter(PwrLimiter *ptr) {
   HW_ASSERT(ptr != nullptr, "pointer to PwrLimiter is nullptr", ptr);
   pwr_limiter_ptr_ = ptr;
 };
-
+void Chassis::registerRampCmdVx(Ramp *ptr) {
+  HW_ASSERT(ptr != nullptr, "RampCmdVx pointer is null", ptr);
+  ramp_cmd_vx_ptr_ = ptr;
+};
+void Chassis::registerRampCmdVy(Ramp *ptr) {
+  HW_ASSERT(ptr != nullptr, "RampCmdVy pointer is null", ptr);
+  ramp_cmd_vy_ptr_ = ptr;
+};
 void Chassis::registerCap(Cap *ptr) {
   HW_ASSERT(ptr != nullptr, "pointer to Capacitor is nullptr", ptr);
   cap_ptr_ = ptr;

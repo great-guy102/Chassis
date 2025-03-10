@@ -153,8 +153,6 @@ public:
   void registerGimbal(Gimbal *ptr);
   void registerShooter(Shooter *ptr);
 
-  void registerRampCmdVx(Ramp *ptr);
-  void registerRampCmdVy(Ramp *ptr);
   void registerBuzzer(Buzzer *ptr);
   void registerCap(Cap *ptr, CanTxMgr *tx_mgr_ptr);
   void registerImu(Imu *ptr);
@@ -226,8 +224,6 @@ private:
   // 无通信功能的组件指针
   Buzzer *buzzer_ptr_ = nullptr; ///< 蜂鸣器指针
   Imu *imu_ptr_ = nullptr;       ///< 底盘 IMU 指针
-  Ramp *ramp_cmd_vx_ptr_ = nullptr; ///< Vx斜坡滤波指针
-  Ramp *ramp_cmd_vy_ptr_ = nullptr; ///< Vy斜坡滤波指针
 
   // 只接收数据的组件指针
   DT7 *rc_ptr_ = nullptr; ///< DT7 指针 只接收数据

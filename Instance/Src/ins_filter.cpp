@@ -18,8 +18,8 @@
 /* Private macro -------------------------------------------------------------*/
 /* Private types -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-hw_filter::Ramp unique_ramp_cmd_vx = hw_filter::Ramp(3.6f, 0.001f, 0.0f, 1);
-hw_filter::Ramp unique_ramp_cmd_vy = hw_filter::Ramp(3.6f, 0.001f, 0.0f, 1);
+hw_filter::Ramp unique_ramp_cmd_vx = hw_filter::Ramp(5.8f, 0.001f, 0.0f, 1);
+hw_filter::Ramp unique_ramp_cmd_vy = hw_filter::Ramp(5.8f, 0.001f, 0.0f, 1);
 /* External variables --------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
 /* Exported function definitions ---------------------------------------------*/

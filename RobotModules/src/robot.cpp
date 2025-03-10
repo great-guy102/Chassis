@@ -120,7 +120,7 @@ void Robot::updateRfrData() {
       if (!rfr_shooter_pkg_ptr_->isHandled()) {
         rfr_shooter_pkg_ptr_->setHandled();
         rfr_bullet_shot_cnt++;
-        if(rfr_bullet_shot_cnt >= 4) {
+        if (rfr_bullet_shot_cnt >= 4) {
           rfr_bullet_shot_cnt = 0;
         }
       }
@@ -144,7 +144,8 @@ void Robot::updateRfrData() {
   GimbalChassisComm::RefereeData::ChassisPart &gimbal_rfr_data =
       gc_comm_ptr_->referee_data().cp;
 
-  gimbal_rfr_data.rfr_bullet_shot_cnt = rfr_bullet_shot_cnt; //is_new_bullet_shot
+  gimbal_rfr_data.rfr_bullet_shot_cnt =
+      rfr_bullet_shot_cnt; // is_new_bullet_shot
   gimbal_rfr_data.robot_id = (hello_world::referee::RfrId)rpp_data.robot_id;
 
   // TODO: 换成实际的枪口
@@ -239,8 +240,7 @@ void Robot::genModulesCmdFromRc() {
   CtrlMode shooter_ctrl_mode = CtrlMode::kManual;
 
   bool use_cap_flag = false;
-  bool shoot_flag =
-      (rc_wheel > 0.9f); // 自动模式也能手动发弹;
+  bool shoot_flag = (rc_wheel > 0.9f); // 自动模式也能手动发弹;
   // bool rev_head_flag = false; //TODO:掉头模式
 
   // TODO: 后续需要加入慢拨模式
@@ -308,12 +308,6 @@ void Robot::genModulesCmdFromRc() {
   ChassisState chassis_cmd = {0};
   chassis_cmd.v_x = hello_world::Bound(rc_ptr_->rc_rv(), -1, 1);
   chassis_cmd.v_y = hello_world::Bound(-rc_ptr_->rc_rh(), -1, 1);
-  // TODO：斜坡优化待调整
-  //  ChassisState chassis_cmd_raw = {0};
-  //  chassis_cmd_raw.v_x = hello_world::Bound(rc_ptr_->rc_rv(), -1, 1);
-  //  chassis_cmd_raw.v_y = hello_world::Bound(-rc_ptr_->rc_rh(), -1, 1);
-  //  ramp_cmd_vx_ptr_->calc(&(chassis_cmd_raw.v_x), &(chassis_cmd.v_x));
-  //  ramp_cmd_vy_ptr_->calc(&(chassis_cmd_raw.v_y), &(chassis_cmd.v_y));
   chassis_cmd.w = 0.0f;
   chassis_ptr_->setNormCmd(chassis_cmd);
   chassis_ptr_->setWorkingMode(chassis_working_mode);
@@ -368,12 +362,14 @@ void Robot::genModulesCmdFromKb() {
     //   chassis_working_mode = Chassis::WorkingMode::Follow;
     // } //TODO:待优化控制逻辑
   }
-
+  if (rc_ptr_->key_Z()) {
+    shooter_working_mode = Shooter::WorkingMode::kBackward;
+  }
   if (rc_ptr_->key_X()) {
     // rev_head_flag = true; //TODO：掉头模式
   }
-  if (rc_ptr_->key_Z()) {
-    shooter_working_mode = Shooter::WorkingMode::kBackward;
+  if(rc_ptr_->key_SHIFT()) {
+    use_cap_flag = true;
   }
   // if (rc_ptr_->key_B()) {
   //   if (shooter_working_mode == Shooter::WorkingMode::kStop) {
@@ -391,18 +387,15 @@ void Robot::genModulesCmdFromKb() {
     shooter_ctrl_mode = CtrlMode::kAuto;
   }
 
-  ChassisState chassis_cmd_raw = {0};
   ChassisState chassis_cmd = {0};
-  chassis_cmd_raw.v_x = hello_world::Bound(
-      ((int8_t)rc_ptr_->key_W() - (int8_t)rc_ptr_->key_S()), -1, 1);
-  chassis_cmd_raw.v_y = hello_world::Bound(
-      ((int8_t)rc_ptr_->key_A() - (int8_t)rc_ptr_->key_D()), -1, 1);
-  ramp_cmd_vx_ptr_->calc(&(chassis_cmd_raw.v_x), &(chassis_cmd.v_x));
-  ramp_cmd_vy_ptr_->calc(&(chassis_cmd_raw.v_y), &(chassis_cmd.v_y));
+  chassis_cmd.v_x = hello_world::Bound(rc_ptr_->key_W() - rc_ptr_->key_S(), -1,
+                                       1); // 前进后退
+  chassis_cmd.v_y = hello_world::Bound(rc_ptr_->key_A() - rc_ptr_->key_D(), -1,
+                                       1); // 左右平移
   chassis_cmd.w = 0.0f;
   chassis_ptr_->setNormCmd(chassis_cmd);
   chassis_ptr_->setWorkingMode(chassis_working_mode);
-  chassis_ptr_->setUseCapFlag(rc_ptr_->key_SHIFT());
+  chassis_ptr_->setUseCapFlag(use_cap_flag);
   // TODO：掉头模式
   //  if (rev_head_flag)
   //    chassis_ptr_->revHead();
@@ -479,41 +472,23 @@ void Robot::setGimbalChassisCommData() {
 void Robot::setUiDrawerData() {
   // ui_drawer_.setSenderId(RobotId::kRedStandard3);
   // Chassis
-  HW_ASSERT(chassis_ptr_ != nullptr, "Chassis FSM pointer is null",
-            chassis_ptr_);
+  HW_ASSERT(chassis_ptr_ != nullptr, "Chassis FSM pointer is null", chassis_ptr_);
   ui_drawer_.setChassisWorkState(chassis_ptr_->getPwrState());
-  // ui_drawer_.setChassisCtrlMode();
   ui_drawer_.setChassisWorkingMode(chassis_ptr_->getWorkingMode());
-  // ui_drawer_.setChassisManualCtrlSrc(chassis_ptr_->getManualCtrlSrc());
   ui_drawer_.setChassisHeadDir(chassis_ptr_->getThetaI2r());
 
   // Gimbal
   HW_ASSERT(gimbal_ptr_ != nullptr, "Gimbal FSM pointer is null", gimbal_ptr_);
-  // ui_drawer_.setGimbalWorkState(chassis_ptr_->getPwrState());
   ui_drawer_.setGimbalCtrlMode(gimbal_ptr_->getCtrlMode());
   ui_drawer_.setGimbalWorkingMode(gimbal_ptr_->getWorkingMode());
-  // ui_drawer_.setGimbalManualCtrlSrc(manual_ctrl_src_);
-  ui_drawer_.setGimbalJointAngPitchFdb(
-      gc_comm_ptr_->gimbal_data().gp.pitch_fdb);
-  // ui_drawer_.setGimbalJointAngPitchRef(gc_comm_ptr_->gimbal_data().gp.pitch_ref);
-  // ui_drawer_.setGimbalJointAngYawFdb(gc_comm_ptr_->gimbal_data().gp.yaw_fdb);
-  // ui_drawer_.setGimbalJointAngYawRef(gc_comm_ptr_->gimbal_data().gp.yaw_ref);
+  ui_drawer_.setGimbalJointAngPitchFdb(gc_comm_ptr_->gimbal_data().gp.pitch_fdb);
 
   // Shooter
-  HW_ASSERT(shooter_ptr_ != nullptr, "Shooter FSM pointer is null",
-            shooter_ptr_);
-  ui_drawer_.setShooterWorkState(chassis_ptr_->getPwrState());
-  ui_drawer_.setShooterCtrlMode(shooter_ptr_->getCtrlMode());
-  ui_drawer_.setShooterWorkingMode(shooter_ptr_->getWorkingMode());
-  // ui_drawer_.setShooterManualCtrlSrc(chassis_ptr_->ge);
+  HW_ASSERT(shooter_ptr_ != nullptr, "Shooter FSM pointer is null", shooter_ptr_);
   ui_drawer_.setHeat(gc_comm_ptr_->referee_data().cp.shooter_heat);
   ui_drawer_.setHeatLimit(gc_comm_ptr_->referee_data().cp.shooter_heat_limit);
 
-  // ui_drawer_.setFeedAngFdb(gc_comm_ptr_->shooter_data().gp.feed_ang_fdb);
-  // ui_drawer_.setFeedAngRef(gc_comm_ptr_->shooter_data().gp.feed_ang_ref);
   ui_drawer_.setFeedStuckFlag(gc_comm_ptr_->shooter_data().gp.feed_stuck_state);
-  // ui_drawer_.setFricSpdFdb(gc_comm_ptr_->shooter_data().gp.fric_spd_fdb);
-  // ui_drawer_.setFricSpdRef(gc_comm_ptr_->shooter_data().gp.fric_spd_ref);
   ui_drawer_.setFricStuckFlag(gc_comm_ptr_->shooter_data().gp.is_fric_stuck_);
 
   // Cap
@@ -521,16 +496,22 @@ void Robot::setUiDrawerData() {
   ui_drawer_.setCapPwrPercent(cap_ptr_->getRemainingPower());
 
   // vision
-  HW_ASSERT(gc_comm_ptr_ != nullptr, "GimbalChassisComm pointer is null",
-            gc_comm_ptr_);
-  bool is_vision_valid = gc_comm_ptr_->vision_data().gp.is_enemy_detected;
+  HW_ASSERT(gc_comm_ptr_ != nullptr, "GimbalChassisComm pointer is null", gc_comm_ptr_);
+  bool is_vision_valid =gc_comm_ptr_->vision_data().gp.is_enemy_detected ;
   ui_drawer_.setVisTgtX(gc_comm_ptr_->vision_data().gp.vtm_x, is_vision_valid);
   ui_drawer_.setVisTgtY(gc_comm_ptr_->vision_data().gp.vtm_y, is_vision_valid);
   ui_drawer_.setisvisionvalid(is_vision_valid);
 
-  if (rc_ptr_->key_V()) {
+  // if (work_tick_ %500 == 0)
+  // {
+  //   ui_drawer_.refresh();
+  // }
+  
+  if (rc_ptr_->key_R()) {
     ui_drawer_.refresh();
   }
+
+  // referee_ptr_->setTxPkg(ui_drawer_.))
 };
 
 #pragma endregion
@@ -643,14 +624,6 @@ void Robot::registerGimbal(Gimbal *ptr) {
 void Robot::registerShooter(Shooter *ptr) {
   HW_ASSERT(ptr != nullptr, "Shooter pointer is null", ptr);
   shooter_ptr_ = ptr;
-};
-void Robot::registerRampCmdVx(Ramp *ptr) {
-  HW_ASSERT(ptr != nullptr, "RampCmdVx pointer is null", ptr);
-  ramp_cmd_vx_ptr_ = ptr;
-};
-void Robot::registerRampCmdVy(Ramp *ptr) {
-  HW_ASSERT(ptr != nullptr, "RampCmdVy pointer is null", ptr);
-  ramp_cmd_vy_ptr_ = ptr;
 };
 void Robot::registerBuzzer(Buzzer *ptr) {
   HW_ASSERT(ptr != nullptr, "Buzzer pointer is null", ptr);

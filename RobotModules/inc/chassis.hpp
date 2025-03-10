@@ -24,6 +24,7 @@
 #include "chassis_iksolver.hpp"
 #include "pid.hpp"
 #include "power_limiter.hpp"
+#include "ramp.hpp"
 
 #include "motor.hpp"
 #include "super_cap.hpp"
@@ -111,6 +112,7 @@ public:
   typedef hello_world::chassis_ik_solver::ChassisIkSolver ChassisIkSolver;
   typedef hello_world::cap::SuperCap Cap;
   typedef hello_world::power_limiter::PowerLimiter PwrLimiter;
+  typedef hello_world::filter::Ramp Ramp;
 
   typedef hello_world::module::PwrState PwrState;
   typedef hello_world::module::CtrlMode CtrlMode;
@@ -192,7 +194,7 @@ public:
       working_mode_ = mode;
     }
   }
-  void setNormCmd(const State &cmd) { norm_cmd_ = cmd; }
+  void setNormCmd(const State &cmd) { cmd_norm_ = cmd; }
   void setRfrData(const RfrData &data) { rfr_data_ = data; }
   float getThetaI2r(bool actual_head_dir = true) const {
     if (actual_head_dir == true) {
@@ -216,6 +218,8 @@ public:
   void setUseCapFlag(bool flag) { use_cap_flag_ = flag; }
   bool getUseCapFlag() const { return use_cap_flag_; }
 
+  void registerRampCmdVx(Ramp *ptr);
+  void registerRampCmdVy(Ramp *ptr);
   void registerIkSolver(ChassisIkSolver *ptr);
   void registerWheelMotor(Motor *ptr, int idx);
   void registerSteerMotor(Motor *ptr, int idx);
@@ -277,7 +281,7 @@ private:
   bool use_cap_flag_ = false; ///< 是否使用超级电容
   GyroDir gyro_dir_ =
       GyroDir::Unspecified; ///< 小陀螺方向，正为绕 Z 轴逆时针，负为顺时针，
-  State norm_cmd_ = {0};      ///< 原始控制指令，基于图传坐标系
+  State cmd_norm_ = {0};    ///< 原始控制指令，基于图传坐标系
   ChassisRfrData rfr_data_; ///< 底盘 RFR 数据
 
   WorkingMode working_mode_ = WorkingMode::Depart;      ///< 工作模式
@@ -307,7 +311,7 @@ private:
   float steer_angle_ref_[4] = {0};           ///< 舵电机的角度参考值 单位 rad
   float steer_current_ref_[4] = {0}; ///< 舵电机的电流参考值 单位 A [-3.0, 3.0]
   float steer_current_ref_limited_[4] = {
-      0};                      ///< 舵电机的电流参考值(限幅后) 单位 rad/s
+      0}; ///< 舵电机的电流参考值(限幅后) 单位 rad/s
   State chassis_state_ = {0}, last_chassis_state_ = {0}; ///< 底盘状态
 
   bool rev_head_flag_ = false;      ///< 转向后退标志
@@ -342,6 +346,8 @@ private:
   MultiNodesPid *steer_pid_ptr_[kSteerPidNum] = {nullptr}; ///< 舵电机 PID 指针
   MultiNodesPid *follow_omega_pid_ptr_ = nullptr; ///< 跟随模式下角速度 PID 指针
   PwrLimiter *pwr_limiter_ptr_ = nullptr;
+  Ramp *ramp_cmd_vx_ptr_ = nullptr; ///< Vx斜坡滤波指针
+  Ramp *ramp_cmd_vy_ptr_ = nullptr; ///< Vy斜坡滤波指针
   // 只接收数据的组件指针
   GimbalChassisComm *gc_comm_ptr_ = nullptr; ///< 云台底盘通信器指针 只接收数据
   Motor *yaw_motor_ptr_ = nullptr;           ///< 云台电机指针 接收、发送数据

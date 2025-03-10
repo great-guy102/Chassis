@@ -82,8 +82,8 @@ public:
   void setRevHeadFlag(bool flag) { rev_head_flag_ = flag; }
   bool getRevHeadFlag() const { return rev_head_flag_; }
 
-  void setNormCmdDelta(const Cmd &cmd) { norm_cmd_delta_ = cmd; }
-  const Cmd &getNormCmdDelta() const { return norm_cmd_delta_; }
+  void setNormCmdDelta(const Cmd &cmd) { cmd_norm_delta_ = cmd; }
+  const Cmd &getNormCmdDelta() const { return cmd_norm_delta_; }
 
   void setCtrlMode(CtrlMode mode) { ctrl_mode_ = mode; }
   CtrlMode getCtrlMode() const { return ctrl_mode_; }
@@ -94,7 +94,7 @@ public:
 private:
   // 由 robot 设置的数据
 
-  Cmd norm_cmd_delta_ = {0.0, 0.0};                ///< 控制指令的增量
+  Cmd cmd_norm_delta_ = {0.0, 0.0};                ///< 控制指令的增量
   CtrlMode ctrl_mode_ = CtrlMode::kManual;         ///< 控制模式
   WorkingMode working_mode_ = WorkingMode::Normal; ///< 工作模式
 
