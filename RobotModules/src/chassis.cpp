@@ -302,14 +302,16 @@ void Chassis::calcChassisState() {
 // TODO:调试1
 hello_world::pid::MultiNodesPid::Datas pid_data; // TODO:PID调试数据
 // 使用示例：pid_data = pid_ptr->getPidAt(0).datas();
-Chassis::State cmd_state_raw = {0.0f}, cmd_state = {0.0f}; // TODO:调试
-float cnt = 0;                                             // TODO:调试
-bool flag = true;                                          // TODO:调试
+// Chassis::State cmd_state_raw = {0.0f}, cmd_state = {0.0f}; // TODO:调试
+bool error_flag = true;  // TODO:调试
+uint16_t cnt = 0;        // TODO:调试
+float error_time = 0.0f; // TODO:调试
+
 void Chassis::revNormCmd() {
   float beta = 0.5f;
   static bool first_follow_flag = true;
   State cmd_raw = cmd_norm_;
-  // State cmd_raw = cmd_norm_, cmd_state_raw = {0.0f}, cmd_state = {0.0f};
+  State cmd_state_raw = {0.0f}, cmd_state = {0.0f};
 
   switch (working_mode_) {
   case WorkingMode::Depart: {
@@ -412,26 +414,26 @@ void Chassis::revNormCmd() {
   cmd_state_raw.v_x = cmd_raw.v_x * config_.normal_trans_vel;
   cmd_state_raw.v_y = cmd_raw.v_y * config_.normal_trans_vel;
   // TODO：预期限幅式斜坡优化
-  // if (is_all_wheel_online_ && is_all_steer_online_) {
-  //   cmd_state_raw.v_x =
-  //       hello_world::Bound(cmd_state_raw.v_x, chassis_state_.v_x - 0.5f,
-  //                          chassis_state_.v_x + 0.5f);
-  //   cmd_state_raw.v_y =
-  //       hello_world::Bound(cmd_state_raw.v_y, chassis_state_.v_y - 0.5f,
-  //                          chassis_state_.v_y + 0.5f);
-  // }
+  if (is_all_wheel_online_ && is_all_steer_online_) {
+    cmd_state_raw.v_x =
+        hello_world::Bound(cmd_state_raw.v_x, chassis_state_.v_x - 0.5f,
+                           chassis_state_.v_x + 0.5f);
+    cmd_state_raw.v_y =
+        hello_world::Bound(cmd_state_raw.v_y, chassis_state_.v_y - 0.5f,
+                           chassis_state_.v_y + 0.5f);
+  }
   ramp_cmd_vx_ptr_->calc(&(cmd_state_raw.v_x), &(cmd_state.v_x));
   ramp_cmd_vy_ptr_->calc(&(cmd_state_raw.v_y), &(cmd_state.v_y));
   // cmd_state.v_x = cmd_state_raw.v_x; //TODO:调试
   // cmd_state.v_y = cmd_state_raw.v_y; //TODO:调试
 
-  cmd_state.v_x = hello_world::Bound(
-      cmd_state.v_x, -config_.max_trans_vel, config_.max_trans_vel);
-  cmd_state.v_y = hello_world::Bound(
-      cmd_state.v_y, -config_.max_trans_vel, config_.max_trans_vel);
+  cmd_state.v_x = hello_world::Bound(cmd_state.v_x, -config_.max_trans_vel,
+                                     config_.max_trans_vel);
+  cmd_state.v_y = hello_world::Bound(cmd_state.v_y, -config_.max_trans_vel,
+                                     config_.max_trans_vel);
   cmd_state.w =
       hello_world::Bound(cmd_raw.w, -config_.max_rot_spd, config_.max_rot_spd);
-  //必要的设置函数，作为cmd_的唯一赋值接口
+  // 必要的设置函数，作为Chassis::cmd_的唯一赋值接口
   setCmdSmoothly(cmd_state, beta);
 };
 
@@ -445,9 +447,12 @@ void Chassis::calcMotorsRef() {
   ik_solver_ptr_->solve(move_vec, theta_i2r, steer_angle_fdb_);
   ik_solver_ptr_->getRotSpdAll(wheel_speed_ref_);
   ik_solver_ptr_->getThetaVelRefAll(steer_angle_ref_);
-  // for(uint8_t i = 0; i < 4; i++) { //TODO（WPY）:舵电机模型调试用
-  //   steer_angle_ref_[i] = 3.0f * cmd_.v_x;
-  // }
+  // TODO（WPY）:舵电机模型调试用
+  //  for(uint8_t i = 0; i < 4; i++) {
+  //    // steer_angle_ref_[i] += 0.03f * cmd_.v_x;
+  //    // steer_angle_ref_[i] = hello_world::NormPeriodData(-PI, PI,
+  //    steer_angle_ref_[i]); steer_angle_ref_[i] = 2 * M_PI * cmd_.v_x;
+  //  }
 }
 
 void Chassis::calcSteerCurrentRef() {
@@ -527,10 +532,10 @@ void Chassis::calcWheelCurrentRef() {
     pid_ptr = wheel_pid_ptr_[wpis[i]];
     HW_ASSERT(pid_ptr != nullptr, "pointer to Wheel PID %d is nullptr",
               wpis[i]);
-    // pid_ptr->calc(&wheel_speed_ref_limited_[i], &wheel_speed_fdb_[i], nullptr,
-    //               &wheel_current_ref_limited_[i]);
-    pid_ptr->calc(&wheel_speed_ref_[i], &wheel_speed_fdb_[i], nullptr,
-                  &wheel_current_ref_[i]); // TODO: 功限调试
+    // pid_ptr->calc(&wheel_speed_ref_[i], &wheel_speed_fdb_[i], nullptr,
+    //               &wheel_current_ref_[i]); // TODO: 功限调试
+    pid_ptr->calc(&wheel_speed_ref_limited_[i], &wheel_speed_fdb_[i], nullptr,
+                  &wheel_current_ref_limited_[i]);
   }
 };
 
@@ -715,8 +720,8 @@ void Chassis::setCommDataMotors(bool working_flag) {
       wheel_motor_ptr->setInput(0);
     } else {
       // wheel_motor_ptr->setInput(0); // TODO：调试
-      wheel_motor_ptr->setInput(wheel_current_ref_[wmi]); // TODO：功限调试
-      // wheel_motor_ptr->setInput(wheel_current_ref_limited_[wmi]);
+      // wheel_motor_ptr->setInput(wheel_current_ref_[wmi]); // TODO：功限调试
+      wheel_motor_ptr->setInput(wheel_current_ref_limited_[wmi]);
     }
 
     if (!working_flag || steer_motor_ptr->isOffline()) {
