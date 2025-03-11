@@ -505,11 +505,6 @@ void Chassis::calcMotorsLimitedRef() {
     runtime_params.remaining_energy = cap_ptr_->getRemainingPower();
   }
 
-  // TODO:待适配
-  if (is_high_spd_enabled_) {
-    runtime_params.p_ref_max += 800.0f;
-    runtime_params.remaining_energy = 60.0f;
-  }
   pwr_limiter_ptr_->updateSteeringModel(steer_speed_fdb_, steer_current_ref_,
                                         nullptr);
   pwr_limiter_ptr_->updateWheelModel(wheel_speed_ref_, wheel_speed_fdb_,

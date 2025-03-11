@@ -371,6 +371,9 @@ void Robot::genModulesCmdFromKb() {
   if(rc_ptr_->key_SHIFT()) {
     use_cap_flag = true;
   }
+  if(rc_ptr_->key_CTRL()) {
+    shooter_ctrl_mode = CtrlMode::kAuto;
+  }
   // if (rc_ptr_->key_B()) {
   //   if (shooter_working_mode == Shooter::WorkingMode::kStop) {
   //     shooter_working_mode = Shooter::WorkingMode::kShoot;
@@ -384,7 +387,6 @@ void Robot::genModulesCmdFromKb() {
   }
   if (rc_ptr_->mouse_r_btn()) {
     gimbal_ctrl_mode = CtrlMode::kAuto;
-    shooter_ctrl_mode = CtrlMode::kAuto;
   }
 
   ChassisState chassis_cmd = {0};
