@@ -20,10 +20,12 @@
 /* Private variables ---------------------------------------------------------*/
 hw_filter::Ramp unique_ramp_cmd_vx = hw_filter::Ramp(5.8f, 0.001f, 0.0f, 1);
 hw_filter::Ramp unique_ramp_cmd_vy = hw_filter::Ramp(5.8f, 0.001f, 0.0f, 1);
+hw_filter::Ramp unique_ramp_cmd_v = hw_filter::Ramp(10.0f, 0.001f, 0.0f, 1);
 /* External variables --------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
 /* Exported function definitions ---------------------------------------------*/
 hw_filter::Ramp *GetRampCmdVx(void) { return &unique_ramp_cmd_vx; };
 hw_filter::Ramp *GetRampCmdVy(void) { return &unique_ramp_cmd_vy; };
+hw_filter::Ramp *GetRampCmdV(void) { return &unique_ramp_cmd_v; };
 
 /* Private function definitions ----------------------------------------------*/

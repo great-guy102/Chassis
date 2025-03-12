@@ -48,7 +48,7 @@ hw_motor::OptionalParams kSteerMotorParams = {
 //                                     -1.03863168};
 
 // 白车
-const float steer_motor_offset[4] = {-0.52813754, -2.06844183, 0.00728712,
+const float steer_motor_offset[4] = {2.61345515, -2.06844183, 0.00728712,
                                      1.58517917};
 
 const hw_motor::OptionalParams kYawMotorParams = {

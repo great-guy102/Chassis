@@ -21,6 +21,7 @@
 #include <stdint.h>
 
 #include "allocator.hpp"
+#include "arm_math.h"
 #include "chassis_iksolver.hpp"
 #include "pid.hpp"
 #include "power_limiter.hpp"
@@ -220,6 +221,7 @@ public:
 
   void registerRampCmdVx(Ramp *ptr);
   void registerRampCmdVy(Ramp *ptr);
+  void registerRampCmdV(Ramp *ptr);
   void registerIkSolver(ChassisIkSolver *ptr);
   void registerWheelMotor(Motor *ptr, int idx);
   void registerSteerMotor(Motor *ptr, int idx);
@@ -268,11 +270,10 @@ private:
   void setCommDataCap(bool is_working);
 
   // 工具函数
-  void setCmdSmoothly(const State &cmd, float beta = 0.9) {
-    beta = hello_world::Bound(beta, 0.0, 1.0);
-    cmd_ = cmd * beta + (1 - beta) * last_cmd_;
-    last_cmd_ = cmd_;
-  };
+  void LinearFilter(const float in, float *last_in, float *out, const float beta = 0.9f) {
+    *out = in * beta + *last_in * (1 - beta);
+    *last_in = *out;
+  }
 
   // 配置参数
   Config config_;
@@ -298,7 +299,8 @@ private:
          ///< ms，实际上是作为上电瞬间的记录
 
   // 在 runOnWorking 函数中更新的数据
-  State cmd_ = {0}, last_cmd_ = {0}; ///< 控制指令，基于图传坐标系
+  State cmd_ = {0.0f}; ///< 控制指令，基于图传坐标系
+  State cmd_state_ = {0.0f}, last_cmd_state_ = {0.0f}; ///< 反映底盘实际运动状态的控制指令
   float omega_feedforward_ =
       0; ///< 云台 YAW 轴角速度，用于底盘跟随前馈，单位 rad/s
   float wheel_speed_ref_[4] = {0}; ///< 轮电机的速度参考值 单位 rad/s
@@ -321,15 +323,16 @@ private:
   bool is_gimbal_imu_ready_ = false; ///< 云台主控板的IMU是否准备完毕
 
   // motor fdb data 在 update 函数中更新
-  bool is_all_wheel_online_ = false; ///< 所有轮电机是否都处于就绪状态
-  bool is_any_wheel_online_ = false; ///< 任意轮电机是否处于就绪状态
-  float wheel_speed_fdb_[4] = {0};   ///< 轮速反馈数据
-  float wheel_current_fdb_[4] = {0}; ///< 轮电流反馈数据
-  bool is_all_steer_online_ = false; ///< 所有舵电机是否都处于就绪状态
-  bool is_any_steer_online_ = false; ///< 任意舵电机是否处于就绪状态
-  float steer_speed_fdb_[4] = {0};   ///< 舵速反馈数据
-  float steer_angle_fdb_[4] = {0};   ///< 舵角度反馈数据
-  float steer_current_fdb_[4] = {0}; ///< 舵电流反馈数据
+  bool is_all_wheel_online_ = false;    ///< 所有轮电机是否都处于就绪状态
+  bool is_any_wheel_online_ = false;    ///< 任意轮电机是否处于就绪状态
+  float wheel_speed_fdb_[4] = {0};      ///< 轮速反馈数据
+  float wheel_current_fdb_[4] = {0};    ///< 轮电流反馈数据
+  bool is_all_steer_online_ = false;    ///< 所有舵电机是否都处于就绪状态
+  bool is_any_steer_online_ = false;    ///< 任意舵电机是否处于就绪状态
+  float steer_speed_fdb_[4] = {0};      ///< 舵速反馈数据
+  float last_steer_speed_fdb_[4] = {0}; ///< 上一次舵速度反馈数据
+  float steer_angle_fdb_[4] = {0};      ///< 舵角度反馈数据
+  float steer_current_fdb_[4] = {0};    ///< 舵电流反馈数据
   float theta_i2r_ =
       0.0f; ///< 图传坐标系绕 Z
             ///< 轴到底盘坐标系的旋转角度，右手定则判定正反向，单位 rad
@@ -348,6 +351,7 @@ private:
   PwrLimiter *pwr_limiter_ptr_ = nullptr;
   Ramp *ramp_cmd_vx_ptr_ = nullptr; ///< Vx斜坡滤波指针
   Ramp *ramp_cmd_vy_ptr_ = nullptr; ///< Vy斜坡滤波指针
+  Ramp *ramp_cmd_v_ptr_ = nullptr;  ///< V斜坡滤波指针
   // 只接收数据的组件指针
   GimbalChassisComm *gc_comm_ptr_ = nullptr; ///< 云台底盘通信器指针 只接收数据
   Motor *yaw_motor_ptr_ = nullptr;           ///< 云台电机指针 接收、发送数据

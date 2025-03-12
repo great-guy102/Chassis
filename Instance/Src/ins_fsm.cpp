@@ -44,6 +44,7 @@ robot::Chassis *GetChassis() {
     // * - 斜坡
     unique_chassis.registerRampCmdVx(GetRampCmdVx());
     unique_chassis.registerRampCmdVy(GetRampCmdVy());
+    unique_chassis.registerRampCmdV(GetRampCmdV());
     // * - pid
     // 轮组 pid
     unique_chassis.registerWheelPid(GetPidMotorWheelLeftFront(),

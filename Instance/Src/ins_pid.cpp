@@ -46,7 +46,7 @@ const hw_pid::MultiNodesPid::ParamsList kPidParamsWheel = {
 const hw_pid::MultiNodesPid::ParamsList kPidParamsSteer = {
     {
         .auto_reset = false, ///< 是否自动清零
-        .kp = 60.0f,         // 16
+        .kp = 50.0f,         // 16
         .ki = 0.0f,
         .kd = 0.0f,
         // .setpoint_ramping = hw_pid::SetpointRamping(false, -0.1, 0.1, 0.1),
@@ -56,7 +56,7 @@ const hw_pid::MultiNodesPid::ParamsList kPidParamsSteer = {
     },
     {
         .auto_reset = false, ///< 是否自动清零
-        .kp = 1400.0f * (3.0f / 16384.0f),
+        .kp = 1200.0f * (3.0f / 16384.0f),
         .ki = 0.0f, // 3.5
         .kd = 0.0f, // 100
         // .setpoint_ramping = hw_pid::SetpointRamping(true, -10, 10, 0.95),

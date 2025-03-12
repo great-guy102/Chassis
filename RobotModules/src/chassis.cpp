@@ -21,8 +21,9 @@ float wheel_speed_ref_debug = 0;
 // float steer_speed_fdb_debug = 0;
 // float steer_speed_ref_debug = 0;
 
-// TODO: cmd_norm_和cmd_好像没有关联起来，非常奇怪
-// Robot的runOnWorking里产生各个模块的cmd_norm_
+hello_world::pid::MultiNodesPid::Datas pid_data; // TODO:PID调试数据
+// 使用示例：pid_data = pid_ptr->getPidAt(0).datas();
+// Chassis::State cmd_state_raw = {0.0f}, cmd_state = {0.0f}; // TODO:调试
 namespace robot {
 /* Private constants ---------------------------------------------------------*/
 /* Private types -------------------------------------------------------------*/
@@ -294,24 +295,23 @@ void Chassis::calcChassisState() {
   chassis_state_.w = chassis_state_raw.w; // 角速度不受坐标系旋转影响
 
   // 线性滤波
-  float beta = 0.1f;
-  chassis_state_ = chassis_state_ * beta + (1 - beta) * last_chassis_state_;
-  last_chassis_state_ = chassis_state_;
+  float chassis_state_beta = 0.1f;
+  LinearFilter(chassis_state_.v_x, &last_chassis_state_.v_x,
+               &chassis_state_.v_x, chassis_state_beta);
+  LinearFilter(chassis_state_.v_y, &last_chassis_state_.v_y,
+               &chassis_state_.v_y, chassis_state_beta);
+  LinearFilter(chassis_state_.w, &last_chassis_state_.w, &chassis_state_.w,
+               chassis_state_beta);
 };
 
 // TODO:调试1
-hello_world::pid::MultiNodesPid::Datas pid_data; // TODO:PID调试数据
-// 使用示例：pid_data = pid_ptr->getPidAt(0).datas();
-// Chassis::State cmd_state_raw = {0.0f}, cmd_state = {0.0f}; // TODO:调试
-bool error_flag = true;  // TODO:调试
-uint16_t cnt = 0;        // TODO:调试
-float error_time = 0.0f; // TODO:调试
-
+// bool error_flag = true;  // TODO:调试
+uint16_t motors_offline_cnt = 0; // TODO:调试
+// float error_time = 0.0f; // TODO:调试
 void Chassis::revNormCmd() {
-  float beta = 0.5f;
   static bool first_follow_flag = true;
   State cmd_raw = cmd_norm_;
-  State cmd_state_raw = {0.0f}, cmd_state = {0.0f};
+  State cmd_state_raw = {0.0f};
 
   switch (working_mode_) {
   case WorkingMode::Depart: {
@@ -406,35 +406,68 @@ void Chassis::revNormCmd() {
   }
   }
 
-  if (is_high_spd_enabled_) {
-    cmd_raw *= 1.5;
-    beta = 1.0;
-  }
-
   cmd_state_raw.v_x = cmd_raw.v_x * config_.normal_trans_vel;
   cmd_state_raw.v_y = cmd_raw.v_y * config_.normal_trans_vel;
   // TODO：预期限幅式斜坡优化
   if (is_all_wheel_online_ && is_all_steer_online_) {
-    cmd_state_raw.v_x =
-        hello_world::Bound(cmd_state_raw.v_x, chassis_state_.v_x - 0.5f,
-                           chassis_state_.v_x + 0.5f);
-    cmd_state_raw.v_y =
-        hello_world::Bound(cmd_state_raw.v_y, chassis_state_.v_y - 0.5f,
-                           chassis_state_.v_y + 0.5f);
-  }
-  ramp_cmd_vx_ptr_->calc(&(cmd_state_raw.v_x), &(cmd_state.v_x));
-  ramp_cmd_vy_ptr_->calc(&(cmd_state_raw.v_y), &(cmd_state.v_y));
-  // cmd_state.v_x = cmd_state_raw.v_x; //TODO:调试
-  // cmd_state.v_y = cmd_state_raw.v_y; //TODO:调试
+    // cmd_state_raw.v_x =
+    //     hello_world::Bound(cmd_state_raw.v_x, chassis_state_.v_x - 0.5f,
+    //                        chassis_state_.v_x + 0.5f);
+    // cmd_state_raw.v_y =
+    //     hello_world::Bound(cmd_state_raw.v_y, chassis_state_.v_y - 0.5f,
+    //                        chassis_state_.v_y + 0.5f);
+    float cmd_state_raw_v = 0.0f, chassis_state_v = 0.0f;
+    cmd_state_raw_v = sqrt(cmd_state_raw.v_x * cmd_state_raw.v_x +
+                           cmd_state_raw.v_y * cmd_state_raw.v_y);
+    chassis_state_v = sqrt(chassis_state_.v_x * chassis_state_.v_x +
+                           chassis_state_.v_y * chassis_state_.v_y);
+    cmd_state_raw_v = hello_world::Bound(
+        cmd_state_raw_v, chassis_state_v - 0.5f, chassis_state_v + 0.5f);
 
-  cmd_state.v_x = hello_world::Bound(cmd_state.v_x, -config_.max_trans_vel,
-                                     config_.max_trans_vel);
-  cmd_state.v_y = hello_world::Bound(cmd_state.v_y, -config_.max_trans_vel,
-                                     config_.max_trans_vel);
-  cmd_state.w =
+    float cmd_state_raw_atan2_deg = 0.0f, cmd_state_raw_atan2_rad = 0.0f,
+          cmd_state_raw_sin = 0.0f, cmd_state_raw_cos = 0.0f;
+    arm_atan2_f32(cmd_state_raw.v_y, cmd_state_raw.v_x,
+                  &cmd_state_raw_atan2_rad);
+    cmd_state_raw_atan2_deg = hello_world::Rad2Deg(cmd_state_raw_atan2_rad);
+    arm_sin_cos_f32(cmd_state_raw_atan2_deg, &cmd_state_raw_sin,
+                    &cmd_state_raw_cos);
+    cmd_state_raw.v_x = cmd_state_raw_v * cmd_state_raw_cos;
+    cmd_state_raw.v_y = cmd_state_raw_v * cmd_state_raw_sin;
+
+    ramp_cmd_vx_ptr_->calc(&(cmd_state_raw.v_x), &(cmd_state_.v_x));
+    ramp_cmd_vy_ptr_->calc(&(cmd_state_raw.v_y), &(cmd_state_.v_y));
+    // cmd_state_.v_x = cmd_state_raw.v_x; //TODO:调试
+    // cmd_state_.v_y = cmd_state_raw.v_y; //TODO:调试
+  } else {
+    cmd_state_raw.reset();
+    cmd_state_.reset();
+    ramp_cmd_vx_ptr_->reset();
+    ramp_cmd_vy_ptr_->reset();
+    motors_offline_cnt++;
+  }
+
+  // 电机掉线测试代码
+  //  if (!(is_all_wheel_online_ && is_all_steer_online_) && !error_flag) {
+  //    cmd_state_.reset();
+  //    cnt++;
+  //    error_flag = true;
+  //    error_time = work_tick_;
+  //  } else if ((work_tick_ - error_time) > 200 && error_flag) {
+  //    error_flag = false;
+  //  }
+
+  cmd_state_.v_x = hello_world::Bound(cmd_state_.v_x, -config_.max_trans_vel,
+                                      config_.max_trans_vel);
+  cmd_state_.v_y = hello_world::Bound(cmd_state_.v_y, -config_.max_trans_vel,
+                                      config_.max_trans_vel);
+  cmd_state_.w =
       hello_world::Bound(cmd_raw.w, -config_.max_rot_spd, config_.max_rot_spd);
+
   // 必要的设置函数，作为Chassis::cmd_的唯一赋值接口
-  setCmdSmoothly(cmd_state, beta);
+  float cmd_state_beta = 0.9f;
+  LinearFilter(cmd_state_.v_x, &last_cmd_state_.v_x, &cmd_.v_x, cmd_state_beta);
+  LinearFilter(cmd_state_.v_y, &last_cmd_state_.v_y, &cmd_.v_y, cmd_state_beta);
+  LinearFilter(cmd_state_.w, &last_cmd_state_.w, &cmd_.w, cmd_state_beta);
 };
 
 void Chassis::calcMotorsRef() {
@@ -469,6 +502,8 @@ void Chassis::calcSteerCurrentRef() {
     HW_ASSERT(pid_ptr != nullptr, "pointer to Steer PID %d is nullptr",
               spis[i]);
 
+    LinearFilter(steer_speed_fdb_[i], &last_steer_speed_fdb_[i],
+                 &steer_speed_fdb_[i], 0.1f);
     float steer_motor_fdb[2] = {steer_angle_fdb_[i],
                                 steer_speed_fdb_[i]}; // TODO：滤波处理速度
     pid_ptr->calc(&steer_angle_ref_[i], steer_motor_fdb, nullptr,
@@ -558,8 +593,6 @@ void Chassis::reset() {
   // ms，实际上是作为上电瞬间的记录
 
   // 在 runOnWorking 函数中更新的数据
-  resetMotorsRef();
-  resetCmds();
   // gimbal board fdb data  在 update 函数中更新
   is_gimbal_imu_ready_ = false; ///< 云台主控板的IMU是否准备完毕
 
@@ -576,6 +609,8 @@ void Chassis::reset() {
   is_high_spd_enabled_ = false; ///< 是否开启了高速模式 （开启意味着从电容取电）
   cap_remaining_energy_ = 0.0f; ///< 剩余电容能量百分比，单位 %
 
+  resetMotorsRef();
+  resetCmds();
   resetMotorsFdb();
   resetPids(); ///< 重置 PID 控制器参数
 };
@@ -619,8 +654,9 @@ void Chassis::resetDataOnStandby() {
 
 // 重置控制指令
 void Chassis::resetCmds() {
-  cmd_.reset();      ///< 控制指令，基于图传坐标系
-  last_cmd_.reset(); ///< 上一控制周期的控制指令，基于图传坐标系
+  cmd_.reset();            ///< 控制指令，基于图传坐标系
+  cmd_state_.reset();      ///< 上一控制周期的控制指令，基于图传坐标系
+  last_cmd_state_.reset(); ///< 上一控制周期的控制指令，基于图传坐标系
 
   rev_head_flag_ = false;  ///< 恢复反转标志位
   last_rev_head_tick_ = 0; ///< 上一次转向后退的时间戳
@@ -645,6 +681,7 @@ void Chassis::resetMotorsFdb() {
   memset(wheel_current_fdb_, 0, sizeof(wheel_current_fdb_));
 
   memset(steer_speed_fdb_, 0, sizeof(steer_speed_fdb_));
+  memset(last_steer_speed_fdb_, 0, sizeof(last_steer_speed_fdb_));
   memset(steer_angle_fdb_, 0, sizeof(steer_angle_fdb_));
   memset(steer_current_fdb_, 0, sizeof(steer_current_fdb_));
 }
@@ -804,6 +841,10 @@ void Chassis::registerRampCmdVx(Ramp *ptr) {
 void Chassis::registerRampCmdVy(Ramp *ptr) {
   HW_ASSERT(ptr != nullptr, "RampCmdVy pointer is null", ptr);
   ramp_cmd_vy_ptr_ = ptr;
+};
+void Chassis::registerRampCmdV(Ramp *ptr) {
+  HW_ASSERT(ptr != nullptr, "RampCmdVw pointer is null", ptr);
+  ramp_cmd_v_ptr_ = ptr;
 };
 void Chassis::registerCap(Cap *ptr) {
   HW_ASSERT(ptr != nullptr, "pointer to Capacitor is nullptr", ptr);
