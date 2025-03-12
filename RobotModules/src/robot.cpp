@@ -362,18 +362,19 @@ void Robot::genModulesCmdFromKb() {
     //   chassis_working_mode = Chassis::WorkingMode::Follow;
     // } //TODO:待优化控制逻辑
   }
+  if (rc_ptr_->key_X()) {
+    shooter_ctrl_mode = CtrlMode::kAuto;
+  }
   if (rc_ptr_->key_Z()) {
     shooter_working_mode = Shooter::WorkingMode::kBackward;
   }
-  if (rc_ptr_->key_X()) {
+  if (rc_ptr_->key_R()) {
     // rev_head_flag = true; //TODO：掉头模式
   }
-  if(rc_ptr_->key_SHIFT()) {
+  if (rc_ptr_->key_SHIFT()) {
     use_cap_flag = true;
   }
-  if(rc_ptr_->key_CTRL()) {
-    shooter_ctrl_mode = CtrlMode::kAuto;
-  }
+
   // if (rc_ptr_->key_B()) {
   //   if (shooter_working_mode == Shooter::WorkingMode::kStop) {
   //     shooter_working_mode = Shooter::WorkingMode::kShoot;
@@ -474,7 +475,8 @@ void Robot::setGimbalChassisCommData() {
 void Robot::setUiDrawerData() {
   // ui_drawer_.setSenderId(RobotId::kRedStandard3);
   // Chassis
-  HW_ASSERT(chassis_ptr_ != nullptr, "Chassis FSM pointer is null", chassis_ptr_);
+  HW_ASSERT(chassis_ptr_ != nullptr, "Chassis FSM pointer is null",
+            chassis_ptr_);
   ui_drawer_.setChassisWorkState(chassis_ptr_->getPwrState());
   ui_drawer_.setChassisWorkingMode(chassis_ptr_->getWorkingMode());
   ui_drawer_.setChassisHeadDir(chassis_ptr_->getThetaI2r());
@@ -483,10 +485,12 @@ void Robot::setUiDrawerData() {
   HW_ASSERT(gimbal_ptr_ != nullptr, "Gimbal FSM pointer is null", gimbal_ptr_);
   ui_drawer_.setGimbalCtrlMode(gimbal_ptr_->getCtrlMode());
   ui_drawer_.setGimbalWorkingMode(gimbal_ptr_->getWorkingMode());
-  ui_drawer_.setGimbalJointAngPitchFdb(gc_comm_ptr_->gimbal_data().gp.pitch_fdb);
+  ui_drawer_.setGimbalJointAngPitchFdb(
+      gc_comm_ptr_->gimbal_data().gp.pitch_fdb);
 
   // Shooter
-  HW_ASSERT(shooter_ptr_ != nullptr, "Shooter FSM pointer is null", shooter_ptr_);
+  HW_ASSERT(shooter_ptr_ != nullptr, "Shooter FSM pointer is null",
+            shooter_ptr_);
   ui_drawer_.setHeat(gc_comm_ptr_->referee_data().cp.shooter_heat);
   ui_drawer_.setHeatLimit(gc_comm_ptr_->referee_data().cp.shooter_heat_limit);
 
@@ -498,8 +502,9 @@ void Robot::setUiDrawerData() {
   ui_drawer_.setCapPwrPercent(cap_ptr_->getRemainingPower());
 
   // vision
-  HW_ASSERT(gc_comm_ptr_ != nullptr, "GimbalChassisComm pointer is null", gc_comm_ptr_);
-  bool is_vision_valid =gc_comm_ptr_->vision_data().gp.is_enemy_detected ;
+  HW_ASSERT(gc_comm_ptr_ != nullptr, "GimbalChassisComm pointer is null",
+            gc_comm_ptr_);
+  bool is_vision_valid = gc_comm_ptr_->vision_data().gp.is_enemy_detected;
   ui_drawer_.setVisTgtX(gc_comm_ptr_->vision_data().gp.vtm_x, is_vision_valid);
   ui_drawer_.setVisTgtY(gc_comm_ptr_->vision_data().gp.vtm_y, is_vision_valid);
   ui_drawer_.setisvisionvalid(is_vision_valid);
@@ -508,7 +513,7 @@ void Robot::setUiDrawerData() {
   // {
   //   ui_drawer_.refresh();
   // }
-  
+
   if (rc_ptr_->key_R()) {
     ui_drawer_.refresh();
   }
