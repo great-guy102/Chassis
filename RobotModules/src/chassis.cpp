@@ -309,7 +309,7 @@ void Chassis::calcChassisState() {
 uint16_t motors_offline_cnt = 0; // TODO:调试
 // float error_time = 0.0f; // TODO:调试
 void Chassis::revNormCmd() {
-  static bool first_follow_flag = true;
+  static bool first_follow_flag = true, first_gyro_flag = true;
   State cmd_raw = cmd_norm_;
   State cmd_state_raw = {0.0f};
 
@@ -318,6 +318,7 @@ void Chassis::revNormCmd() {
     // 分离模式不对 cmd_norm_ 进行额外处理
     gyro_dir_ = GyroDir::Unspecified;
     first_follow_flag = true;
+    first_gyro_flag = true;
     break;
   }
 
@@ -326,20 +327,32 @@ void Chassis::revNormCmd() {
     // 则每次进入陀螺模式时，随机选择一个方向
     first_follow_flag = true;
 
-    if (gyro_dir_ == GyroDir::Unspecified) {
-      if (rand() % 2 == 0) {
-        gyro_dir_ = GyroDir::Clockwise;
-      } else {
+    if (first_gyro_flag) {
+      first_gyro_flag = false;
+      if (last_gyro_dir_ == GyroDir::Clockwise) {
         gyro_dir_ = GyroDir::AntiClockwise;
+      } else if (last_gyro_dir_ == GyroDir::AntiClockwise) {
+        gyro_dir_ = GyroDir::Clockwise;
       }
+    }else {
+      gyro_dir_ = last_gyro_dir_;
     }
+
+    // if (gyro_dir_ == GyroDir::Unspecified) {
+    //   if (last_gyro_dir_ == GyroDir::Clockwise) {
+    //     gyro_dir_ = GyroDir::AntiClockwise;
+    //   } else if (last_gyro_dir_ == GyroDir::AntiClockwise) {
+    //     gyro_dir_ = GyroDir::Clockwise;
+    //   }
+    // }
     // 小陀螺模式下，旋转分量为定值
     cmd_raw.w = config_.gyro_rot_spd * (int8_t)gyro_dir_;
+    last_gyro_dir_ = gyro_dir_;
     break;
   }
 
   case WorkingMode::Follow: {
-    gyro_dir_ = GyroDir::Unspecified;
+    first_gyro_flag = true;
     // TODO：掉头模式
     // //  在转头过程中，底盘不响应跟随转动指令
     // if (work_tick_ - last_rev_head_tick_ < 800) {

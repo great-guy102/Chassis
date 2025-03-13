@@ -270,7 +270,8 @@ private:
   void setCommDataCap(bool is_working);
 
   // 工具函数
-  void LinearFilter(const float in, float *last_in, float *out, const float beta = 0.9f) {
+  void LinearFilter(const float in, float *last_in, float *out,
+                    const float beta = 0.9f) {
     *out = in * beta + *last_in * (1 - beta);
     *last_in = *out;
   }
@@ -280,8 +281,8 @@ private:
 
   // 由 robot 设置的数据
   bool use_cap_flag_ = false; ///< 是否使用超级电容
-  GyroDir gyro_dir_ =
-      GyroDir::Unspecified; ///< 小陀螺方向，正为绕 Z 轴逆时针，负为顺时针，
+  GyroDir gyro_dir_ = GyroDir::Clockwise, last_gyro_dir_ = GyroDir::Clockwise;
+  ///< 小陀螺方向，正为绕 Z 轴逆时针，负为顺时针，
   State cmd_norm_ = {0};    ///< 原始控制指令，基于图传坐标系
   ChassisRfrData rfr_data_; ///< 底盘 RFR 数据
 
@@ -300,7 +301,8 @@ private:
 
   // 在 runOnWorking 函数中更新的数据
   State cmd_ = {0.0f}; ///< 控制指令，基于图传坐标系
-  State cmd_state_ = {0.0f}, last_cmd_state_ = {0.0f}; ///< 反映底盘实际运动状态的控制指令
+  State cmd_state_ = {0.0f},
+        last_cmd_state_ = {0.0f}; ///< 反映底盘实际运动状态的控制指令
   float omega_feedforward_ =
       0; ///< 云台 YAW 轴角速度，用于底盘跟随前馈，单位 rad/s
   float wheel_speed_ref_[4] = {0}; ///< 轮电机的速度参考值 单位 rad/s
