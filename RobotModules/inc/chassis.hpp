@@ -297,7 +297,8 @@ private:
   bool is_power_on_ = false; ///< 底盘电源是否开启
   uint32_t last_pwr_off_tick_ =
       0; ///< 上一次底盘电源处于关闭状态的时间戳，单位为
-         ///< ms，实际上是作为上电瞬间的记录
+  ///< ms，实际上是作为上电瞬间的记录
+  uint32_t resurrection_tick_ = 0; ///< 底盘模块复活时间戳
 
   // 在 runOnWorking 函数中更新的数据
   State cmd_ = {0.0f}; ///< 控制指令，基于图传坐标系

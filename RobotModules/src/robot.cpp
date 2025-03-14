@@ -533,17 +533,17 @@ void Robot::sendCommData() {
   sendUsartData();
 };
 void Robot::sendCanData() {
+  sendSteersMotorData();
   if (work_tick_ % 10 == 0) {
     sendCapData();
   }
+
+  // CAN2负载高，交替发送降低负载
   if (work_tick_ > 1000 && work_tick_ % 2 == 1) {
     sendGimbalChassisCommData();
   }
-  if (work_tick_ > 2000) {
-    sendSteersMotorData();
-    if (work_tick_ % 2 == 0) {
-      sendWheelsMotorData();
-    }
+  if (work_tick_ % 2 == 0) {
+    sendWheelsMotorData();
   }
 };
 void Robot::sendWheelsMotorData() {

@@ -68,6 +68,7 @@ void Chassis::updatePwrState() {
     // 死亡状态下，如果上电，则切到复活状态
     if (is_power_on_) {
       next_state = PwrState::kResurrection;
+      resurrection_tick_ = 0;
     }
   } else if (current_state == PwrState::kResurrection) {
     // 1. 为什么要判断云台板准备就绪？
@@ -83,8 +84,15 @@ void Chassis::updatePwrState() {
     // 轴电机上电时，底盘会按照图传坐标系进行解算
     if (is_gimbal_imu_ready_ &&
         (is_any_wheel_online_ || is_any_steer_online_)) {
-      next_state = PwrState::kWorking;
+      resurrection_tick_++;
+      // 底盘缓启动
+      if (resurrection_tick_ > 2000) {
+        next_state = PwrState::kWorking;
+      }
+    } else {
+      resurrection_tick_ = 0;
     }
+
   } else if (current_state == PwrState::kWorking) {
     // 工作状态下，保持当前状态
   } else {
@@ -334,7 +342,7 @@ void Chassis::revNormCmd() {
       } else if (last_gyro_dir_ == GyroDir::AntiClockwise) {
         gyro_dir_ = GyroDir::Clockwise;
       }
-    }else {
+    } else {
       gyro_dir_ = last_gyro_dir_;
     }
 
@@ -526,33 +534,37 @@ void Chassis::calcSteerCurrentRef() {
 
 float rfr_pwr = 0.0f; // TODO:功限调试
 void Chassis::calcMotorsLimitedRef() {
+  float up_ref = 120.0f;
+  if (working_mode_ == WorkingMode::Gyro) {
+    up_ref = 60.0f;
+  } else {
+    up_ref = 120.0f;
+  }
   hello_world::power_limiter::PowerLimiterRuntimeParams runtime_params = {
-      /* 期望功率上限，可以根据模式设置（低速/高速），单位：W */
-      .p_ref_max = 1.2f * rfr_data_.pwr_limit, // 60.0f, 1.2f*, 2.0f*
-      /* 裁判系统给出的底盘功率限制，单位：W */
+      .p_ref_max =
+          up_ref +
+          static_cast<float>(
+              rfr_data_.pwr_limit), // 60.0f,//1.2f * rfr_data_.pwr_limit
       .p_referee_max = static_cast<float>(rfr_data_.pwr_limit),
-      /* 期望功率下限，建议设为当前 p_referee_max 乘一个 0 ~ 1
-         的比例系数，单位：W */
-      .p_ref_min = 0.8f * rfr_data_.pwr_limit, // 50.0f,
-      /* 剩余能量：采用裁判系统控制时为裁判系统缓冲能量 buffer_energy，单位：J
-       */
+      .p_ref_min = 0.8f * rfr_data_.pwr_limit,
       .remaining_energy = static_cast<float>(rfr_data_.pwr_buffer),
-      /* 剩余能量收敛值，当剩余能量到达该值时，期望功率等于裁判系统给出的底盘功率上限
-         p_referee_max */
-      .energy_converge = 40.0f,
-      /* 期望功率随当前剩余能量线性变化的斜率
-      >= (p_ref_max - p_referee_max) / (remaining_energy - energy_converge)
-      开启超电时 remaining_energy 可取 100 */
-      .p_slope = 1.6f,
-      /* 危险能量值，若剩余能量低于该值，p_ref_ 设为 0 */
+      .energy_converge = 50.0f,
+      .p_slope = 2.0f,
       .danger_energy = 5.0f,
   };
 
-  // TODO:关闭超电时需一并注释掉，防止间断通信误入本分支
   if (!cap_ptr_->isOffline()) {
-    runtime_params.remaining_energy = cap_ptr_->getRemainingPower();
+    if (use_cap_flag_ == true) {
+      runtime_params.remaining_energy = cap_ptr_->getRemainingPower();
+      runtime_params.energy_converge = 30.0f;
+    } else {
+      runtime_params.remaining_energy = cap_ptr_->getRemainingPower();
+      runtime_params.energy_converge = 50.0f;
+    }
+  } else {
+    runtime_params.remaining_energy = static_cast<float>(rfr_data_.pwr_buffer);
+    runtime_params.energy_converge = 20.0f;
   }
-
   pwr_limiter_ptr_->updateSteeringModel(steer_speed_fdb_, steer_current_ref_,
                                         nullptr);
   pwr_limiter_ptr_->updateWheelModel(wheel_speed_ref_, wheel_speed_fdb_,
@@ -783,12 +795,8 @@ void Chassis::setCommDataMotors(bool working_flag) {
 void Chassis::setCommDataCap(bool working_flag = true) {
   // 电容根据电容充电状态发送数据
   HW_ASSERT(cap_ptr_ != nullptr, "pointer to Capacitor is nullptr", cap_ptr_);
-  if (working_flag && use_cap_flag_) {
-    cap_ptr_->enable();
-  } else {
-    cap_ptr_->disable();
-  }
-  if (pwr_state_ != PwrState::kWorking) {
+  if (pwr_state_ != PwrState::kWorking ||
+      (rfr_data_.is_rfr_on && !rfr_data_.is_pwr_on)) {
     cap_ptr_->setRfrData(rfr_data_.pwr_buffer, rfr_data_.pwr_limit, 0);
   } else {
     cap_ptr_->setRfrData(rfr_data_.pwr_buffer, rfr_data_.pwr_limit,
