@@ -143,7 +143,11 @@ void Robot::updateRfrData() {
 
   GimbalChassisComm::RefereeData::ChassisPart &gimbal_rfr_data =
       gc_comm_ptr_->referee_data().cp;
-
+  gimbal_rfr_data.is_rfr_on = (!referee_ptr_->isOffline());
+  gimbal_rfr_data.is_rfr_shooter_power_on =
+      rpp_data.power_management_shooter_output;
+  gimbal_rfr_data.is_rfr_gimbal_power_on =
+      rpp_data.power_management_gimbal_output;
   gimbal_rfr_data.rfr_bullet_shot_cnt =
       rfr_bullet_shot_cnt; // is_new_bullet_shot
   gimbal_rfr_data.robot_id = (hello_world::referee::RfrId)rpp_data.robot_id;
@@ -372,7 +376,7 @@ void Robot::genModulesCmdFromKb() {
     shooter_working_mode = Shooter::WorkingMode::kBackward;
   }
   if (rc_ptr_->key_R()) {
-    // rev_head_flag = true; //TODO：掉头模式
+    ui_drawer_.refresh();
   }
   if (rc_ptr_->key_SHIFT()) {
     use_cap_flag = true;
@@ -516,10 +520,6 @@ void Robot::setUiDrawerData() {
   // {
   //   ui_drawer_.refresh();
   // }
-
-  if (rc_ptr_->key_R()) {
-    ui_drawer_.refresh();
-  }
 
   // referee_ptr_->setTxPkg(ui_drawer_.))
 };
