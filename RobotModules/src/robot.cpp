@@ -258,7 +258,8 @@ void Robot::genModulesCmdFromRc() {
       // * 左上右上
       use_cap_flag = true;
       gimbal_working_mode = Gimbal::WorkingMode::Sentry;
-      shooter_working_mode = ShooterWorkingMode::kStop;
+      gimbal_ctrl_mode = CtrlMode::kAuto;
+      shooter_ctrl_mode = CtrlMode::kAuto;
     } else if (r_switch == RcSwitchState::kMid) {
       // * 左上右中
       gimbal_ctrl_mode = CtrlMode::kAuto;
@@ -279,7 +280,8 @@ void Robot::genModulesCmdFromRc() {
       // * 左中右上
       use_cap_flag = true;
       gimbal_working_mode = Gimbal::WorkingMode::Sentry;
-      shooter_working_mode = ShooterWorkingMode::kStop;
+      gimbal_ctrl_mode = CtrlMode::kAuto;
+      shooter_ctrl_mode = CtrlMode::kAuto;
     } else if (r_switch == RcSwitchState::kMid) {
       // * 左中右中
       gimbal_ctrl_mode = CtrlMode::kAuto;
@@ -300,7 +302,8 @@ void Robot::genModulesCmdFromRc() {
       // * 左下右上
       use_cap_flag = true;
       gimbal_working_mode = Gimbal::WorkingMode::Sentry;
-      shooter_working_mode = ShooterWorkingMode::kStop;
+      gimbal_ctrl_mode = CtrlMode::kAuto;
+      shooter_ctrl_mode = CtrlMode::kAuto;
       gyro_dir = Chassis::GyroDir::Clockwise;
     } else if (r_switch == RcSwitchState::kMid) {
       // * 左下右中
@@ -369,12 +372,12 @@ void Robot::genModulesCmdFromKb() {
   Shooter::WorkingMode shooter_working_mode = Shooter::WorkingMode::kShoot;
   Chassis::GyroDir gyro_dir = Chassis::GyroDir::Unspecified;
   Chassis::GyroMode gyro_mode = Chassis::GyroMode::ConstW;
-  
+
   CtrlMode gimbal_ctrl_mode = CtrlMode::kManual;
   CtrlMode shooter_ctrl_mode = CtrlMode::kManual;
 
   bool use_cap_flag = false;
-  bool shoot_flag = false; // 自动模式也能手动发弹;
+  bool shoot_flag = false;      // 自动模式也能手动发弹;
   bool rev_gimbal_flag = false; // TODO:掉头模式，只建议分离/跟随模式使用
   bool rev_chassis_flag = false;
 

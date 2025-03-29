@@ -338,11 +338,11 @@ void Chassis::revNormCmd() {
 
     if (first_gyro_flag) {
       first_gyro_flag = false;
-      if (last_gyro_dir_ == GyroDir::Clockwise) {
-        gyro_dir_ = GyroDir::AntiClockwise;
-      } else if (last_gyro_dir_ == GyroDir::AntiClockwise) {
-        gyro_dir_ = GyroDir::Clockwise;
-      }
+      // if (last_gyro_dir_ == GyroDir::Clockwise) {
+      //   gyro_dir_ = GyroDir::AntiClockwise;
+      // } else if (last_gyro_dir_ == GyroDir::AntiClockwise) {
+      //   gyro_dir_ = GyroDir::Clockwise;
+      // }
     } else {
       gyro_dir_ = last_gyro_dir_;
     }
