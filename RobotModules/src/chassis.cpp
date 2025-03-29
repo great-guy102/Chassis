@@ -314,6 +314,7 @@ void Chassis::calcChassisState() {
 
 // TODO:调试1
 // bool error_flag = true;  // TODO:调试
+uint16_t rev_chassis_cnt = 0;    // TODO:调试
 uint16_t motors_offline_cnt = 0; // TODO:调试
 // float error_time = 0.0f; // TODO:调试
 void Chassis::revNormCmd() {
@@ -377,11 +378,10 @@ void Chassis::revNormCmd() {
 
   case WorkingMode::Follow: {
     first_gyro_flag = true;
-    // TODO：掉头模式
     // //  在转头过程中，底盘不响应跟随转动指令
-    // if (work_tick_ - last_rev_head_tick_ < 800) {
-    //   break;
-    // }
+    if (work_tick_ - last_rev_chassis_tick_ < 200) {
+      break;
+    }
 
     // 跟随模式下，更新跟随目标
     float theta_fdb = theta_i2r_;
@@ -400,9 +400,14 @@ void Chassis::revNormCmd() {
         theta_ref = PI;
       }
     }
+    if (last_rev_chassis_flag_ != rev_chassis_flag_) {
+      last_rev_chassis_flag_ = rev_chassis_flag_;
+      theta_ref = (theta_ref == 0.0f ? PI : 0.0f);
+      rev_chassis_cnt++;
+    }
 
     follow_omega_pid_ptr_->calc(&theta_ref, &theta_fdb, nullptr, &cmd_raw.w);
-    pid_data = follow_omega_pid_ptr_->getPidAt(0).datas();
+
     // 解决跟随模式的低速底盘抖动问题
     if ((cmd_raw.v_x * cmd_raw.v_x + cmd_raw.v_y * cmd_raw.v_y) >= 0.000001f) {
       float w_max = fabsf(cmd_raw.w);
@@ -477,9 +482,9 @@ void Chassis::revNormCmd() {
     ramp_cmd_vx_ptr_->calc(&(cmd_state_raw.v_x), &(cmd_state_.v_x));
     ramp_cmd_vy_ptr_->calc(&(cmd_state_raw.v_y), &(cmd_state_.v_y));
 
-    //无限幅式斜坡
-    // cmd_state_.v_x = cmd_state_raw.v_x; //TODO:调试
-    // cmd_state_.v_y = cmd_state_raw.v_y; //TODO:调试
+    // 无限幅式斜坡
+    //  cmd_state_.v_x = cmd_state_raw.v_x; //TODO:调试
+    //  cmd_state_.v_y = cmd_state_raw.v_y; //TODO:调试
   } else {
     cmd_state_raw.reset();
     cmd_state_.reset();
@@ -622,12 +627,10 @@ void Chassis::reset() {
   pwr_state_ = PwrState::kDead;      ///< 电源状态
   last_pwr_state_ = PwrState::kDead; ///< 上一电源状态
 
-  // 由 robot 设置的数据
-  use_cap_flag_ = false; ///< 是否使用超级电容
+  // last_rev_chassis_tick_ = 0; ///< 上一次转向后退的时间戳
   gyro_dir_ =
       GyroDir::Unspecified; ///< 小陀螺方向，正为绕 Z 轴逆时针，负为顺时针，
-  cmd_norm_.reset();
-  rfr_data_ = RfrData(); ///< 底盘 RFR 数据
+  rfr_data_ = RfrData();    ///< 底盘 RFR 数据
 
   working_mode_ = WorkingMode::Depart;      ///< 工作模式
   last_working_mode_ = WorkingMode::Depart; ///< 上一次工作模式
@@ -639,9 +642,7 @@ void Chassis::reset() {
   // ms，实际上是作为上电瞬间的记录
 
   // 在 runOnWorking 函数中更新的数据
-  // gimbal board fdb data  在 update 函数中更新
   is_gimbal_imu_ready_ = false; ///< 云台主控板的IMU是否准备完毕
-
   // motor fdb data 在 update 函数中更新
   is_all_wheel_online_ = false; ///< 所有轮电机是否都处于就绪状态
   is_any_wheel_online_ = false; ///< 任意轮电机是否处于就绪状态
@@ -655,8 +656,9 @@ void Chassis::reset() {
   is_high_spd_enabled_ = false; ///< 是否开启了高速模式 （开启意味着从电容取电）
   cap_remaining_energy_ = 0.0f; ///< 剩余电容能量百分比，单位 %
 
-  resetMotorsRef();
   resetCmds();
+  resetRuntimeFlags();
+  resetMotorsRef();
   resetMotorsFdb();
   resetPids(); ///< 重置 PID 控制器参数
 };
@@ -665,7 +667,7 @@ void Chassis::resetDataOnDead() {
   // 在 update 函数中更新的数据
   // 在 runOnWorking 函数中更新的数据
   resetCmds();
-
+  resetRuntimeFlags();
   // gimbal board fdb data  在 update 函数中更新
   // motor fdb data 在 update 函数中更新
   // cap fdb data 在 update 函数中更新
@@ -677,7 +679,7 @@ void Chassis::resetDataOnResurrection() {
   // 在 update 函数中更新的数据
   // 在 runOnWorking 函数中更新的数据
   resetCmds();
-
+  resetRuntimeFlags();
   // gimbal board fdb data  在 update 函数中更新
   // motor fdb data 在 update 函数中更新
   // cap fdb data 在 update 函数中更新
@@ -690,7 +692,7 @@ void Chassis::resetDataOnStandby() {
   // 在 update 函数中更新的数据
   // 在 runOnWorking 函数中更新的数据
   resetCmds();
-
+  resetRuntimeFlags();
   // gimbal board fdb data  在 update 函数中更新
   // motor fdb data 在 update 函数中更新
   // cap fdb data 在 update 函数中更新
@@ -698,14 +700,19 @@ void Chassis::resetDataOnStandby() {
   resetPids(); ///< 重置 PID 控制器参数
 };
 
+void Chassis::resetRuntimeFlags() {
+  use_cap_flag_ = false;          ///< 是否使用超级电容
+  rev_chassis_flag_ = false;      ///< 转向反转标志位
+  last_rev_chassis_flag_ = false; ///< 上一次转向反转标志位
+}
+
 // 重置控制指令
 void Chassis::resetCmds() {
   cmd_.reset();            ///< 控制指令，基于图传坐标系
   cmd_state_.reset();      ///< 上一控制周期的控制指令，基于图传坐标系
   last_cmd_state_.reset(); ///< 上一控制周期的控制指令，基于图传坐标系
 
-  rev_head_flag_ = false;  ///< 恢复反转标志位
-  last_rev_head_tick_ = 0; ///< 上一次转向后退的时间戳
+  last_rev_chassis_tick_ = 0; ///< 上一次转向后退的时间戳
 };
 
 // 重置轮、舵电机参考数据

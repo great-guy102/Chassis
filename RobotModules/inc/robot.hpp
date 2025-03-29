@@ -212,6 +212,9 @@ private:
   ManualCtrlSrc manual_ctrl_src_ = ManualCtrlSrc::kRc;      ///< 手动控制源
   ManualCtrlSrc last_manual_ctrl_src_ = ManualCtrlSrc::kRc; ///< 上一手动控制源
 
+  float last_rev_chassis_tick_ = 0.0f; ///< 上一次底盘转向的时间戳
+  float last_rev_gimbal_tick_ = 0.0f;  ///< 上一次云台转向的时间戳
+
   RobotId robot_id_ = RobotId::kBlueStandard3;
   UiDrawer ui_drawer_ ; 
   uint8_t rfr_tx_data_[255] = {0};  ///< 机器人交互数据包发送缓存

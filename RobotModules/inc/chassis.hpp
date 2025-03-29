@@ -203,22 +203,22 @@ public:
   }
   void setNormCmd(const State &cmd) { cmd_norm_ = cmd; }
   void setRfrData(const RfrData &data) { rfr_data_ = data; }
-  float getThetaI2r(bool actual_head_dir = true) const {
+  float getThetaI2r(bool rev_gimbal_flag = false,
+                    bool actual_head_dir = true) const {
     if (actual_head_dir == true) {
       return theta_i2r_;
     }
 
-    if (rev_head_flag_) {
-      return theta_i2r_ + PI;
+    if (rev_chassis_flag_ || rev_gimbal_flag) {
+      return hello_world::AngleNormRad(theta_i2r_ + PI);
     } else {
       return theta_i2r_;
     }
   };
-  void revHead() {
-    if (work_tick_ - last_rev_head_tick_ > 200) {
-      rev_head_flag_ = !rev_head_flag_;
-      last_rev_head_tick_ = work_tick_;
-    }
+  void revChassis() {
+      last_rev_chassis_flag_ = rev_chassis_flag_;
+      rev_chassis_flag_ = !rev_chassis_flag_;
+      last_rev_chassis_tick_ = work_tick_;
   }
   void setGyroDir(GyroDir dir) { gyro_dir_ = dir; }
   void setGyroMode(GyroMode mode) { gyro_mode_ = mode; }
@@ -264,6 +264,7 @@ private:
   void resetDataOnResurrection();
   void resetDataOnStandby();
   void resetCmds();
+  void resetRuntimeFlags();
   void resetMotorsRef();
   void resetMotorsFdb();
   void resetPids();
@@ -324,8 +325,9 @@ private:
       0}; ///< 舵电机的电流参考值(限幅后) 单位 rad/s
   State chassis_state_ = {0}, last_chassis_state_ = {0}; ///< 底盘状态
 
-  bool rev_head_flag_ = false;      ///< 转向后退标志
-  uint32_t last_rev_head_tick_ = 0; ///< 上一次转向后退的时间戳
+  bool rev_chassis_flag_ = false;      ///< 转向后退标志
+  bool last_rev_chassis_flag_ = false; ///< 上一次转向后退标志
+  uint32_t last_rev_chassis_tick_ = 0; ///< 上一次底盘转向的时间戳
 
   // gimbal board fdb data  在 update 函数中更新
   bool is_gimbal_imu_ready_ = false; ///< 云台主控板的IMU是否准备完毕

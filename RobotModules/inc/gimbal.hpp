@@ -79,9 +79,8 @@ public:
   Gimbal() {};
   ~Gimbal() {};
 
-  void setRevHeadFlag(bool flag) { rev_head_flag_ = flag; }
-  bool getRevHeadFlag() const { return rev_head_flag_; }
-
+  void setRevGimbalCnt(uint8_t cnt) { rev_gimbal_cnt_  = cnt; }
+  bool getRevGimbalCnt() const { return rev_gimbal_cnt_ ; }
   void setNormCmdDelta(const Cmd &cmd) { cmd_norm_delta_ = cmd; }
   const Cmd &getNormCmdDelta() const { return cmd_norm_delta_; }
 
@@ -93,13 +92,12 @@ public:
 
 private:
   // 由 robot 设置的数据
-
   Cmd cmd_norm_delta_ = {0.0, 0.0};                ///< 控制指令的增量
   CtrlMode ctrl_mode_ = CtrlMode::kManual;         ///< 控制模式
   WorkingMode working_mode_ = WorkingMode::Normal; ///< 工作模式
 
-  bool rev_head_flag_ = false;      ///< 翻转头部朝向标志位
-  uint32_t last_rev_head_tick_ = 0; ///< 上一次翻转头部朝向的时间戳
+  uint8_t rev_gimbal_cnt_ = false;      ///< 翻转头部朝向标志位
+  uint32_t last_rev_gimbal_tick_ = 0; ///< 上一次翻转头部朝向的时间戳
 };
 /* Exported variables --------------------------------------------------------*/
 /* Exported function prototypes ----------------------------------------------*/
