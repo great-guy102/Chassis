@@ -100,7 +100,8 @@ struct ChassisRfrData {
 
 struct ChassisConfig {
   float normal_trans_vel; ///< 正常平移速度
-  float gyro_rot_spd;     ///< 小陀螺旋转速度
+  float gyro_rot_spd_move;     ///< 平移时小陀螺旋转速度
+  float gyro_rot_spd_stand;    ///< 静止时小陀螺旋转速度
   float yaw_sensitivity;  ///< 跟随前馈灵敏度
   float max_trans_vel;    ///< 最大平移速度
   float max_rot_spd;      ///< 最大旋转速度
@@ -140,6 +141,11 @@ public:
     Clockwise = -1,    ///< 顺时针
     Unspecified = 0,   ///< 静止
     AntiClockwise = 1, ///< 逆时针
+  };
+
+  enum class GyroMode : int8_t {
+    ConstW = 0, ///< 常速旋转
+    SinW = 1,   ///< 正弦偏置速度旋转
   };
 
   enum WheelMotorIdx : uint8_t {
@@ -215,6 +221,7 @@ public:
     }
   }
   void setGyroDir(GyroDir dir) { gyro_dir_ = dir; }
+  void setGyroMode(GyroMode mode) { gyro_mode_ = mode; }
   void setOmegaFeedforward(float omega) { omega_feedforward_ = omega; }
   void setUseCapFlag(bool flag) { use_cap_flag_ = flag; }
   bool getUseCapFlag() const { return use_cap_flag_; }
@@ -281,17 +288,15 @@ private:
 
   // 由 robot 设置的数据
   bool use_cap_flag_ = false; ///< 是否使用超级电容
-  GyroDir gyro_dir_ = GyroDir::Clockwise, last_gyro_dir_ = GyroDir::Clockwise;
+  GyroDir gyro_dir_ = GyroDir::Unspecified,
+          last_gyro_dir_ = GyroDir::Unspecified;
+  GyroMode gyro_mode_ = GyroMode::ConstW; ///< 陀螺模式
   ///< 小陀螺方向，正为绕 Z 轴逆时针，负为顺时针，
   State cmd_norm_ = {0};    ///< 原始控制指令，基于图传坐标系
   ChassisRfrData rfr_data_; ///< 底盘 RFR 数据
 
   WorkingMode working_mode_ = WorkingMode::Depart;      ///< 工作模式
   WorkingMode last_working_mode_ = WorkingMode::Depart; ///< 上一次工作模式
-
-  // debug用数据
-  float theta_vel_delta_debug_ = 0.0f;
-  float rot_spd_dir_debug_ = 0.0f;
 
   // 在 update 函数中更新的数据
   bool is_power_on_ = false; ///< 底盘电源是否开启

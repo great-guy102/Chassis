@@ -354,7 +354,23 @@ void Chassis::revNormCmd() {
     //   }
     // }
     // 小陀螺模式下，旋转分量为定值
-    cmd_raw.w = config_.gyro_rot_spd * (int8_t)gyro_dir_;
+    // cmd_raw.w = (config_.gyro_rot_spd - 0.5f + arm_sin_f32((2*PI / 4000) *
+    // work_tick_)) * (int8_t)gyro_dir_;
+    if (cmd_raw.v_x * cmd_raw.v_x + cmd_raw.v_y * cmd_raw.v_y < 0.0001f) {
+      if (gyro_mode_ == GyroMode::ConstW) {
+        cmd_raw.w = config_.gyro_rot_spd_stand * (int8_t)gyro_dir_;
+      } else if (gyro_mode_ == GyroMode::SinW) {
+        // cmd_raw.w = (config_.gyro_rot_spd_stand - 1.0f +
+        //              1.5f * arm_sin_f32((2 * PI / 4000) * work_tick_)) *
+        //             (int8_t)gyro_dir_;
+        cmd_raw.w = (config_.gyro_rot_spd_stand +
+                     0.75f * arm_sin_f32((2 * PI / 4000) * work_tick_) +
+                     0.75f * arm_sin_f32((2 * PI / 16000) * work_tick_)) *
+                    (int8_t)gyro_dir_;
+      }
+    } else {
+      cmd_raw.w = config_.gyro_rot_spd_move * (int8_t)gyro_dir_;
+    };
     last_gyro_dir_ = gyro_dir_;
     break;
   }
@@ -431,12 +447,15 @@ void Chassis::revNormCmd() {
   cmd_state_raw.v_y = cmd_raw.v_y * config_.normal_trans_vel;
   // TODO：预期限幅式斜坡优化
   if (is_all_wheel_online_ && is_all_steer_online_) {
+    // x,y分离限幅式斜坡
     // cmd_state_raw.v_x =
     //     hello_world::Bound(cmd_state_raw.v_x, chassis_state_.v_x - 0.5f,
     //                        chassis_state_.v_x + 0.5f);
     // cmd_state_raw.v_y =
     //     hello_world::Bound(cmd_state_raw.v_y, chassis_state_.v_y - 0.5f,
     //                        chassis_state_.v_y + 0.5f);
+
+    // 合成速度v限幅式斜坡
     float cmd_state_raw_v = 0.0f, chassis_state_v = 0.0f;
     cmd_state_raw_v = sqrt(cmd_state_raw.v_x * cmd_state_raw.v_x +
                            cmd_state_raw.v_y * cmd_state_raw.v_y);
@@ -457,6 +476,8 @@ void Chassis::revNormCmd() {
 
     ramp_cmd_vx_ptr_->calc(&(cmd_state_raw.v_x), &(cmd_state_.v_x));
     ramp_cmd_vy_ptr_->calc(&(cmd_state_raw.v_y), &(cmd_state_.v_y));
+
+    //无限幅式斜坡
     // cmd_state_.v_x = cmd_state_raw.v_x; //TODO:调试
     // cmd_state_.v_y = cmd_state_raw.v_y; //TODO:调试
   } else {

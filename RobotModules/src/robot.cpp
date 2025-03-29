@@ -120,7 +120,7 @@ void Robot::updateRfrData() {
       if (!rfr_shooter_pkg_ptr_->isHandled()) {
         rfr_shooter_pkg_ptr_->setHandled();
         rfr_bullet_shot_cnt++;
-        if (rfr_bullet_shot_cnt >= 4) {
+        if (rfr_bullet_shot_cnt >= 2) {
           rfr_bullet_shot_cnt = 0;
         }
       }
@@ -239,6 +239,7 @@ void Robot::genModulesCmdFromRc() {
   Gimbal::WorkingMode gimbal_working_mode = Gimbal::WorkingMode::Normal;
   Shooter::WorkingMode shooter_working_mode = Shooter::WorkingMode::kShoot;
   Chassis::GyroDir gyro_dir = Chassis::GyroDir::Unspecified;
+  Chassis::GyroMode gyro_mode = Chassis::GyroMode::ConstW;
 
   CtrlMode gimbal_ctrl_mode = CtrlMode::kManual;
   CtrlMode shooter_ctrl_mode = CtrlMode::kManual;
@@ -301,7 +302,7 @@ void Robot::genModulesCmdFromRc() {
       gimbal_ctrl_mode = CtrlMode::kAuto;
       shooter_ctrl_mode = CtrlMode::kManual;
       gyro_dir = Chassis::GyroDir::Clockwise;
-      // rev_head_flag = (rc_wheel > 0.9f); // TODO:掉头模式
+      gyro_mode = Chassis::GyroMode::SinW;
     } else if (r_switch == RcSwitchState::kDown) {
       // * 左下右下
       // gimbal_working_mode = Gimbal::WorkingMode::PidTest;
@@ -319,6 +320,7 @@ void Robot::genModulesCmdFromRc() {
   chassis_ptr_->setNormCmd(chassis_cmd);
   chassis_ptr_->setWorkingMode(chassis_working_mode);
   chassis_ptr_->setGyroDir(gyro_dir);
+  chassis_ptr_->setGyroMode(gyro_mode);
   chassis_ptr_->setUseCapFlag(use_cap_flag);
   // TODO：掉头模式
   //  if (rev_head_flag) {
@@ -515,11 +517,6 @@ void Robot::setUiDrawerData() {
   ui_drawer_.setVisTgtX(gc_comm_ptr_->vision_data().gp.vtm_x, is_vision_valid);
   ui_drawer_.setVisTgtY(gc_comm_ptr_->vision_data().gp.vtm_y, is_vision_valid);
   ui_drawer_.setisvisionvalid(is_vision_valid);
-
-  // if (work_tick_ %500 == 0)
-  // {
-  //   ui_drawer_.refresh();
-  // }
 
   // referee_ptr_->setTxPkg(ui_drawer_.))
 };
