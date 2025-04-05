@@ -525,8 +525,8 @@ void Robot::setUiDrawerData() {
   HW_ASSERT(gimbal_ptr_ != nullptr, "Gimbal FSM pointer is null", gimbal_ptr_);
   ui_drawer_.setGimbalWorkState(gc_comm_ptr_->gimbal_data().gp.pwr_state);
   ui_drawer_.setGimbalCtrlMode(gimbal_ptr_->getCtrlMode());
-  ui_drawer_.setGimbalWorkingMode(gimbal_ptr_->getWorkingMode());
   ui_drawer_.setGimbalManualCtrlSrc(manual_ctrl_src_);
+  ui_drawer_.setGimbalWorkingMode(gimbal_ptr_->getWorkingMode());
   ui_drawer_.setGimbalJointAngPitchFdb(
       gc_comm_ptr_->gimbal_data().gp.pitch_fdb);
 
@@ -535,6 +535,7 @@ void Robot::setUiDrawerData() {
             shooter_ptr_);
   ui_drawer_.setShooterWorkState(gc_comm_ptr_->shooter_data().gp.pwr_state);
   ui_drawer_.setShooterCtrlMode(shooter_ptr_->getCtrlMode());
+  ui_drawer_.setShooterManualCtrlSrc(manual_ctrl_src_);
   ui_drawer_.setShooterStuckFlag(
       gc_comm_ptr_->shooter_data().gp.is_shooter_stuck);
   ui_drawer_.setFeedStuckStatus(

@@ -44,13 +44,10 @@ const uint16_t kUiModuleStateAreaX1 = 15;
 const uint16_t kUiModuleStateAreaX2_1 = 140;
 const uint16_t kUiModuleStateAreaX2_2 =
     kUiModuleStateAreaX2_1 - kUiModuleStateFontSize;
-const uint16_t kUiModuleStateAreaX3 = 200;
-const uint16_t kUiModuleStateAreaX4 = 1300;
-const uint16_t kUiModuleStateAreaX5 = 1340;
+const uint16_t kUiModuleStateAreaX2_3 = kUiModuleStateAreaX2_1;
+const uint16_t kUiModuleStateAreaX3 = 960;
 const uint16_t kUiModuleStateAreaY1 = 890;
 const uint16_t kUiModuleStateAreaY2 = 700;
-const int16_t kUiModuleStateAreaXDelta = 60;
-const int16_t kUiModuleStateAreaXDeltaFloating = 100;
 const int16_t kUiModuleStateAreaYDelta = -35;
 
 // 行车线 中下
@@ -193,33 +190,22 @@ bool UiDrawer::encodeStaticUi(uint8_t *data_ptr, size_t &data_len,
   case kSuiDelAll:
     return encodeDelAll(data_ptr, data_len);
     break;
-  case kSuiPkgGroup1:
-  //   return encodeStaticPkgGroup1(data_ptr, data_len, opt);
-    break;
-  case kSuiPkgGroup2:
-    return encodeStaticPkgGroup2(data_ptr, data_len, opt);
-    break;
   case kSuiChassisTitle:
     return encodeChassisWorkStateTitle(data_ptr, data_len, opt);
     break;
   case kSuiGimbalTitle:
     return encodeGimbalWorkStateTitle(data_ptr, data_len, opt);
     break;
-  // case kSuiShooterTitle:
-  //   return encodeShooterWorkStateTitle(data_ptr, data_len, opt);
-  //   break;
-  // case kSuiFeedAngTitle:
-  //   return encodeFeedTitle(data_ptr, data_len, opt);
-  //   break;
-  // case kSuiFricSpdTitle:
-  //   return encodeFricTitle(data_ptr, data_len, opt);
-  //   break;
-  // case kSuiPitchAngTitle:
-  //   return encodeGimbalPitchTitle(data_ptr, data_len, opt);
-  //   break;
-  // case kSuiYawAngTitle:
-  //   return encodeGimbalYawTitle(data_ptr, data_len, opt);
-  //   break;
+  case kSuiShooterTitle:
+    return encodeShooterWorkStateTitle(data_ptr, data_len, opt);
+    break;
+  case kSuiPkgGroup1:
+    //   return encodeStaticPkgGroup1(data_ptr, data_len, opt);
+    break;
+  case kSuiPkgGroup2:
+    return encodeStaticPkgGroup2(data_ptr, data_len, opt);
+    break;
+
   default:
     break;
   }
@@ -603,7 +589,7 @@ void UiDrawer::genPassSafe(hello_world::referee::Circle &g, bool is_safe) {
   g.setName(kUiNamePassSafe);
   g.setCenterPos(kUiModuleStateAreaX3,
                  kUiModuleStateAreaY1 +
-                     kUiModuleStateAreaYDelta); // todo确认该指示显示位置
+                     kUiModuleStateAreaYDelta); //TODO：确认该指示显示位置
   g.setRadius(25);
   g.setColor(is_safe ? hello_world::referee::Circle::Color::kGreen
                      : hello_world::referee::Circle::Color::kPurple);
@@ -613,26 +599,58 @@ void UiDrawer::genPassSafe(hello_world::referee::Circle &g, bool is_safe) {
 #pragma endregion
 
 #pragma region 发射机构相关 UI
-/**
- * @brief 编码左上方 UI 字符串 `Scope:`
- */
 
-bool UiDrawer::encodeFeedTitle(uint8_t *data_ptr, size_t &data_len,
-                               UiDrawer::GraphicOperation opt) {
-  std::string str = "Feed:";
+//  * @brief 编码左上方 UI 字符串 `Shooter:`
+//  */
+bool UiDrawer::encodeShooterWorkStateTitle(uint8_t *data_ptr, size_t &data_len,
+                                           UiDrawer::GraphicOperation opt) {
+  std::string str = "Shooter:";
+
   hello_world::referee::String options = hello_world::referee::String(
-      kUiNameFeedAngTitle, opt, kStaticUiLayer, kUiModuleStateTitleColor,
-      kUiModuleStateAreaX1, kUiModuleStateAreaY1 + 4 * kUiModuleStateAreaYDelta,
+      kUiNameShooterWorkStateTitle, opt, kStaticUiLayer,
+      kUiModuleStateTitleColor, kUiModuleStateAreaX1,
+      kUiModuleStateAreaY1 + 2 * kUiModuleStateAreaYDelta,
       kUiModuleStateFontSize, str.length(), kUiModuleStateLineWidth);
   return encodeString(data_ptr, data_len, opt, options, str);
 };
-bool UiDrawer::encodeFricTitle(uint8_t *data_ptr, size_t &data_len,
-                               UiDrawer::GraphicOperation opt) {
-  std::string str = "Fric:";
+/**
+ * @brief 根据射门工作状态编码左上方 UI 字符串(`Shooter:` 之后的内容)
+ */
+bool UiDrawer::encodeShooterWorkStateContent(uint8_t *data_ptr,
+                                             size_t &data_len,
+                                             UiDrawer::GraphicOperation opt) {
+  std::string str = "Unknown";
+
+  if (shooter_work_state_ != PwrState::kWorking) {
+    str = PwrStateToStr(shooter_work_state_);
+  } else {
+    if (shooter_stuck_flag_) {
+      switch (feed_stuck_status_) {
+      case 0:
+        str = "Fric Stuck";
+        break;
+      case 1:
+        str = "Forward Stuck";
+        break;
+      case 2:
+        str = "Backward Stuck";
+        break;
+      default:
+        str = "Unknown";
+        break;
+      }
+    } else {
+      str = Shooter::WorkingModeToStr(shooter_working_mode_) + "-" +
+            CtrlModeSrcToStr(shooter_ctrl_mode_, shooter_manual_ctrl_src_);
+    }
+  }
+
   hello_world::referee::String options = hello_world::referee::String(
-      kUiNameFricSpdTitle, opt, kStaticUiLayer, kUiModuleStateTitleColor,
-      kUiModuleStateAreaX1, kUiModuleStateAreaY1 + 5 * kUiModuleStateAreaYDelta,
+      kUiNameShooterWorkStateContent, opt, kDynamicUiLayer,
+      kUiModuleStateContentColor, kUiModuleStateAreaX2_3,
+      kUiModuleStateAreaY1 + 2 * kUiModuleStateAreaYDelta,
       kUiModuleStateFontSize, str.length(), kUiModuleStateLineWidth);
+
   return encodeString(data_ptr, data_len, opt, options, str);
 };
 
@@ -658,45 +676,6 @@ void UiDrawer::genShooterHeat(hello_world::referee::Arc &g) {
 };
 #pragma endregion
 
-#pragma region 倍镜云台
-/**
- * @brief 编码左上方 UI 字符串 `Shooter:`
- */
-bool UiDrawer::encodeShooterWorkStateTitle(uint8_t *data_ptr, size_t &data_len,
-                                           UiDrawer::GraphicOperation opt) {
-  std::string str = "Shooter:";
-
-  hello_world::referee::String options = hello_world::referee::String(
-      kUiNameShooterWorkStateTitle, opt, kStaticUiLayer,
-      kUiModuleStateTitleColor, kUiModuleStateAreaX1,
-      kUiModuleStateAreaY1 + 2 * kUiModuleStateAreaYDelta,
-      kUiModuleStateFontSize, str.length(), kUiModuleStateLineWidth);
-  return encodeString(data_ptr, data_len, opt, options, str);
-};
-/**
- * @brief 根据射门工作状态编码左上方 UI 字符串(`Shooter:` 之后的内容)
- */
-bool UiDrawer::encodeShooterWorkStateContent(uint8_t *data_ptr,
-                                             size_t &data_len,
-                                             UiDrawer::GraphicOperation opt) {
-  std::string str = "Unknown";
-  if (shooter_work_state_ != PwrState::kWorking) {
-    str = PwrStateToStr(shooter_work_state_);
-  } else {
-    str = Shooter::WorkingModeToStr(shooter_working_mode_) + "-" +
-          CtrlModeSrcToStr(shooter_ctrl_mode_, shooter_manual_ctrl_src_);
-  }
-
-  hello_world::referee::String options = hello_world::referee::String(
-      kUiNameShooterWorkStateContent, opt, kDynamicUiLayer,
-      kUiModuleStateContentColor, kUiModuleStateAreaX3,
-      kUiModuleStateAreaY1 + 2 * kUiModuleStateAreaYDelta,
-      kUiModuleStateFontSize, str.length(), kUiModuleStateLineWidth);
-
-  return encodeString(data_ptr, data_len, opt, options, str);
-};
-
-#pragma endregion
 #pragma region 视觉 UI
 
 void UiDrawer::genVisTgt(hello_world::referee::Circle &g) {
