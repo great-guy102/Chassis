@@ -39,6 +39,8 @@ public:
   typedef hello_world::referee::ids::RobotId RobotId;
   typedef hello_world::referee::RfrEncoder RfrEncoder;
   typedef hello_world::referee::String String;
+  typedef hello_world::referee::GraphicLayer GraphicLayer;
+  typedef hello_world::referee::String::Color StringColor;
 
   typedef hello_world::module::CtrlMode FsmCtrlMode;
   typedef hello_world::module::ManualCtrlSrc FsmManualCtrlSrc;

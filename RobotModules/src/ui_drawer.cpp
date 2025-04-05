@@ -31,12 +31,20 @@ const hello_world::referee::GraphicLayer kStaticUiLayer =
 const hello_world::referee::GraphicLayer kDynamicUiLayer =
     hello_world::referee::GraphicLayer::k1;
 
-const hello_world::referee::String::Color kUiModuleStateTitleColor =
-    hello_world::referee::String::Color::kOrange;
-const hello_world::referee::String::Color kUiModuleStateContentColor =
-    hello_world::referee::String::Color::kYellow;
-const hello_world::referee::String::Color kUiPassLineColor =
-    hello_world::referee::String::Color::kOrange;
+const hello_world::referee::Graphic::Color kUiNormalColor =
+    hello_world::referee::Graphic::Color::kGreen;
+const hello_world::referee::Graphic::Color kUiWarningColor =
+    hello_world::referee::Graphic::Color::kOrange;
+const hello_world::referee::Graphic::Color kUiErrorColor =
+    hello_world::referee::Graphic::Color::kPurple;
+
+const hello_world::referee::Graphic::Color kUiModuleStateTitleColor =
+    hello_world::referee::Graphic::Color::kOrange;
+const hello_world::referee::Graphic::Color kUiPassLineColor =
+    hello_world::referee::Graphic::Color::kOrange;
+const hello_world::referee::Graphic::Color kUiVisTgtColor =
+    hello_world::referee::Graphic::Color::kPurple;
+
 const hello_world::referee::Pixel kUiModuleStateFontSize = 16;
 const hello_world::referee::Pixel kUiModuleStateLineWidth = 3;
 
@@ -69,7 +77,7 @@ const uint8_t kUiNameChassisDirTail[3] = {0x00, 0x00,
 const uint16_t kPixelCenterXCapBox = 1920 / 2; // 超电位置
 const uint16_t kPixelCenterYCapBox = 120;
 const uint16_t kPixelCapBoxWidth = 400; // 超电能量余量外框
-const uint16_t kPixelCapBoxHeight = 15;
+const uint16_t kPixelCapBoxHeight = 16;
 const uint8_t kUiNameChassisCapBox[3] = {0x00, 0x00,
                                          0x05}; ///< 超级电容能量余量外框
 const uint8_t kUiNameChassisCapPercent[3] = {
@@ -439,7 +447,10 @@ bool UiDrawer::encodeChassisWorkStateContent(uint8_t *data_ptr,
                                              size_t &data_len,
                                              UiDrawer::GraphicOperation opt) {
   std::string str = "Unknown";
+  hello_world::referee::Graphic::Color color = kUiNormalColor;
+
   if (chassis_work_state_ != PwrState::kWorking) {
+    color = kUiWarningColor;
     str = PwrStateToStr(chassis_work_state_);
   } else {
     str = Chassis::WorkingModeToStr(chassis_working_mode_) + "-" +
@@ -447,9 +458,9 @@ bool UiDrawer::encodeChassisWorkStateContent(uint8_t *data_ptr,
   }
 
   hello_world::referee::String options = hello_world::referee::String(
-      kUiNameChassisWorkStateContent, opt, kDynamicUiLayer,
-      kUiModuleStateContentColor, kUiModuleStateAreaX2_1, kUiModuleStateAreaY1,
-      kUiModuleStateFontSize, str.length(), kUiModuleStateLineWidth);
+      kUiNameChassisWorkStateContent, opt, kDynamicUiLayer, color,
+      kUiModuleStateAreaX2_1, kUiModuleStateAreaY1, kUiModuleStateFontSize,
+      str.length(), kUiModuleStateLineWidth);
 
   return encodeString(data_ptr, data_len, opt, options, str);
 };
@@ -467,7 +478,7 @@ void UiDrawer::genChassisDir(hello_world::referee::Arc &g_head,
   end_ang_other = hello_world::NormPeriodData(0, 360, end_ang_other);
 
   float radius = 50; // 灯条所处圆的半径
-  g_head.setColor(hello_world::referee::Arc::Color::kYellow);
+  g_head.setColor(hello_world::referee::Graphic::Color::kYellow);
   g_head.setAng(start_ang_head, end_ang_head);
   g_head.setCenterPos(kUiChassisDirCircleX,
                       kUiChassisDirCircleY); // 灯条中心位置
@@ -476,7 +487,7 @@ void UiDrawer::genChassisDir(hello_world::referee::Arc &g_head,
   g_head.setLineWidth(3);
   g_head.setLayer(kDynamicUiLayer);
 
-  g_tail.setColor(hello_world::referee::Arc::Color::kCyan);
+  g_tail.setColor(hello_world::referee::Graphic::Color::kCyan);
   g_tail.setAng(start_ang_other, end_ang_other);
   g_tail.setCenterPos(kUiChassisDirCircleX, kUiChassisDirCircleY);
   g_tail.setRadius(radius, radius);
@@ -491,16 +502,14 @@ void UiDrawer::genCapPwrPercent(hello_world::referee::Rectangle &g_rect,
   float percent = hello_world::Bound(cap_pwr_percent_ / 100.0f, 0, 1);
   uint16_t end_x = start_x + kPixelCapBoxWidth * percent;
 
-  hello_world::referee::GraphicColor color =
-      hello_world::referee::Rectangle::Color::kGreen;
+  hello_world::referee::Graphic::Color color;
 
-  if (percent > 0.8) {
-  } else if (percent > 0.6) {
-    color = hello_world::referee::Rectangle::Color::kYellow;
-  } else if (percent > 0.4) {
-    color = hello_world::referee::Rectangle::Color::kOrange;
-  } else {
-    color = hello_world::referee::Rectangle::Color::kPurple;
+  if (percent > 0.75) {
+    color = kUiNormalColor;
+  } else if (percent > 0.3) {
+    color = kUiWarningColor;
+  } else{
+    color = kUiErrorColor;
   }
 
   g_rect.setName(kUiNameChassisCapPercent);
@@ -512,10 +521,10 @@ void UiDrawer::genCapPwrPercent(hello_world::referee::Rectangle &g_rect,
 
   g_num.setName(kUiNameChassisCapPercentNum);
   g_num.setDisplayValue(percent * 100);
-  g_num.setStartPos(start_x - 100, kPixelCenterYCapBox);
+  g_num.setStartPos(start_x - 106, kPixelCenterYCapBox + kPixelCapBoxHeight / 2);
   g_num.setColor(color);
   g_num.setLayer(kDynamicUiLayer);
-  g_num.setFontSize(20); // 调整超电剩余电量的数字大小
+  g_num.setFontSize(24); // 调整超电剩余电量的数字大小
   g_num.setLineWidth(kUiModuleStateLineWidth);
 };
 
@@ -569,7 +578,9 @@ bool UiDrawer::encodeGimbalWorkStateTitle(uint8_t *data_ptr, size_t &data_len,
 bool UiDrawer::encodeGimbalWorkStateContent(uint8_t *data_ptr, size_t &data_len,
                                             UiDrawer::GraphicOperation opt) {
   std::string str = "Unknown";
+  hello_world::referee::Graphic::Color color = kUiNormalColor;
   if (gimbal_work_state_ != PwrState::kWorking) {
+    color = kUiWarningColor;
     str = PwrStateToStr(gimbal_work_state_);
   } else {
     str = Gimbal::WorkingModeToStr(gimbal_working_mode_) + "-" +
@@ -577,10 +588,9 @@ bool UiDrawer::encodeGimbalWorkStateContent(uint8_t *data_ptr, size_t &data_len,
   }
 
   hello_world::referee::String options = hello_world::referee::String(
-      kUiNameGimbalWorkStateContent, opt, kDynamicUiLayer,
-      kUiModuleStateContentColor, kUiModuleStateAreaX2_2,
-      kUiModuleStateAreaY1 + kUiModuleStateAreaYDelta, kUiModuleStateFontSize,
-      str.length(), kUiModuleStateLineWidth);
+      kUiNameGimbalWorkStateContent, opt, kDynamicUiLayer, color,
+      kUiModuleStateAreaX2_2, kUiModuleStateAreaY1 + kUiModuleStateAreaYDelta,
+      kUiModuleStateFontSize, str.length(), kUiModuleStateLineWidth);
 
   return encodeString(data_ptr, data_len, opt, options, str);
 };
@@ -589,10 +599,10 @@ void UiDrawer::genPassSafe(hello_world::referee::Circle &g, bool is_safe) {
   g.setName(kUiNamePassSafe);
   g.setCenterPos(kUiModuleStateAreaX3,
                  kUiModuleStateAreaY1 +
-                     kUiModuleStateAreaYDelta); //TODO：确认该指示显示位置
+                     kUiModuleStateAreaYDelta); // TODO：确认该指示显示位置
   g.setRadius(25);
-  g.setColor(is_safe ? hello_world::referee::Circle::Color::kGreen
-                     : hello_world::referee::Circle::Color::kPurple);
+  g.setColor(is_safe ? kUiNormalColor
+                     : kUiErrorColor);
   g.setLayer(kDynamicUiLayer);
   g.setLineWidth(3);
 };
@@ -620,11 +630,13 @@ bool UiDrawer::encodeShooterWorkStateContent(uint8_t *data_ptr,
                                              size_t &data_len,
                                              UiDrawer::GraphicOperation opt) {
   std::string str = "Unknown";
-
+  hello_world::referee::Graphic::Color color = kUiNormalColor;
   if (shooter_work_state_ != PwrState::kWorking) {
     str = PwrStateToStr(shooter_work_state_);
+    color = kUiWarningColor;
   } else {
     if (shooter_stuck_flag_) {
+      color = kUiErrorColor;
       switch (feed_stuck_status_) {
       case 0:
         str = "Fric Stuck";
@@ -646,8 +658,8 @@ bool UiDrawer::encodeShooterWorkStateContent(uint8_t *data_ptr,
   }
 
   hello_world::referee::String options = hello_world::referee::String(
-      kUiNameShooterWorkStateContent, opt, kDynamicUiLayer,
-      kUiModuleStateContentColor, kUiModuleStateAreaX2_3,
+      kUiNameShooterWorkStateContent, opt, kDynamicUiLayer, color,
+      kUiModuleStateAreaX2_3,
       kUiModuleStateAreaY1 + 2 * kUiModuleStateAreaYDelta,
       kUiModuleStateFontSize, str.length(), kUiModuleStateLineWidth);
 
@@ -659,14 +671,13 @@ void UiDrawer::genShooterHeat(hello_world::referee::Arc &g) {
   percent = hello_world::Bound(percent, 0.0f, 1.0f);
   g.setName(kUiNameShooterHeat);
   g.setCenterPos(1920 / 2, 1080 / 2);
-  hello_world::referee::GraphicColor color =
-      hello_world::referee::Arc::Color::kGreen;
+  hello_world::referee::Graphic::Color color;
   if (percent > 0.8) {
-    color = hello_world::referee::Arc::Color::kPurple;
+    color = kUiNormalColor;
   } else if (percent > 0.6) {
-    color = hello_world::referee::Arc::Color::kOrange;
+    color = kUiWarningColor;
   } else if (percent > 0.3) {
-    color = hello_world::referee::Arc::Color::kYellow;
+    color = kUiErrorColor;
   }
   g.setRadius(100, 100);
   g.setAng(360 - 360 * percent, 0);
@@ -682,18 +693,19 @@ void UiDrawer::genVisTgt(hello_world::referee::Circle &g) {
   g.setName(kUiNameVisionTgt);
   g.setCenterPos(960 + vis_tgt_x_ - 150, 540 - vis_tgt_y_);
   g.setRadius(35);
-  g.setColor(hello_world::referee::String::Color::kGreen);
+  g.setColor(kUiVisTgtColor);
   g.setLayer(hello_world::referee::GraphicLayer::k1);
   g.setLineWidth(2);
 };
+
 void UiDrawer::genVisionbox(hello_world::referee::Rectangle &g_rect) {
   // uint16_t start_x = kPixelCenterXVisionBox - kPixelVisionBoxWidth / 2;
   // uint16_t end_x = start_x + kPixelVisionBoxWidth;
 
   if (is_vision_valid_) {
-    g_rect.setColor(hello_world::referee::String::Color::kPurple);
+    g_rect.setColor(kUiNormalColor);
   } else {
-    g_rect.setColor(hello_world::referee::String::Color::kWhite);
+    g_rect.setColor(kUiErrorColor);
   }
 
   g_rect.setName(kUiNameVisionBox);

@@ -550,9 +550,8 @@ void Robot::setUiDrawerData() {
   // vision
   HW_ASSERT(gc_comm_ptr_ != nullptr, "GimbalChassisComm pointer is null",
             gc_comm_ptr_);
-  bool is_vision_valid = true;
-  // bool is_vision_valid = gc_comm_ptr_->vision_data().gp.is_enemy_detected;
-  // //TODO:调试
+  bool is_vision_valid = gc_comm_ptr_->vision_data().gp.is_enemy_detected;
+  // bool is_vision_valid = true;  //TODO:调试
   ui_drawer_.setVisTgtX(gc_comm_ptr_->vision_data().gp.vtm_x, is_vision_valid);
   ui_drawer_.setVisTgtY(gc_comm_ptr_->vision_data().gp.vtm_y, is_vision_valid);
   ui_drawer_.setisvisionvalid(is_vision_valid);
