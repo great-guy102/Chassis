@@ -73,14 +73,18 @@ public:
   static std::string WorkingModeToStr(WorkingMode mode) {
     if (mode == WorkingMode::Normal)
       return "Normal";
-    return "ErrGWM";
+    else if (mode == WorkingMode::Sentry)
+      return "Sentry";
+    else if (mode == WorkingMode::PidTest)
+      return "PidTest";
+    return "Unknown";
   };
-  
+
   Gimbal() {};
   ~Gimbal() {};
 
-  void setRevGimbalCnt(uint8_t cnt) { rev_gimbal_cnt_  = cnt; }
-  bool getRevGimbalCnt() const { return rev_gimbal_cnt_ ; }
+  void setRevGimbalCnt(uint8_t cnt) { rev_gimbal_cnt_ = cnt; }
+  bool getRevGimbalCnt() const { return rev_gimbal_cnt_; }
   void setNormCmdDelta(const Cmd &cmd) { cmd_norm_delta_ = cmd; }
   const Cmd &getNormCmdDelta() const { return cmd_norm_delta_; }
 
@@ -96,7 +100,7 @@ private:
   CtrlMode ctrl_mode_ = CtrlMode::kManual;         ///< 控制模式
   WorkingMode working_mode_ = WorkingMode::Normal; ///< 工作模式
 
-  uint8_t rev_gimbal_cnt_ = false;      ///< 翻转头部朝向标志位
+  uint8_t rev_gimbal_cnt_ = false;    ///< 翻转头部朝向标志位
   uint32_t last_rev_gimbal_tick_ = 0; ///< 上一次翻转头部朝向的时间戳
 };
 /* Exported variables --------------------------------------------------------*/

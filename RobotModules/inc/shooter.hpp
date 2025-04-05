@@ -31,9 +31,13 @@ public:
   typedef hello_world::module::CtrlMode CtrlMode;
 
   static std::string WorkingModeToStr(WorkingMode mode) {
-    if (mode == WorkingMode::kShoot)
-      return "kShoot";
-    return "ErrGWM";
+    if (mode == WorkingMode::kStop)
+      return "Stop";
+    else if (mode == WorkingMode::kShoot)
+      return "Shoot";
+    else if (mode == WorkingMode::kBackward)
+      return "Backward";
+    return "Unknown";
   };
 
   Shooter() {};

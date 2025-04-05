@@ -31,20 +31,27 @@ const hello_world::referee::GraphicLayer kStaticUiLayer =
 const hello_world::referee::GraphicLayer kDynamicUiLayer =
     hello_world::referee::GraphicLayer::k1;
 
-const uint16_t kUiModuleStateAreaX1 = 100;
-const uint16_t kUiModuleStateAreaX2 = 160;
+const hello_world::referee::String::Color kUiModuleStateTitleColor =
+    hello_world::referee::String::Color::kOrange;
+const hello_world::referee::String::Color kUiModuleStateContentColor =
+    hello_world::referee::String::Color::kYellow;
+const hello_world::referee::String::Color kUiPassLineColor =
+    hello_world::referee::String::Color::kOrange;
+const hello_world::referee::Pixel kUiModuleStateFontSize = 16;
+const hello_world::referee::Pixel kUiModuleStateLineWidth = 3;
+
+const uint16_t kUiModuleStateAreaX1 = 15;
+const uint16_t kUiModuleStateAreaX2_1 = 140;
+const uint16_t kUiModuleStateAreaX2_2 =
+    kUiModuleStateAreaX2_1 - kUiModuleStateFontSize;
 const uint16_t kUiModuleStateAreaX3 = 200;
 const uint16_t kUiModuleStateAreaX4 = 1300;
 const uint16_t kUiModuleStateAreaX5 = 1340;
-const uint16_t kUiModuleStateAreaY1 = 860;
+const uint16_t kUiModuleStateAreaY1 = 890;
 const uint16_t kUiModuleStateAreaY2 = 700;
 const int16_t kUiModuleStateAreaXDelta = 60;
 const int16_t kUiModuleStateAreaXDeltaFloating = 100;
 const int16_t kUiModuleStateAreaYDelta = -35;
-const hello_world::referee::String::Color kUiModuleStateColor =
-    hello_world::referee::String::Color::kOrange;
-const hello_world::referee::Pixel kUiModuleStateFontSize = 10;
-const hello_world::referee::Pixel kUiModuleStateLineWidth = 3;
 
 // 行车线 中下
 
@@ -94,13 +101,10 @@ const uint8_t kUiNameGimbalPitchTitle[3] = {0x00, 0x00,
                                             0x42}; ///< 云台俯仰角度标题
 const uint8_t kUiNameGimbalPitchFdb[3] = {0x00, 0x00,
                                           0x43}; ///< 云台俯仰角度反馈
-const uint8_t kUiNameGimbalPitchRef[3] = {0x00, 0x00,
-                                          0x44}; ///< 云台俯仰角度期望
 
 const uint8_t kUiNameGimbalYawTitle[3] = {0x00, 0x00,
-                                          0x45};           ///< 云台偏航角度标题
-const uint8_t kUiNameGimbalYawFdb[3] = {0x00, 0x00, 0x46}; ///< 云台偏航角度反馈
-const uint8_t kUiNameGimbalYawRef[3] = {0x00, 0x00, 0x47}; ///< 云台偏航角度期望
+                                          0x44};           ///< 云台偏航角度标题
+const uint8_t kUiNameGimbalYawFdb[3] = {0x00, 0x00, 0x45}; ///< 云台偏航角度反馈
 
 // shooter
 const uint8_t kUiNameShooterWorkStateTitle[3] = {
@@ -109,16 +113,12 @@ const uint8_t kUiNameShooterWorkStateContent[3] = {
     0x00, 0x00, 0x81}; ///< 发射机构工作状态内容
 
 const uint8_t kUiNameFeedAngTitle[3] = {0x00, 0x00, 0x82}; ///< 拨盘角度标题
-const uint8_t kUiNameFeedAngFdb[3] = {0x00, 0x00, 0x83};   ///< 拨盘角度反馈
-const uint8_t kUiNameFeedAngRef[3] = {0x00, 0x00, 0x84};   ///< 拨盘角度期望
-const uint8_t kUiNameFeedStuck[3] = {0x00, 0x00, 0x85};    ///< 拨盘堵转提示
+const uint8_t kUiNameFeedStuck[3] = {0x00, 0x00, 0x83};    ///< 拨盘堵转提示
 
-const uint8_t kUiNameFricSpdTitle[3] = {0x00, 0x00, 0x86};   ///< 摩擦轮转速标题
-const uint8_t kUiNameFricSpdContent[3] = {0x00, 0x00, 0x87}; ///< 摩擦轮转速反馈
-const uint8_t kUiNameFricSpdRef[3] = {0x00, 0x00, 0x88};     ///< 摩擦轮转速期望
-const uint8_t kUiNameFricStuck[3] = {0x00, 0x00, 0x89};      ///< 摩擦轮堵转提示
+const uint8_t kUiNameFricSpdTitle[3] = {0x00, 0x00, 0x84}; ///< 摩擦轮转速标题
+const uint8_t kUiNameFricStuck[3] = {0x00, 0x00, 0x85};    ///< 摩擦轮堵转提示
 
-const uint8_t kUiNameShooterHeat[3] = {0x00, 0x00, 0x80}; ///< 发射机构热量
+const uint8_t kUiNameShooterHeat[3] = {0x00, 0x00, 0x86}; ///< 发射机构热量
 
 // 瞄准线 正中
 // const uint16_t kUiAimLineX = 987;
@@ -135,30 +135,16 @@ const uint8_t kUiNameShooterHeat[3] = {0x00, 0x00, 0x80}; ///< 发射机构热�
 // const uint8_t kUiNameAimLineH5m[3] = {0x00, 0x00, 0x8C};   ///< 瞄准线水平 5m
 // const uint8_t kUiNameAimLineH8m[3] = {0x00, 0x00, 0x8D};   ///< 瞄准线水平 8m
 // const uint8_t kuiNameAimLineH10m[3] = {0x00, 0x00, 0x8E};  ///< 瞄准线水平
-// 10m const uint8_t kuiNameAimLineH15m[3] = {0x00, 0x00, 0x8F};  ///<
-// 瞄准线水平 15m mini gimbal
-const uint8_t kUiNameScopeWorkStateTitle[3] = {0x00, 0x00,
-                                               0xC0}; ///< 小云台工作状态标题
-const uint8_t kUiNameScopeWorkStateContent[3] = {0x00, 0x00,
-                                                 0xC1}; ///< 小云台工作状态内容
-
-const uint8_t kUiNameScopeAngTitle[3] = {0x00, 0x00,
-                                         0xC2}; ///< 小云台俯仰角度标题
-const uint8_t kUiNameScopeAngPreSet[3] = {0x00, 0x00,
-                                          0xC3}; ///< 当前小云台俯仰角度预设值
-const uint8_t kUiNameScopeAngNow[3] = {0x00, 0x00,
-                                       0xC4}; ///< 当前小云台俯仰额外俯仰角
+// 10m const uint8_t kuiNameAimLineH15m[3] = {0x00, 0x00, 0x8F};  ///<瞄准线水平
+// 15m mini gimbal
 
 // vision
-const uint8_t kUiNameVisionBox1[3] = {0x00, 0x00, 0xE0};  ///< 视觉相机视场框
-const uint8_t kUiNameVisionBox2[3] = {0x00, 0x00, 0xE1}; ///< 视觉相机目标框
-const uint8_t kUiNameVisionBox3[3] = {0x00, 0x00, 0xE2}; ///< 视觉相机目标框
-const uint8_t kUiNameVisionBox4[3] = {0x00, 0x00, 0xE3}; ///< 视觉相机目标框
-const uint8_t kUiNameVisionTgt[3] = {0x00, 0x00, 0xE1};  ///< 视觉相机目标框
+const uint8_t kUiNameVisionBox[3] = {0x00, 0x00, 0xE0}; ///< 视觉相机视场框
+const uint8_t kUiNameVisionTgt[3] = {0x00, 0x00, 0xE1}; ///< 视觉相机目标框
 
 // 安全过洞参数
-const float ksafepitchmin = 0.0; // todo
-const float ksafepitchmax = 0.1; // todo
+const float ksafepitchmin = 0.0; // TODO：待标定
+const float ksafepitchmax = 0.1; // TODO
 #pragma endregion names of graphics
 
 /* Private types -------------------------------------------------------------*/
@@ -207,10 +193,10 @@ bool UiDrawer::encodeStaticUi(uint8_t *data_ptr, size_t &data_len,
   case kSuiDelAll:
     return encodeDelAll(data_ptr, data_len);
     break;
-  // case kSuiPassLinePkgGroup1:
+  case kSuiPkgGroup1:
   //   return encodeStaticPkgGroup1(data_ptr, data_len, opt);
-  //   break;
-  case kSuiPassLinePkgGroup2:
+    break;
+  case kSuiPkgGroup2:
     return encodeStaticPkgGroup2(data_ptr, data_len, opt);
     break;
   case kSuiChassisTitle:
@@ -265,6 +251,7 @@ bool UiDrawer::encodeDynamicUi(uint8_t *data_ptr, size_t &data_len,
     }
 
     break;
+
   case kDuiGimbalContent:
     if (opt == hello_world::referee::GraphicOperation::kModify) {
       if (last_gimbal_work_state_ == gimbal_work_state_ &&
@@ -277,7 +264,8 @@ bool UiDrawer::encodeDynamicUi(uint8_t *data_ptr, size_t &data_len,
     } else {
       return true;
     }
-    // res = encodeGimbalWorkStateContent(data_ptr, data_len, opt);
+
+    res = encodeGimbalWorkStateContent(data_ptr, data_len, opt);
     if (res == true) {
       last_gimbal_work_state_ = gimbal_work_state_;
       last_gimbal_working_mode_ = gimbal_working_mode_;
@@ -298,7 +286,7 @@ bool UiDrawer::encodeDynamicUi(uint8_t *data_ptr, size_t &data_len,
     } else {
       return true;
     }
-    // res = encodeShooterWorkStateContent(data_ptr, data_len, opt);
+    res = encodeShooterWorkStateContent(data_ptr, data_len, opt);
     if (res == true) {
       last_shooter_work_state_ = shooter_work_state_;
       last_shooter_working_mode_ = shooter_working_mode_;
@@ -359,87 +347,35 @@ bool UiDrawer::encodeDelAll(uint8_t *data_ptr, size_t &data_len) {
 // };
 bool UiDrawer::encodeStaticPkgGroup2(uint8_t *data_ptr, size_t &data_len,
                                      GraphicOperation opt) {
-  // 为满足过洞需求，将行车线修改为动态
-  //  hello_world::referee::StraightLine g_pass_line_left, g_pass_line_right;
-  //  genChassisPassLineLeft(g_pass_line_left);
-  //  g_pass_line_left.setOperation(opt);
-  //  genChassisPassLineRight(g_pass_line_right);
-  //  g_pass_line_right.setOperation(opt);
-
   // 新增视觉框
-  hello_world::referee::Rectangle g_vision_box1;
-  genVisionbox1(g_vision_box1);
-  // genVisionbox2(g_vision_box2);
-  // genVisionbox3(g_vision_box3);
-  // genVisionbox4(g_vision_box4);
-  g_vision_box1.setOperation(opt);
-  // g_vision_box2.setOperation(opt);
-  // g_vision_box3.setOperation(opt);
-  // g_vision_box4.setOperation(opt);
+  hello_world::referee::Rectangle g_vision_box;
+  genVisionbox(g_vision_box);
+  g_vision_box.setOperation(opt);
 
   hello_world::referee::InterGraphic1Package pkg;
   pkg.setSenderId(static_cast<uint16_t>(sender_id_));
-  pkg.setRectangle(g_vision_box1);
-  // pkg.setStraightLineAt(g_pass_line_left, 0);
-  // pkg.setStraightLineAt(g_pass_line_right, 1);
-  // pkg.setStraightLineAt(g_vision_box1, 0);
-  // pkg.setStraightLineAt(g_vision_box2, 1);
-  // pkg.setStraightLineAt(g_vision_box3, 2);
-  // pkg.setStraightLineAt(g_vision_box4, 3);
+  pkg.setRectangle(g_vision_box);
   return encodePkg(data_ptr, data_len, opt, pkg);
 };
+
 bool UiDrawer::encodeDynaUiPkgGroup1(uint8_t *data_ptr, size_t &data_len,
                                      GraphicOperation opt) {
-  // hello_world::referee::FloatingNumber g_pitch_fdb, g_yaw_fdb;
-  // hello_world::referee::Integer g_feed_fdb, g_fric_fdb;
-  // hello_world::referee::FloatingNumber g_mini_pitch_preset;
   hello_world::referee::Arc g_chassis_status_head, g_chassis_status_other;
 
-  // genGimbalJointAngPitchFdb(g_pitch_fdb);
-  // g_pitch_fdb.setOperation(opt);
-
-  // genGimbalJointAngYawFdb(g_yaw_fdb);
-  // g_yaw_fdb.setOperation(opt);
-
-  // genShooterFeedAngFdb(g_feed_fdb);
-  // g_feed_fdb.setOperation(opt);
-
-  // genShooterFricSpdFdb(g_fric_fdb);
-  // g_fric_fdb.setOperation(opt);
-
-  genChassisStatus(g_chassis_status_head, g_chassis_status_other);
+  genChassisDir(g_chassis_status_head, g_chassis_status_other);
   g_chassis_status_head.setOperation(opt);
   g_chassis_status_other.setOperation(opt);
 
   hello_world::referee::InterGraphic2Package pkg;
   pkg.setSenderId(static_cast<uint16_t>(sender_id_));
-  // pkg.setFloatingNumberAt(g_pitch_fdb, 0);
-  // pkg.setFloatingNumberAt(g_yaw_fdb, 1);
-  // pkg.setIntegerAt(g_feed_fdb, 2);
-  // pkg.setIntegerAt(g_fric_fdb, 3);
-  // pkg.setFloatingNumberAt(g_mini_pitch_preset, 4);
   pkg.setArcAt(g_chassis_status_head, 0);
   pkg.setArcAt(g_chassis_status_other, 1);
   return encodePkg(data_ptr, data_len, opt, pkg);
 };
 bool UiDrawer::encodeDynaUiPkgGroup2(uint8_t *data_ptr, size_t &data_len,
                                      GraphicOperation opt) {
-  hello_world::referee::FloatingNumber g_pitch_ref, g_yaw_ref;
-  hello_world::referee::Integer g_feed_ref, g_fric_ref;
-  hello_world::referee::FloatingNumber g_mini_Pitch_now;
   hello_world::referee::Rectangle g_cap_pwr_percent_rect;
   hello_world::referee::FloatingNumber g_cap_pwr_percent_num;
-  // genGimbalJointAngPitchRef(g_pitch_ref);
-  // g_pitch_ref.setOperation(opt);
-
-  // genGimbalJointAngYawRef(g_yaw_ref);
-  // g_yaw_ref.setOperation(opt);
-
-  // genShooterFeedAngRef(g_feed_ref);
-  // g_feed_ref.setOperation(opt);
-
-  // genShooterFricSpdRef(g_fric_ref);
-  // g_fric_ref.setOperation(opt);
 
   genCapPwrPercent(g_cap_pwr_percent_rect, g_cap_pwr_percent_num);
   g_cap_pwr_percent_rect.setOperation(opt);
@@ -465,11 +401,6 @@ bool UiDrawer::encodeDynaUiPkgGroup2(uint8_t *data_ptr, size_t &data_len,
 
   hello_world::referee::InterGraphic5Package pkg;
   pkg.setSenderId(static_cast<uint16_t>(sender_id_));
-  // pkg.setFloatingNumberAt(g_pitch_ref, 0);
-  // pkg.setFloatingNumberAt(g_yaw_ref, 1);
-  // pkg.setIntegerAt(g_feed_ref, 2);
-  // pkg.setIntegerAt(g_fric_ref, 3);
-  // pkg.setFloatingNumberAt(g_mini_Pitch_now, 4);
   pkg.setRectangleAt(g_cap_pwr_percent_rect, 0);
   pkg.setFloatingNumberAt(g_cap_pwr_percent_num, 1);
   pkg.setStraightLineAt(g_pass_line_left, 2);
@@ -507,12 +438,12 @@ bool UiDrawer::encodeDynaUiPkgGroup3(uint8_t *data_ptr, size_t &data_len,
 bool UiDrawer::encodeChassisWorkStateTitle(uint8_t *data_ptr, size_t &data_len,
                                            GraphicOperation opt) {
   std::string str = "Chassis:";
-  hello_world::referee::String g = hello_world::referee::String(
-      kUiNameChassisWorkStateTitle, opt, kStaticUiLayer, kUiModuleStateColor,
-      kUiModuleStateAreaX1, kUiModuleStateAreaY1, kUiModuleStateFontSize,
-      str.length(), kUiModuleStateLineWidth);
+  hello_world::referee::String options = hello_world::referee::String(
+      kUiNameChassisWorkStateTitle, opt, kStaticUiLayer,
+      kUiModuleStateTitleColor, kUiModuleStateAreaX1, kUiModuleStateAreaY1,
+      kUiModuleStateFontSize, str.length(), kUiModuleStateLineWidth);
 
-  return encodeString(data_ptr, data_len, opt, g, str);
+  return encodeString(data_ptr, data_len, opt, options, str);
 };
 
 /**
@@ -524,22 +455,21 @@ bool UiDrawer::encodeChassisWorkStateContent(uint8_t *data_ptr,
   std::string str = "Unknown";
   if (chassis_work_state_ != PwrState::kWorking) {
     str = PwrStateToStr(chassis_work_state_);
-
   } else {
     str = Chassis::WorkingModeToStr(chassis_working_mode_) + "-" +
           CtrlModeSrcToStr(chassis_ctrl_mode_, chassis_manual_ctrl_src_);
   }
 
-  hello_world::referee::String g = hello_world::referee::String(
-      kUiNameChassisWorkStateContent, opt, kDynamicUiLayer, kUiModuleStateColor,
-      kUiModuleStateAreaX3, kUiModuleStateAreaY1, kUiModuleStateFontSize,
-      str.length(), kUiModuleStateLineWidth);
+  hello_world::referee::String options = hello_world::referee::String(
+      kUiNameChassisWorkStateContent, opt, kDynamicUiLayer,
+      kUiModuleStateContentColor, kUiModuleStateAreaX2_1, kUiModuleStateAreaY1,
+      kUiModuleStateFontSize, str.length(), kUiModuleStateLineWidth);
 
-  return encodeString(data_ptr, data_len, opt, g, str);
+  return encodeString(data_ptr, data_len, opt, options, str);
 };
 
-void UiDrawer::genChassisStatus(hello_world::referee::Arc &g_head,
-                                hello_world::referee::Arc &g_other) {
+void UiDrawer::genChassisDir(hello_world::referee::Arc &g_head,
+                             hello_world::referee::Arc &g_tail) {
   float now_head_ang = -theta_i2r_ * 180 / M_PI;
   float start_ang_head = now_head_ang - 40, end_ang_head = now_head_ang + 40;
   start_ang_head = hello_world::NormPeriodData(0, 360, start_ang_head);
@@ -560,12 +490,12 @@ void UiDrawer::genChassisStatus(hello_world::referee::Arc &g_head,
   g_head.setLineWidth(3);
   g_head.setLayer(kDynamicUiLayer);
 
-  g_other.setColor(hello_world::referee::Arc::Color::kCyan);
-  g_other.setAng(start_ang_other, end_ang_other);
-  g_other.setCenterPos(kUiChassisDirCircleX, kUiChassisDirCircleY);
-  g_other.setRadius(radius, radius);
-  g_other.setName(kUiNameChassisDirTail);
-  g_other.setLineWidth(3);
+  g_tail.setColor(hello_world::referee::Arc::Color::kCyan);
+  g_tail.setAng(start_ang_other, end_ang_other);
+  g_tail.setCenterPos(kUiChassisDirCircleX, kUiChassisDirCircleY);
+  g_tail.setRadius(radius, radius);
+  g_tail.setName(kUiNameChassisDirTail);
+  g_tail.setLineWidth(3);
   g_head.setLayer(kDynamicUiLayer);
 };
 
@@ -608,13 +538,13 @@ void UiDrawer::genChassisPassLineLeft(hello_world::referee::StraightLine &g) {
   uint16_t start_posX = 0;
   uint16_t end_posY = 0;
   g.setName(kuiNameChassisPassLineLeft);
-  end_posX = gimbal_joint_ang_pitch_fdb_ * -81.75 + 814.7;
+  end_posX = gimbal_joint_ang_pitch_fdb_ * (-81.75) + 814.7;
   start_posX = gimbal_joint_ang_pitch_fdb_ * 660.4 + 577.15;
-  end_posY = gimbal_joint_ang_pitch_fdb_ * -927.28 + 334.39;
+  end_posY = gimbal_joint_ang_pitch_fdb_ * (-927.28) + 334.39;
   g.setLayer(kDynamicUiLayer);
   g.setStartPos(start_posX, 0);
   g.setEndPos(end_posX, end_posY);
-  g.setColor(kUiModuleStateColor);
+  g.setColor(kUiPassLineColor);
   g.setLineWidth(3);
 };
 void UiDrawer::genChassisPassLineRight(hello_world::referee::StraightLine &g) {
@@ -628,7 +558,7 @@ void UiDrawer::genChassisPassLineRight(hello_world::referee::StraightLine &g) {
   g.setLayer(kDynamicUiLayer);
   g.setStartPos(start_posX, 0);
   g.setEndPos(end_posX, end_posY);
-  g.setColor(kUiModuleStateColor);
+  g.setColor(kUiPassLineColor);
   g.setLineWidth(3);
 };
 #pragma endregion
@@ -640,95 +570,35 @@ bool UiDrawer::encodeGimbalWorkStateTitle(uint8_t *data_ptr, size_t &data_len,
                                           UiDrawer::GraphicOperation opt) {
   std::string str = "Gimbal:";
 
-  hello_world::referee::String g = hello_world::referee::String(
-      kUiNameGimbalWorkStateTitle, opt, kStaticUiLayer, kUiModuleStateColor,
-      kUiModuleStateAreaX1, kUiModuleStateAreaY1 + kUiModuleStateAreaYDelta,
-      kUiModuleStateFontSize, str.length(), kUiModuleStateLineWidth);
-  return encodeString(data_ptr, data_len, opt, g, str);
+  hello_world::referee::String options = hello_world::referee::String(
+      kUiNameGimbalWorkStateTitle, opt, kStaticUiLayer,
+      kUiModuleStateTitleColor, kUiModuleStateAreaX1,
+      kUiModuleStateAreaY1 + kUiModuleStateAreaYDelta, kUiModuleStateFontSize,
+      str.length(), kUiModuleStateLineWidth);
+  return encodeString(data_ptr, data_len, opt, options, str);
 };
 /**
  * @brief 根据云台工作状态编码左上方 UI 字符串(`Gimbal:` 之后的内容)
  */
 bool UiDrawer::encodeGimbalWorkStateContent(uint8_t *data_ptr, size_t &data_len,
                                             UiDrawer::GraphicOperation opt) {
-  std::string str = "Unkown";
+  std::string str = "Unknown";
   if (gimbal_work_state_ != PwrState::kWorking) {
     str = PwrStateToStr(gimbal_work_state_);
   } else {
     str = Gimbal::WorkingModeToStr(gimbal_working_mode_) + "-" +
           CtrlModeSrcToStr(gimbal_ctrl_mode_, gimbal_manual_ctrl_src_);
   }
-  hello_world::referee::String g = hello_world::referee::String(
-      kUiNameGimbalWorkStateContent, opt, kDynamicUiLayer, kUiModuleStateColor,
-      kUiModuleStateAreaX3, kUiModuleStateAreaY1 + kUiModuleStateAreaYDelta,
-      kUiModuleStateFontSize, str.length(), kUiModuleStateLineWidth);
 
-  return encodeString(data_ptr, data_len, opt, g, str);
-};
-
-bool UiDrawer::encodeGimbalPitchTitle(uint8_t *data_ptr, size_t &data_len,
-                                      UiDrawer::GraphicOperation opt) {
-  std::string str = "P:";
-  hello_world::referee::String g = hello_world::referee::String(
-      kUiNameGimbalPitchTitle, opt, kStaticUiLayer, kUiModuleStateColor,
-      kUiModuleStateAreaX4, kUiModuleStateAreaY2, kUiModuleStateFontSize,
+  hello_world::referee::String options = hello_world::referee::String(
+      kUiNameGimbalWorkStateContent, opt, kDynamicUiLayer,
+      kUiModuleStateContentColor, kUiModuleStateAreaX2_2,
+      kUiModuleStateAreaY1 + kUiModuleStateAreaYDelta, kUiModuleStateFontSize,
       str.length(), kUiModuleStateLineWidth);
-  return encodeString(data_ptr, data_len, opt, g, str);
+
+  return encodeString(data_ptr, data_len, opt, options, str);
 };
 
-bool UiDrawer::encodeGimbalYawTitle(uint8_t *data_ptr, size_t &data_len,
-                                    UiDrawer::GraphicOperation opt) {
-  std::string str = "Y:";
-  hello_world::referee::String g = hello_world::referee::String(
-      kUiNameGimbalYawTitle, opt, kStaticUiLayer, kUiModuleStateColor,
-      kUiModuleStateAreaX4, kUiModuleStateAreaY2 + kUiModuleStateAreaYDelta,
-      kUiModuleStateFontSize, str.length(), kUiModuleStateLineWidth);
-  return encodeString(data_ptr, data_len, opt, g, str);
-};
-
-void UiDrawer::genGimbalJointAngPitchFdb(
-    hello_world::referee::FloatingNumber &g) {
-  g.setName(kUiNameGimbalPitchFdb);
-  g.setDisplayValue(gimbal_joint_ang_pitch_fdb_ * 180 / PI);
-  g.setStartPos(kUiModuleStateAreaX5, kUiModuleStateAreaY2);
-  g.setColor(kUiModuleStateColor);
-  g.setLayer(kDynamicUiLayer);
-  g.setFontSize(kUiModuleStateFontSize);
-  g.setLineWidth(kUiModuleStateLineWidth);
-};
-void UiDrawer::genGimbalJointAngPitchRef(
-    hello_world::referee::FloatingNumber &g) {
-  g.setName(kUiNameGimbalPitchRef);
-  g.setDisplayValue(gimbal_joint_ang_pitch_ref_ * 180 / PI);
-  g.setStartPos(kUiModuleStateAreaX5 + kUiModuleStateAreaXDeltaFloating,
-                kUiModuleStateAreaY2);
-  g.setColor(kUiModuleStateColor);
-  g.setLayer(kDynamicUiLayer);
-  g.setFontSize(kUiModuleStateFontSize);
-  g.setLineWidth(kUiModuleStateLineWidth);
-};
-void UiDrawer::genGimbalJointAngYawFdb(
-    hello_world::referee::FloatingNumber &g) {
-  g.setName(kUiNameGimbalYawFdb);
-  g.setDisplayValue(gimbal_joint_ang_yaw_fdb_ * 180 / PI);
-  g.setStartPos(kUiModuleStateAreaX5,
-                kUiModuleStateAreaY2 + kUiModuleStateAreaYDelta);
-  g.setColor(kUiModuleStateColor);
-  g.setLayer(kDynamicUiLayer);
-  g.setFontSize(kUiModuleStateFontSize);
-  g.setLineWidth(kUiModuleStateLineWidth);
-};
-void UiDrawer::genGimbalJointAngYawRef(
-    hello_world::referee::FloatingNumber &g) {
-  g.setName(kUiNameGimbalYawRef);
-  g.setDisplayValue(gimbal_joint_ang_yaw_ref_ * 180 / PI);
-  g.setStartPos(kUiModuleStateAreaX5 + kUiModuleStateAreaXDeltaFloating,
-                kUiModuleStateAreaY2 + kUiModuleStateAreaYDelta);
-  g.setColor(kUiModuleStateColor);
-  g.setLayer(kDynamicUiLayer);
-  g.setFontSize(kUiModuleStateFontSize);
-  g.setLineWidth(kUiModuleStateLineWidth);
-};
 void UiDrawer::genPassSafe(hello_world::referee::Circle &g, bool is_safe) {
   g.setName(kUiNamePassSafe);
   g.setCenterPos(kUiModuleStateAreaX3,
@@ -750,21 +620,22 @@ void UiDrawer::genPassSafe(hello_world::referee::Circle &g, bool is_safe) {
 bool UiDrawer::encodeFeedTitle(uint8_t *data_ptr, size_t &data_len,
                                UiDrawer::GraphicOperation opt) {
   std::string str = "Feed:";
-  hello_world::referee::String g = hello_world::referee::String(
-      kUiNameFeedAngTitle, opt, kStaticUiLayer, kUiModuleStateColor,
+  hello_world::referee::String options = hello_world::referee::String(
+      kUiNameFeedAngTitle, opt, kStaticUiLayer, kUiModuleStateTitleColor,
       kUiModuleStateAreaX1, kUiModuleStateAreaY1 + 4 * kUiModuleStateAreaYDelta,
       kUiModuleStateFontSize, str.length(), kUiModuleStateLineWidth);
-  return encodeString(data_ptr, data_len, opt, g, str);
+  return encodeString(data_ptr, data_len, opt, options, str);
 };
 bool UiDrawer::encodeFricTitle(uint8_t *data_ptr, size_t &data_len,
                                UiDrawer::GraphicOperation opt) {
   std::string str = "Fric:";
-  hello_world::referee::String g = hello_world::referee::String(
-      kUiNameFricSpdTitle, opt, kStaticUiLayer, kUiModuleStateColor,
+  hello_world::referee::String options = hello_world::referee::String(
+      kUiNameFricSpdTitle, opt, kStaticUiLayer, kUiModuleStateTitleColor,
       kUiModuleStateAreaX1, kUiModuleStateAreaY1 + 5 * kUiModuleStateAreaYDelta,
       kUiModuleStateFontSize, str.length(), kUiModuleStateLineWidth);
-  return encodeString(data_ptr, data_len, opt, g, str);
+  return encodeString(data_ptr, data_len, opt, options, str);
 };
+
 void UiDrawer::genShooterHeat(hello_world::referee::Arc &g) {
   float percent = heat_limit_ > 0 ? heat_ / heat_limit_ : 0.0f;
   percent = hello_world::Bound(percent, 0.0f, 1.0f);
@@ -785,47 +656,6 @@ void UiDrawer::genShooterHeat(hello_world::referee::Arc &g) {
   g.setLayer(kDynamicUiLayer);
   g.setLineWidth(percent == 0 ? 0 : 2);
 };
-void UiDrawer::genShooterFeedAngFdb(hello_world::referee::Integer &g) {
-  g.setName(kUiNameFeedAngFdb);
-  g.setDisplayValue(feed_ang_fdb_ * 180.0f / PI);
-  g.setStartPos(kUiModuleStateAreaX2,
-                kUiModuleStateAreaY1 + 4 * kUiModuleStateAreaYDelta);
-  g.setColor(kUiModuleStateColor);
-  g.setLayer(kDynamicUiLayer);
-  g.setFontSize(kUiModuleStateFontSize);
-  g.setLineWidth(kUiModuleStateLineWidth);
-};
-void UiDrawer::genShooterFeedAngRef(hello_world::referee::Integer &g) {
-  g.setName(kUiNameFeedAngRef);
-  g.setDisplayValue(feed_ang_ref_ * 180.0f / PI);
-  g.setStartPos(kUiModuleStateAreaX2 + kUiModuleStateAreaXDelta,
-                kUiModuleStateAreaY1 + 4 * kUiModuleStateAreaYDelta);
-  g.setColor(kUiModuleStateColor);
-  g.setLayer(kDynamicUiLayer);
-  g.setFontSize(kUiModuleStateFontSize);
-  g.setLineWidth(kUiModuleStateLineWidth);
-};
-void UiDrawer::genShooterFricSpdFdb(hello_world::referee::Integer &g) {
-  g.setName(kUiNameFricSpdContent);
-  g.setDisplayValue(fric_spd_fdb_);
-  g.setStartPos(kUiModuleStateAreaX2,
-                kUiModuleStateAreaY1 + 5 * kUiModuleStateAreaYDelta);
-  g.setColor(kUiModuleStateColor);
-  g.setLayer(kDynamicUiLayer);
-  g.setFontSize(kUiModuleStateFontSize);
-  g.setLineWidth(kUiModuleStateLineWidth);
-};
-void UiDrawer::genShooterFricSpdRef(hello_world::referee::Integer &g) {
-  g.setName(kUiNameFricSpdRef);
-  g.setDisplayValue(fric_spd_ref_);
-  g.setStartPos(kUiModuleStateAreaX2 + kUiModuleStateAreaXDelta,
-                kUiModuleStateAreaY1 + 5 * kUiModuleStateAreaYDelta);
-  g.setColor(kUiModuleStateColor);
-  g.setLayer(kDynamicUiLayer);
-  g.setFontSize(kUiModuleStateFontSize);
-  g.setLineWidth(kUiModuleStateLineWidth);
-};
-
 #pragma endregion
 
 #pragma region 倍镜云台
@@ -836,11 +666,12 @@ bool UiDrawer::encodeShooterWorkStateTitle(uint8_t *data_ptr, size_t &data_len,
                                            UiDrawer::GraphicOperation opt) {
   std::string str = "Shooter:";
 
-  hello_world::referee::String g = hello_world::referee::String(
-      kUiNameShooterWorkStateTitle, opt, kStaticUiLayer, kUiModuleStateColor,
-      kUiModuleStateAreaX1, kUiModuleStateAreaY1 + 2 * kUiModuleStateAreaYDelta,
+  hello_world::referee::String options = hello_world::referee::String(
+      kUiNameShooterWorkStateTitle, opt, kStaticUiLayer,
+      kUiModuleStateTitleColor, kUiModuleStateAreaX1,
+      kUiModuleStateAreaY1 + 2 * kUiModuleStateAreaYDelta,
       kUiModuleStateFontSize, str.length(), kUiModuleStateLineWidth);
-  return encodeString(data_ptr, data_len, opt, g, str);
+  return encodeString(data_ptr, data_len, opt, options, str);
 };
 /**
  * @brief 根据射门工作状态编码左上方 UI 字符串(`Shooter:` 之后的内容)
@@ -848,7 +679,7 @@ bool UiDrawer::encodeShooterWorkStateTitle(uint8_t *data_ptr, size_t &data_len,
 bool UiDrawer::encodeShooterWorkStateContent(uint8_t *data_ptr,
                                              size_t &data_len,
                                              UiDrawer::GraphicOperation opt) {
-  std::string str = "Unkown";
+  std::string str = "Unknown";
   if (shooter_work_state_ != PwrState::kWorking) {
     str = PwrStateToStr(shooter_work_state_);
   } else {
@@ -856,12 +687,13 @@ bool UiDrawer::encodeShooterWorkStateContent(uint8_t *data_ptr,
           CtrlModeSrcToStr(shooter_ctrl_mode_, shooter_manual_ctrl_src_);
   }
 
-  hello_world::referee::String g = hello_world::referee::String(
-      kUiNameShooterWorkStateContent, opt, kDynamicUiLayer, kUiModuleStateColor,
-      kUiModuleStateAreaX3, kUiModuleStateAreaY1 + 2 * kUiModuleStateAreaYDelta,
+  hello_world::referee::String options = hello_world::referee::String(
+      kUiNameShooterWorkStateContent, opt, kDynamicUiLayer,
+      kUiModuleStateContentColor, kUiModuleStateAreaX3,
+      kUiModuleStateAreaY1 + 2 * kUiModuleStateAreaYDelta,
       kUiModuleStateFontSize, str.length(), kUiModuleStateLineWidth);
 
-  return encodeString(data_ptr, data_len, opt, g, str);
+  return encodeString(data_ptr, data_len, opt, options, str);
 };
 
 #pragma endregion
@@ -869,15 +701,15 @@ bool UiDrawer::encodeShooterWorkStateContent(uint8_t *data_ptr,
 
 void UiDrawer::genVisTgt(hello_world::referee::Circle &g) {
   g.setName(kUiNameVisionTgt);
-  g.setCenterPos(vis_tgt_x_ + 77, 1080 - vis_tgt_y_ - 36);
+  g.setCenterPos(960 + vis_tgt_x_ - 150, 540 - vis_tgt_y_);
   g.setRadius(35);
   g.setColor(hello_world::referee::String::Color::kGreen);
   g.setLayer(hello_world::referee::GraphicLayer::k1);
   g.setLineWidth(2);
 };
-void UiDrawer::genVisionbox1(hello_world::referee::Rectangle &g_rect) {
-  uint16_t start_x = kPixelCenterXVisionBox - kPixelVisionBoxWidth / 2;
-  uint16_t end_x = start_x + kPixelVisionBoxWidth;
+void UiDrawer::genVisionbox(hello_world::referee::Rectangle &g_rect) {
+  // uint16_t start_x = kPixelCenterXVisionBox - kPixelVisionBoxWidth / 2;
+  // uint16_t end_x = start_x + kPixelVisionBoxWidth;
 
   if (is_vision_valid_) {
     g_rect.setColor(hello_world::referee::String::Color::kPurple);
@@ -885,63 +717,13 @@ void UiDrawer::genVisionbox1(hello_world::referee::Rectangle &g_rect) {
     g_rect.setColor(hello_world::referee::String::Color::kWhite);
   }
 
-  g_rect.setName(kUiNameVisionBox1);
+  g_rect.setName(kUiNameVisionBox);
   // g_rect.setStartPos(start_x, kPixelCenterYVisionBox - kPixelVisionBoxHeight
   // / 2);
-  g_rect.setStartPos(start_x, 250);
+  g_rect.setStartPos(655, 250);
   // g_rect.setEndPos(end_x, kPixelCenterYVisionBox + kPixelVisionBoxHeight /
   // 2);
-  g_rect.setEndPos(1269, kPixelCenterYVisionBox + kPixelVisionBoxHeight / 2);
-  g_rect.setLayer(kStaticUiLayer);
-  g_rect.setLineWidth(1.5);
-};
-void UiDrawer::genVisionbox2(hello_world::referee::Rectangle &g_rect) {
-  uint16_t start_x = kPixelCenterXVisionBox - kPixelVisionBoxWidth / 2;
-  uint16_t end_x = start_x + kPixelVisionBoxWidth;
-
-  if (is_vision_valid_) {
-    g_rect.setColor(hello_world::referee::String::Color::kPurple);
-  } else {
-    g_rect.setColor(hello_world::referee::String::Color::kWhite);
-  }
-
-  g_rect.setName(kUiNameVisionBox2);
-  g_rect.setStartPos(start_x,
-                     kPixelCenterYVisionBox - kPixelVisionBoxHeight / 2);
-  g_rect.setEndPos(end_x, kPixelCenterYVisionBox - kPixelVisionBoxHeight / 2);
-  g_rect.setLayer(kStaticUiLayer);
-  g_rect.setLineWidth(1.5);
-};
-void UiDrawer::genVisionbox3(hello_world::referee::Rectangle &g_rect) {
-  uint16_t start_x = kPixelCenterXVisionBox - kPixelVisionBoxWidth / 2;
-  uint16_t end_x = start_x + kPixelVisionBoxWidth;
-
-  if (is_vision_valid_) {
-    g_rect.setColor(hello_world::referee::String::Color::kPurple);
-  } else {
-    g_rect.setColor(hello_world::referee::String::Color::kWhite);
-  }
-
-  g_rect.setName(kUiNameVisionBox3);
-  g_rect.setStartPos(end_x, kPixelCenterYVisionBox - kPixelVisionBoxHeight / 2);
-  g_rect.setEndPos(end_x, kPixelCenterYVisionBox + kPixelVisionBoxHeight / 2);
-  g_rect.setLayer(kStaticUiLayer);
-  g_rect.setLineWidth(1.5);
-};
-void UiDrawer::genVisionbox4(hello_world::referee::Rectangle &g_rect) {
-  uint16_t start_x = kPixelCenterXVisionBox - kPixelVisionBoxWidth / 2;
-  uint16_t end_x = start_x + kPixelVisionBoxWidth;
-
-  if (is_vision_valid_) {
-    g_rect.setColor(hello_world::referee::String::Color::kPurple);
-  } else {
-    g_rect.setColor(hello_world::referee::String::Color::kWhite);
-  }
-
-  g_rect.setName(kUiNameVisionBox4);
-  g_rect.setStartPos(start_x,
-                     kPixelCenterYVisionBox + kPixelVisionBoxHeight / 2);
-  g_rect.setEndPos(end_x, kPixelCenterYVisionBox + kPixelVisionBoxHeight / 2);
+  g_rect.setEndPos(1269, 651);
   g_rect.setLayer(kStaticUiLayer);
   g_rect.setLineWidth(1.5);
 };

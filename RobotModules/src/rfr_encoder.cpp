@@ -6,7 +6,8 @@
  * @par last editor  ZhouShichan (zsc19823382069@163.com)
  * @version   1.0.0
  *
- * @copyright Copyright (c) 2024 Hello World Team, Zhejiang University. All Rights Reserved.
+ * @copyright Copyright (c) 2024 Hello World Team, Zhejiang University. All
+ * Rights Reserved.
  *
  * @attention
  *
@@ -19,12 +20,11 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "rfr_encoder.hpp"
-#include "rfr_crc.hpp"
+#include "../prv/rfr_crc.hpp"  // TODO:CmakeList里面，prv被认为是私有文件夹，指定后才能引用
+// #include "../../HW-Components/devices/referee/prv/rfr_crc.hpp" // 基于项目根目录的相对路径
 
-namespace hello_world
-{
-namespace referee
-{
+namespace hello_world {
+namespace referee {
 using namespace internal;
 /* Exported macro ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
@@ -35,10 +35,10 @@ using namespace internal;
 /* Private function prototypes -----------------------------------------------*/
 /* Exported function definitions ---------------------------------------------*/
 
-bool RfrEncoder::encodeFrame(
-    ProtocolTxPackage *pkg_ptr, uint8_t *frame_ptr, size_t *frame_len_ptr)
-{
-  HW_ASSERT(pkg_ptr != nullptr, "Invalid ProtocolTxPackage pointer %p", pkg_ptr);
+bool RfrEncoder::encodeFrame(ProtocolTxPackage *pkg_ptr, uint8_t *frame_ptr,
+                             size_t *frame_len_ptr) {
+  HW_ASSERT(pkg_ptr != nullptr, "Invalid ProtocolTxPackage pointer %p",
+            pkg_ptr);
   HW_ASSERT(frame_ptr != nullptr, "Invalid frame_ptr pointer %p", frame_ptr);
   HW_ASSERT(frame_len_ptr != nullptr, "Invalid frame_len_ptr pointer %p",
             frame_len_ptr);
@@ -70,5 +70,5 @@ bool RfrEncoder::encodeFrame(
   return true;
 }
 /* Private function definitions ----------------------------------------------*/
-}  // namespace referee
-}  // namespace hello_world
+} // namespace referee
+} // namespace hello_world

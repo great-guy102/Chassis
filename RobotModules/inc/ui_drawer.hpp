@@ -53,17 +53,11 @@ class UiDrawer
   
   enum StaticUiIdx {
     kSuiDelAll = 0,
-    kSuiPassLinePkgGroup1,
-    kSuiPassLinePkgGroup2,
+    kSuiPkgGroup1, //TODO：瞄准距离参考线
+    kSuiPkgGroup2, //自瞄范围参考框
     kSuiChassisTitle,
     kSuiGimbalTitle,
     kSuiShooterTitle,
-    kSuiScopeTitle,
-    kSuiFeedAngTitle,
-    kSuiFricSpdTitle,
-    kSuiScopeAngTitle,
-    kSuiPitchAngTitle,
-    kSuiYawAngTitle,
     kSuiPkgNum,
   };
 
@@ -71,7 +65,6 @@ class UiDrawer
     kDuiChassisContent,
     kDuiGimbalContent,
     kDuiShooterContent,
-    kDuiScopeContent,
     kDuiPkgGroup1,  ///< 云台 pitch yaw 角度反馈，拨盘角度反馈，摩擦轮转速反馈，超电，底盘朝向(2)
     kDuiPkgGroup2,  ///< 云台 pitch yaw 角度期望，拨盘角度期望，摩擦轮转速期望，小云台预设值，小云台当前俯仰角度
     kDuiPkgGroup3,
@@ -122,7 +115,7 @@ class UiDrawer
       chassis_working_mode_ = mode;
     }
   }
-  void setChassisHeadDir(float theta_i2r) { theta_i2r_ = theta_i2r; }
+  void setChassisThetaI2r(float theta_i2r) { theta_i2r_ = theta_i2r; }
 
   void setGimbalWorkState(FsmWorkState state)
   {
@@ -153,9 +146,7 @@ class UiDrawer
     }
   }
   void setGimbalJointAngPitchFdb(float pitch) { gimbal_joint_ang_pitch_fdb_ = pitch; }
-  void setGimbalJointAngPitchRef(float pitch) { gimbal_joint_ang_pitch_ref_ = pitch; }
   void setGimbalJointAngYawFdb(float yaw) { gimbal_joint_ang_yaw_fdb_ = yaw; }
-  void setGimbalJointAngYawRef(float yaw) { gimbal_joint_ang_yaw_ref_ = yaw; }
 
   void setShooterWorkState(FsmWorkState state)
   {
@@ -187,25 +178,21 @@ class UiDrawer
   }
   void setHeat(float heat) { heat_ = heat; }
   void setHeatLimit(float limit) { heat_limit_ = limit; }
-  void setFeedAngFdb(float ang) { feed_ang_fdb_ = ang; }
-  void setFeedAngRef(float ang) { feed_ang_ref_ = ang; }
-  void setFeedStuckFlag(bool flag)
+  void setShooterStuckFlag(bool flag)
   {
-    if (flag != feed_stuck_flag_) {
-      last_feed_stuck_flag_ = feed_stuck_flag_;
-      feed_stuck_flag_ = flag;
-    }
-  }
-  void setFricSpdFdb(float spd) { fric_spd_fdb_ = spd; }
-  void setFricSpdRef(float spd) { fric_spd_ref_ = spd; }
-  void setFricStuckFlag(bool flag)
-  {
-    if (flag != fric_stuck_flag_) {
-      last_fric_stuck_flag_ = fric_stuck_flag_;
-      fric_stuck_flag_ = flag;
+    if (flag != shooter_stuck_flag_) {
+      last_shooter_stuck_flag_ = shooter_stuck_flag_;
+      shooter_stuck_flag_ = flag;
     }
   }
 
+  void setFeedStuckStatus(uint8_t status)
+  {
+    if (status != feed_stuck_status_) {
+      last_feed_stuck_status_ = feed_stuck_status_;
+      feed_stuck_status_ = status;
+    }
+  }
 
   void setCapPwrPercent(float percent) { cap_pwr_percent_ = percent; }
 
@@ -243,8 +230,6 @@ class UiDrawer
 
   bool encodeFeedTitle(uint8_t* data_ptr, size_t& data_len, GraphicOperation opt);
   bool encodeFricTitle(uint8_t* data_ptr, size_t& data_len, GraphicOperation opt);
-  bool encodeGimbalPitchTitle(uint8_t* data_ptr, size_t& data_len, GraphicOperation opt);
-  bool encodeGimbalYawTitle(uint8_t* data_ptr, size_t& data_len, GraphicOperation opt);
 
   bool encodeStaticPkgGroup1(uint8_t* data_ptr, size_t& data_len, GraphicOperation opt);
   bool encodeStaticPkgGroup2(uint8_t* data_ptr, size_t& data_len, GraphicOperation opt);
@@ -254,33 +239,20 @@ class UiDrawer
   bool encodeDynaUiPkgGroup3(uint8_t* data_ptr, size_t& data_len, GraphicOperation opt);
   bool encodeDynaUiPkgGroup4(uint8_t* data_ptr, size_t& data_len, GraphicOperation opt);
 
-  void genChassisStatus(hello_world::referee::Arc& g_head, hello_world::referee::Arc& g_other);
+  void genChassisDir(hello_world::referee::Arc& g_head, hello_world::referee::Arc& g_tail);
   void genChassisPassLineLeft(hello_world::referee::StraightLine& g);
   void genChassisPassLineRight(hello_world::referee::StraightLine& g);
 
   void genGimbalJointAngPitchFdb(hello_world::referee::FloatingNumber& g);
-  void genGimbalJointAngPitchRef(hello_world::referee::FloatingNumber& g);
   void genGimbalJointAngYawFdb(hello_world::referee::FloatingNumber& g);
-  void genGimbalJointAngYawRef(hello_world::referee::FloatingNumber& g);
   void genPassSafe(hello_world::referee::Circle& g, bool is_safe);
 
   void genShooterHeat(hello_world::referee::Arc& g);
-  void genShooterFeedAngFdb(hello_world::referee::FloatingNumber& g);
-  void genShooterFeedAngFdb(hello_world::referee::Integer& g);
-  void genShooterFeedAngRef(hello_world::referee::FloatingNumber& g);
-  void genShooterFeedAngRef(hello_world::referee::Integer& g);
-  void genShooterFricSpdFdb(hello_world::referee::FloatingNumber& g);
-  void genShooterFricSpdFdb(hello_world::referee::Integer& g);
-  void genShooterFricSpdRef(hello_world::referee::FloatingNumber& g);
-  void genShooterFricSpdRef(hello_world::referee::Integer& g);
 
   void genCapPwrPercent(hello_world::referee::Rectangle& g_rect, hello_world::referee::FloatingNumber& g_num);
 
   void genVisTgt(hello_world::referee::Circle& g);
-  void genVisionbox1(hello_world::referee::Rectangle& g_rect);
-  void genVisionbox2(hello_world::referee::Rectangle& g_rect);
-  void genVisionbox3(hello_world::referee::Rectangle& g_rect);
-  void genVisionbox4(hello_world::referee::Rectangle& g_rect);
+  void genVisionbox(hello_world::referee::Rectangle& g_rect);
 
   // encode
   size_t ui_idx_ = 0;
@@ -308,8 +280,7 @@ class UiDrawer
   FsmManualCtrlSrc last_gimbal_manual_ctrl_src_ = FsmManualCtrlSrc::kRc;
   GimbalWorkingMode gimbal_working_mode_ = GimbalWorkingMode::Normal;
   GimbalWorkingMode last_gimbal_working_mode_ = GimbalWorkingMode::Normal;
-  float gimbal_joint_ang_pitch_fdb_ = 0.0f, gimbal_joint_ang_pitch_ref_ = 0.0f;
-  float gimbal_joint_ang_yaw_fdb_ = 0.0f, gimbal_joint_ang_yaw_ref_ = 0.0f;
+  float gimbal_joint_ang_pitch_fdb_ = 0.0f, gimbal_joint_ang_yaw_fdb_ = 0.0f;
 
   // var for shooter
   FsmWorkState shooter_work_state_ = FsmWorkState::kDead;
@@ -320,13 +291,9 @@ class UiDrawer
   FsmManualCtrlSrc last_shooter_manual_ctrl_src_ = FsmManualCtrlSrc::kRc;
   ShooterWorkingMode shooter_working_mode_ = ShooterWorkingMode::kShoot;
   ShooterWorkingMode last_shooter_working_mode_ = ShooterWorkingMode::kShoot;
-  bool feed_stuck_flag_ = false, last_feed_stuck_flag_ = false;
-  bool fric_stuck_flag_ = false, last_fric_stuck_flag_ = false;
-  float heat_ = 0;
-  float heat_limit_ = 100;
-  float feed_ang_fdb_ = 0.0f, feed_ang_ref_ = 0.0f;
-  float fric_spd_fdb_ = 0.0f, fric_spd_ref_ = 0.0f;
-
+  bool shooter_stuck_flag_ = false, last_shooter_stuck_flag_ = false;
+  uint8_t feed_stuck_status_ = 0, last_feed_stuck_status_; // 记录卡弹状态
+  float heat_ = 0,heat_limit_ = 100;
 
   // var for super capacitor
   float cap_pwr_percent_ = 0;

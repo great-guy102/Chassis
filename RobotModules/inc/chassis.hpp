@@ -134,7 +134,7 @@ public:
       return "Follow";
     if (mode == Chassis::WorkingMode::Gyro)
       return "Gyro";
-    return "ErrCWM";
+    return "Unknown";
   };
 
   enum class GyroDir : int8_t {
