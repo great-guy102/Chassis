@@ -138,9 +138,9 @@ public:
     }
   }
   void setGimbalJointAngPitchFdb(float pitch) {
-    gimbal_joint_ang_pitch_fdb_ = pitch;
+    gimbal_joint_angle_pitch_fdb_ = pitch;
   }
-  void setGimbalJointAngYawFdb(float yaw) { gimbal_joint_ang_yaw_fdb_ = yaw; }
+  void setGimbalJointAngYawFdb(float yaw) { gimbal_joint_angle_yaw_fdb_ = yaw; }
 
   void setShooterWorkState(FsmWorkState state) {
     if (state != shooter_work_state_) {
@@ -187,9 +187,13 @@ public:
   void setVisTgtX(uint16_t x, bool valid) { vis_tgt_x_ = valid ? x : -1; }
   void setVisTgtY(uint16_t y, bool valid) { vis_tgt_y_ = valid ? y : -1; }
 
-  void setisvisionvalid(bool isvisionvalid) {
-    is_vision_valid_ = isvisionvalid;
+  void setIsVisionValid(bool is_vision_valid) {
+    is_vision_valid_ = is_vision_valid;
   }
+
+  void setIsArmorHit(bool is_armor_hit) { is_armor_hit_ = is_armor_hit; }
+  void setArmorIdHit(uint8_t armor_id_hit) { armor_id_hit_ = armor_id_hit; }
+
 #pragma endregion
 private:
   template <typename T>
@@ -257,6 +261,8 @@ private:
   void genVisTgt(hello_world::referee::Circle &g);
   void genVisionbox(hello_world::referee::Rectangle &g_rect);
 
+  void genArmorHit(hello_world::referee::Arc &g_hit);
+
   // encode
   size_t ui_idx_ = 0;
   size_t n_added_ = 0;
@@ -283,7 +289,8 @@ private:
   FsmManualCtrlSrc last_gimbal_manual_ctrl_src_ = FsmManualCtrlSrc::kRc;
   GimbalWorkingMode gimbal_working_mode_ = GimbalWorkingMode::Normal;
   GimbalWorkingMode last_gimbal_working_mode_ = GimbalWorkingMode::Normal;
-  float gimbal_joint_ang_pitch_fdb_ = 0.0f, gimbal_joint_ang_yaw_fdb_ = 0.0f;
+  float gimbal_joint_angle_pitch_fdb_ = 0.0f,
+        gimbal_joint_angle_yaw_fdb_ = 0.0f;
 
   // var for shooter
   FsmWorkState shooter_work_state_ = FsmWorkState::kDead;
@@ -305,6 +312,14 @@ private:
   int16_t vis_tgt_x_ = 0; ///< 视觉瞄准目标的 x 坐标，单位为像素，负数为无效值
   int16_t vis_tgt_y_ = 0; ///< 视觉瞄准目标的 y 坐标，单位为像素，负数为无效值
   bool is_vision_valid_ = false; // 视觉是否瞄到
+
+  // var for hurt warning
+  bool is_armor_hit_ = false; ///< 装甲是否被击中
+  uint8_t
+      armor_id_hit_ = 4,
+      last_armor_id_hit_ =
+          4; ///< 被击中装甲的 ID,初始设置>3,防止小陀螺模式首次受击无法触发提示
+  float last_armor_angle_hit_ = 0.0f;
 };
 /* Exported variables --------------------------------------------------------*/
 /* Exported function prototypes ----------------------------------------------*/

@@ -59,6 +59,12 @@ const hello_world::referee::RobotShooterData kDefaultRobotShooterData = {
     .launching_frequency = 0, ///< 弹丸射频，单位：Hz
     .bullet_speed = 15.5f,    ///< 弹丸初速度，单位：m/s
 };
+const hello_world::referee::RobotHurtData kDefaultRobotHurtData = {
+    .module_id = 0, ///< 模块ID
+    .hp_deduction_reason = static_cast<uint8_t>(
+        hello_world::referee::HpDeductionReason::
+            kArmorHit), ///< 扣血原因，@see HpDeductionReason
+};
 /* Private types -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 /* External variables --------------------------------------------------------*/
@@ -100,22 +106,24 @@ void Robot::updateRcData() {
   }
 };
 
+// float inf1 = 0.0f, inf2 = 0.0f; //TODO：测试
+// Robot::HurtPkg::Data rhr_data = kDefaultRobotHurtData; //TODO:测试
 void Robot::updateRfrData() {
   HW_ASSERT(referee_ptr_ != nullptr, "RFR pointer is null", referee_ptr_);
   HW_ASSERT(chassis_ptr_ != nullptr, "Chassis FSM pointer is null",
             chassis_ptr_);
 
-  Chassis::RfrData chassis_rfr_data;
-
   PerformancePkg::Data rpp_data = kDefaultRobotPerformanceData;
   PowerHeatPkg::Data rph_data = kDefaultRobotPowerHeatData;
   ShooterPkg::Data rsp_data = kDefaultRobotShooterData;
+  HurtPkg::Data rhr_data = kDefaultRobotHurtData;
   static uint8_t rfr_bullet_shot_cnt = 0;
 
   if (!referee_ptr_->isOffline()) {
     rpp_data = rfr_performance_pkg_ptr_->getData();
     rph_data = rfr_power_heat_pkg_ptr_->getData();
     rsp_data = rfr_shooter_pkg_ptr_->getData();
+    rhr_data = rfr_hurt_pkg_ptr_->getData();
 
     if (!referee_ptr_->isOffline()) {
       if (!rfr_shooter_pkg_ptr_->isHandled()) {
@@ -132,6 +140,8 @@ void Robot::updateRfrData() {
   }
   ui_drawer_.setSenderId(robot_id_);
 
+  // Chassis
+  Chassis::RfrData chassis_rfr_data;
   chassis_rfr_data.is_rfr_on = (!referee_ptr_->isOffline());
   chassis_rfr_data.is_pwr_on = rpp_data.power_management_chassis_output;
   chassis_rfr_data.pwr_limit = rpp_data.chassis_power_limit;
@@ -139,6 +149,7 @@ void Robot::updateRfrData() {
   chassis_rfr_data.current_hp = rpp_data.current_hp;
   chassis_ptr_->setRfrData(chassis_rfr_data);
 
+  // Gimbal
   GimbalChassisComm::RefereeData::ChassisPart &gimbal_rfr_data =
       gc_comm_ptr_->referee_data().cp;
   gimbal_rfr_data.is_rfr_on = (!referee_ptr_->isOffline());
@@ -150,11 +161,16 @@ void Robot::updateRfrData() {
       rfr_bullet_shot_cnt; // is_new_bullet_shot
   gimbal_rfr_data.robot_id = (hello_world::referee::RfrId)rpp_data.robot_id;
 
-  // TODO: 换成实际的枪口
+  // Shooter
+  //  TODO: 换成实际的枪口
   gimbal_rfr_data.bullet_speed = rsp_data.bullet_speed;
   gimbal_rfr_data.shooter_heat = rph_data.shooter_17mm_1_barrel_heat;
   gimbal_rfr_data.shooter_cooling = rpp_data.shooter_barrel_cooling_value;
   gimbal_rfr_data.shooter_heat_limit = rpp_data.shooter_barrel_heat_limit;
+
+  // Hurt
+  robot_rfr_data_.hurt_module_id = rhr_data.module_id;
+  robot_rfr_data_.hurt_reason = rhr_data.hp_deduction_reason;
 };
 
 void Robot::updatePwrState() {
@@ -554,7 +570,19 @@ void Robot::setUiDrawerData() {
   // bool is_vision_valid = true;  //TODO:调试
   ui_drawer_.setVisTgtX(gc_comm_ptr_->vision_data().gp.vtm_x, is_vision_valid);
   ui_drawer_.setVisTgtY(gc_comm_ptr_->vision_data().gp.vtm_y, is_vision_valid);
-  ui_drawer_.setisvisionvalid(is_vision_valid);
+  ui_drawer_.setIsVisionValid(is_vision_valid);
+
+  // hurt
+  if (robot_rfr_data_.hurt_reason ==
+          static_cast<uint8_t>(HurtReason::kArmorHit) ||
+      robot_rfr_data_.hurt_reason ==
+          static_cast<uint8_t>(HurtReason::kArmorCollision)) {
+    ui_drawer_.setIsArmorHit(true);
+    ui_drawer_.setArmorIdHit(robot_rfr_data_.hurt_module_id);
+  } else {
+    ui_drawer_.setIsArmorHit(false);
+    ui_drawer_.setArmorIdHit(0);
+  }
 
   // referee_ptr_->setTxPkg(ui_drawer_.))
 };
@@ -787,7 +815,6 @@ void Robot::registerPerformancePkg(PerformancePkg *ptr) {
   if (rfr_performance_pkg_ptr_ == ptr) {
     return;
   }
-
   rfr_performance_pkg_ptr_ = ptr;
 };
 void Robot::registerPowerHeatPkg(PowerHeatPkg *ptr) {
@@ -803,6 +830,13 @@ void Robot::registerShooterPkg(ShooterPkg *ptr) {
     return;
   }
   rfr_shooter_pkg_ptr_ = ptr;
+};
+void Robot::registerHurtPkg(HurtPkg *ptr) {
+  HW_ASSERT(ptr != nullptr, "HurtPkg pointer is null", ptr);
+  if (rfr_hurt_pkg_ptr_ == ptr) {
+    return;
+  }
+  rfr_hurt_pkg_ptr_ = ptr;
 };
 #pragma endregion
 /* Private function definitions

@@ -43,22 +43,25 @@ const hello_world::referee::Graphic::Color kUiModuleStateTitleColor =
 const hello_world::referee::Graphic::Color kUiPassLineColor =
     hello_world::referee::Graphic::Color::kOrange;
 const hello_world::referee::Graphic::Color kUiVisTgtColor =
-    hello_world::referee::Graphic::Color::kPurple;
+    hello_world::referee::Graphic::Color::kGreen;
+const hello_world::referee::Graphic::Color kUiVisBoxColor =
+    hello_world::referee::Graphic::Color::kWhite;
 
 const hello_world::referee::Pixel kUiModuleStateFontSize = 16;
 const hello_world::referee::Pixel kUiModuleStateLineWidth = 3;
+const int16_t kUiModuleStateAreaYDelta = -35;
+
+const uint16_t kUiScreenMiddleX = 1920 / 2; // 操作界面中心位置
+const uint16_t kUiScreenMiddleY = 1080 / 2; // 操作界面中心位置
 
 const uint16_t kUiModuleStateAreaX1 = 15;
 const uint16_t kUiModuleStateAreaX2_1 = 140;
 const uint16_t kUiModuleStateAreaX2_2 =
     kUiModuleStateAreaX2_1 - kUiModuleStateFontSize;
 const uint16_t kUiModuleStateAreaX2_3 = kUiModuleStateAreaX2_1;
-const uint16_t kUiModuleStateAreaX3 = 960;
+const uint16_t kUiModuleStateAreaX3 = kUiScreenMiddleX;
 const uint16_t kUiModuleStateAreaY1 = 890;
 const uint16_t kUiModuleStateAreaY2 = 700;
-const int16_t kUiModuleStateAreaYDelta = -35;
-
-// 行车线 中下
 
 // 各模块状态 左上角
 // chassis
@@ -66,15 +69,12 @@ const uint8_t kUiNameChassisWorkStateTitle[3] = {0x00, 0x00,
                                                  0x01}; ///< 底盘工作状态标题
 const uint8_t kUiNameChassisWorkStateContent[3] = {0x00, 0x00,
                                                    0x02}; ///< 底盘工作状态内容
-
-const uint16_t kUiChassisDirCircleX = 960; // 灯条中心位置
-const uint16_t kUiChassisDirCircleY = 540;
 const uint8_t kUiNameChassisDirHead[3] = {0x00, 0x00,
                                           0x03}; ///< 底盘朝向示意（底盘头部）
 const uint8_t kUiNameChassisDirTail[3] = {0x00, 0x00,
                                           0x04}; ///< 底盘朝向示意（底盘尾部）
 
-const uint16_t kPixelCenterXCapBox = 1920 / 2; // 超电位置
+const uint16_t kPixelCenterXCapBox = kUiScreenMiddleX; // 超电位置
 const uint16_t kPixelCenterYCapBox = 120;
 const uint16_t kPixelCapBoxWidth = 400; // 超电能量余量外框
 const uint16_t kPixelCapBoxHeight = 16;
@@ -90,9 +90,9 @@ const uint8_t kuiNameChassisPassLineLeft[3] = {0x00, 0x00,
                                                0x08}; ///< 底盘通行线左侧
 const uint8_t kuiNameChassisPassLineRight[3] = {0x00, 0x00,
                                                 0x09}; ///< 底盘通行线右侧
-const uint8_t kUiNamePassSafe[3] = {0x00, 0x00, 0x0A}; ///< 底盘通行线中间
+
 // gimbal
-const uint16_t kPixelCenterXVisionBox = 1704.5 / 2; // todo 云台视觉状态位置
+const uint16_t kPixelCenterXVisionBox = 1704.5 / 2; // TODO： 云台视觉状态位置
 const uint16_t kPixelCenterYVisionBox = 1198.3 / 2;
 const uint16_t kPixelVisionBoxWidth = 592.5; // 状态外框 云台视觉
 const uint16_t kPixelVisionBoxHeight = 315.3;
@@ -110,6 +110,7 @@ const uint8_t kUiNameGimbalPitchFdb[3] = {0x00, 0x00,
 const uint8_t kUiNameGimbalYawTitle[3] = {0x00, 0x00,
                                           0x44};           ///< 云台偏航角度标题
 const uint8_t kUiNameGimbalYawFdb[3] = {0x00, 0x00, 0x45}; ///< 云台偏航角度反馈
+const uint8_t kUiNamePassSafe[3] = {0x00, 0x00, 0x0A};     ///< 云台过洞安全提示
 
 // shooter
 const uint8_t kUiNameShooterWorkStateTitle[3] = {
@@ -117,13 +118,7 @@ const uint8_t kUiNameShooterWorkStateTitle[3] = {
 const uint8_t kUiNameShooterWorkStateContent[3] = {
     0x00, 0x00, 0x81}; ///< 发射机构工作状态内容
 
-const uint8_t kUiNameFeedAngTitle[3] = {0x00, 0x00, 0x82}; ///< 拨盘角度标题
-const uint8_t kUiNameFeedStuck[3] = {0x00, 0x00, 0x83};    ///< 拨盘堵转提示
-
-const uint8_t kUiNameFricSpdTitle[3] = {0x00, 0x00, 0x84}; ///< 摩擦轮转速标题
-const uint8_t kUiNameFricStuck[3] = {0x00, 0x00, 0x85};    ///< 摩擦轮堵转提示
-
-const uint8_t kUiNameShooterHeat[3] = {0x00, 0x00, 0x86}; ///< 发射机构热量
+const uint8_t kUiNameShooterHeat[3] = {0x00, 0x00, 0x82}; ///< 发射机构热量
 
 // 瞄准线 正中
 // const uint16_t kUiAimLineX = 987;
@@ -146,6 +141,9 @@ const uint8_t kUiNameShooterHeat[3] = {0x00, 0x00, 0x86}; ///< 发射机构热�
 // vision
 const uint8_t kUiNameVisionBox[3] = {0x00, 0x00, 0xE0}; ///< 视觉相机视场框
 const uint8_t kUiNameVisionTgt[3] = {0x00, 0x00, 0xE1}; ///< 视觉相机目标框
+
+// hurt
+const uint8_t kUiNameHitWarning[3] = {0x00, 0x00, 0xE2}; ///< 装甲被击中提示
 
 // 安全过洞参数
 const float ksafepitchmin = 0.0; // TODO：待标定
@@ -354,16 +352,16 @@ bool UiDrawer::encodeStaticPkgGroup2(uint8_t *data_ptr, size_t &data_len,
 
 bool UiDrawer::encodeDynaUiPkgGroup1(uint8_t *data_ptr, size_t &data_len,
                                      GraphicOperation opt) {
-  hello_world::referee::Arc g_chassis_status_head, g_chassis_status_other;
+  hello_world::referee::Arc g_chassis_head, g_chassis_tail;
 
-  genChassisDir(g_chassis_status_head, g_chassis_status_other);
-  g_chassis_status_head.setOperation(opt);
-  g_chassis_status_other.setOperation(opt);
+  genChassisDir(g_chassis_head, g_chassis_tail);
+  g_chassis_head.setOperation(opt);
+  g_chassis_tail.setOperation(opt);
 
   hello_world::referee::InterGraphic2Package pkg;
   pkg.setSenderId(static_cast<uint16_t>(sender_id_));
-  pkg.setArcAt(g_chassis_status_head, 0);
-  pkg.setArcAt(g_chassis_status_other, 1);
+  pkg.setArcAt(g_chassis_head, 0);
+  pkg.setArcAt(g_chassis_tail, 1);
   return encodePkg(data_ptr, data_len, opt, pkg);
 };
 bool UiDrawer::encodeDynaUiPkgGroup2(uint8_t *data_ptr, size_t &data_len,
@@ -384,8 +382,8 @@ bool UiDrawer::encodeDynaUiPkgGroup2(uint8_t *data_ptr, size_t &data_len,
   // 显示过洞角度是否安全
   hello_world::referee::Circle g_pass_hole;
   bool is_safe = false;
-  if (gimbal_joint_ang_pitch_fdb_ > ksafepitchmin &&
-      gimbal_joint_ang_pitch_fdb_ < ksafepitchmax) {
+  if (gimbal_joint_angle_pitch_fdb_ > ksafepitchmin &&
+      gimbal_joint_angle_pitch_fdb_ < ksafepitchmax) {
     is_safe = true;
   } else {
     is_safe = false;
@@ -404,7 +402,7 @@ bool UiDrawer::encodeDynaUiPkgGroup2(uint8_t *data_ptr, size_t &data_len,
 };
 bool UiDrawer::encodeDynaUiPkgGroup3(uint8_t *data_ptr, size_t &data_len,
                                      GraphicOperation opt) {
-  hello_world::referee::Arc g_heat;
+  hello_world::referee::Arc g_heat, g_armor_hit;
   hello_world::referee::Circle g_vision;
   hello_world::referee::Integer g_balence_number;
 
@@ -414,12 +412,16 @@ bool UiDrawer::encodeDynaUiPkgGroup3(uint8_t *data_ptr, size_t &data_len,
   genVisTgt(g_vision);
   g_vision.setOperation(opt);
 
+  genArmorHit(g_armor_hit);
+  g_armor_hit.setOperation(opt);
+
   hello_world::referee::InterGraphic5Package pkg;
   pkg.setSenderId(static_cast<uint16_t>(sender_id_));
   pkg.setArcAt(g_heat, 0);
   pkg.setCircleAt(g_vision, 1);
   pkg.setArcAt(g_heat, 2);
   pkg.setCircleAt(g_vision, 3);
+  pkg.setArcAt(g_armor_hit, 4);
   return encodePkg(data_ptr, data_len, opt, pkg);
 };
 #pragma endregion
@@ -467,29 +469,31 @@ bool UiDrawer::encodeChassisWorkStateContent(uint8_t *data_ptr,
 
 void UiDrawer::genChassisDir(hello_world::referee::Arc &g_head,
                              hello_world::referee::Arc &g_tail) {
-  float now_head_ang = -theta_i2r_ * 180 / M_PI;
-  float start_ang_head = now_head_ang - 40, end_ang_head = now_head_ang + 40;
-  start_ang_head = hello_world::NormPeriodData(0, 360, start_ang_head);
-  end_ang_head = hello_world::NormPeriodData(0, 360, end_ang_head);
+  float armor_angle_head = -theta_i2r_ * 180 / M_PI;
+  float arc_angle_head_start = armor_angle_head - 40,
+        arc_angle_head_end = armor_angle_head + 40;
+  arc_angle_head_start =
+      hello_world::NormPeriodData(0, 360, arc_angle_head_start);
+  arc_angle_head_end = hello_world::NormPeriodData(0, 360, arc_angle_head_end);
 
-  float start_ang_other = start_ang_head + 180,
-        end_ang_other = end_ang_head + 180;
-  start_ang_other = hello_world::NormPeriodData(0, 360, start_ang_other);
-  end_ang_other = hello_world::NormPeriodData(0, 360, end_ang_other);
+  float arc_angle_tail_start = arc_angle_head_start + 180,
+        arc_angle_tail_end = arc_angle_head_end + 180;
+  arc_angle_tail_start =
+      hello_world::NormPeriodData(0, 360, arc_angle_tail_start);
+  arc_angle_tail_end = hello_world::NormPeriodData(0, 360, arc_angle_tail_end);
 
   float radius = 50; // 灯条所处圆的半径
   g_head.setColor(hello_world::referee::Graphic::Color::kYellow);
-  g_head.setAng(start_ang_head, end_ang_head);
-  g_head.setCenterPos(kUiChassisDirCircleX,
-                      kUiChassisDirCircleY); // 灯条中心位置
+  g_head.setAng(arc_angle_head_start, arc_angle_head_end);
+  g_head.setCenterPos(kUiScreenMiddleX, kUiScreenMiddleY);
   g_head.setRadius(radius, radius);
   g_head.setName(kUiNameChassisDirHead);
   g_head.setLineWidth(3);
   g_head.setLayer(kDynamicUiLayer);
 
   g_tail.setColor(hello_world::referee::Graphic::Color::kCyan);
-  g_tail.setAng(start_ang_other, end_ang_other);
-  g_tail.setCenterPos(kUiChassisDirCircleX, kUiChassisDirCircleY);
+  g_tail.setAng(arc_angle_tail_start, arc_angle_tail_end);
+  g_tail.setCenterPos(kUiScreenMiddleX, kUiScreenMiddleY);
   g_tail.setRadius(radius, radius);
   g_tail.setName(kUiNameChassisDirTail);
   g_tail.setLineWidth(3);
@@ -508,7 +512,7 @@ void UiDrawer::genCapPwrPercent(hello_world::referee::Rectangle &g_rect,
     color = kUiNormalColor;
   } else if (percent > 0.3) {
     color = kUiWarningColor;
-  } else{
+  } else {
     color = kUiErrorColor;
   }
 
@@ -521,7 +525,8 @@ void UiDrawer::genCapPwrPercent(hello_world::referee::Rectangle &g_rect,
 
   g_num.setName(kUiNameChassisCapPercentNum);
   g_num.setDisplayValue(percent * 100);
-  g_num.setStartPos(start_x - 106, kPixelCenterYCapBox + kPixelCapBoxHeight / 2);
+  g_num.setStartPos(start_x - 106,
+                    kPixelCenterYCapBox + kPixelCapBoxHeight / 2);
   g_num.setColor(color);
   g_num.setLayer(kDynamicUiLayer);
   g_num.setFontSize(24); // 调整超电剩余电量的数字大小
@@ -533,9 +538,9 @@ void UiDrawer::genChassisPassLineLeft(hello_world::referee::StraightLine &g) {
   uint16_t start_posX = 0;
   uint16_t end_posY = 0;
   g.setName(kuiNameChassisPassLineLeft);
-  end_posX = gimbal_joint_ang_pitch_fdb_ * (-81.75) + 814.7;
-  start_posX = gimbal_joint_ang_pitch_fdb_ * 660.4 + 577.15;
-  end_posY = gimbal_joint_ang_pitch_fdb_ * (-927.28) + 334.39;
+  end_posX = gimbal_joint_angle_pitch_fdb_ * (-81.75) + 814.7;
+  start_posX = gimbal_joint_angle_pitch_fdb_ * 660.4 + 577.15;
+  end_posY = gimbal_joint_angle_pitch_fdb_ * (-927.28) + 334.39;
   g.setLayer(kDynamicUiLayer);
   g.setStartPos(start_posX, 0);
   g.setEndPos(end_posX, end_posY);
@@ -546,9 +551,9 @@ void UiDrawer::genChassisPassLineRight(hello_world::referee::StraightLine &g) {
   uint16_t end_posX = 0;
   uint16_t start_posX = 0;
   uint16_t end_posY = 0;
-  start_posX = gimbal_joint_ang_pitch_fdb_ * (-801.84) + 1277.1;
-  end_posX = gimbal_joint_ang_pitch_fdb_ * 96.48 + 1077;
-  end_posY = gimbal_joint_ang_pitch_fdb_ * (-927.28) + 334.39;
+  start_posX = gimbal_joint_angle_pitch_fdb_ * (-801.84) + 1277.1;
+  end_posX = gimbal_joint_angle_pitch_fdb_ * 96.48 + 1077;
+  end_posY = gimbal_joint_angle_pitch_fdb_ * (-927.28) + 334.39;
   g.setName(kuiNameChassisPassLineRight);
   g.setLayer(kDynamicUiLayer);
   g.setStartPos(start_posX, 0);
@@ -601,8 +606,7 @@ void UiDrawer::genPassSafe(hello_world::referee::Circle &g, bool is_safe) {
                  kUiModuleStateAreaY1 +
                      kUiModuleStateAreaYDelta); // TODO：确认该指示显示位置
   g.setRadius(25);
-  g.setColor(is_safe ? kUiNormalColor
-                     : kUiErrorColor);
+  g.setColor(is_safe ? kUiNormalColor : kUiErrorColor);
   g.setLayer(kDynamicUiLayer);
   g.setLineWidth(3);
 };
@@ -669,8 +673,7 @@ bool UiDrawer::encodeShooterWorkStateContent(uint8_t *data_ptr,
 void UiDrawer::genShooterHeat(hello_world::referee::Arc &g) {
   float percent = heat_limit_ > 0 ? heat_ / heat_limit_ : 0.0f;
   percent = hello_world::Bound(percent, 0.0f, 1.0f);
-  g.setName(kUiNameShooterHeat);
-  g.setCenterPos(1920 / 2, 1080 / 2);
+
   hello_world::referee::Graphic::Color color;
   if (percent > 0.8) {
     color = kUiNormalColor;
@@ -679,44 +682,98 @@ void UiDrawer::genShooterHeat(hello_world::referee::Arc &g) {
   } else if (percent > 0.3) {
     color = kUiErrorColor;
   }
+
+  g.setName(kUiNameShooterHeat);
+  g.setCenterPos(kUiScreenMiddleX, kUiScreenMiddleY);
   g.setRadius(100, 100);
   g.setAng(360 - 360 * percent, 0);
   g.setColor(color);
-  g.setLayer(kDynamicUiLayer);
   g.setLineWidth(percent == 0 ? 0 : 2);
+  g.setLayer(kDynamicUiLayer);
 };
 #pragma endregion
 
 #pragma region 视觉 UI
 
 void UiDrawer::genVisTgt(hello_world::referee::Circle &g) {
+  if (is_vision_valid_) {
+    g.setLineWidth(3);
+  } else {
+    g.setLineWidth(0);
+  }
+
   g.setName(kUiNameVisionTgt);
-  g.setCenterPos(960 + vis_tgt_x_ - 150, 540 - vis_tgt_y_);
-  g.setRadius(35);
-  g.setColor(kUiVisTgtColor);
-  g.setLayer(hello_world::referee::GraphicLayer::k1);
-  g.setLineWidth(2);
+  g.setCenterPos(960 + vis_tgt_x_ - 100, 540 - vis_tgt_y_);
+  g.setRadius(30);
+  g.setColor(kUiNormalColor);
+  g.setLayer(kDynamicUiLayer);
 };
 
 void UiDrawer::genVisionbox(hello_world::referee::Rectangle &g_rect) {
   // uint16_t start_x = kPixelCenterXVisionBox - kPixelVisionBoxWidth / 2;
   // uint16_t end_x = start_x + kPixelVisionBoxWidth;
 
-  if (is_vision_valid_) {
-    g_rect.setColor(kUiNormalColor);
-  } else {
-    g_rect.setColor(kUiErrorColor);
-  }
-
-  g_rect.setName(kUiNameVisionBox);
   // g_rect.setStartPos(start_x, kPixelCenterYVisionBox - kPixelVisionBoxHeight
   // / 2);
-  g_rect.setStartPos(655, 250);
   // g_rect.setEndPos(end_x, kPixelCenterYVisionBox + kPixelVisionBoxHeight /
   // 2);
+  g_rect.setName(kUiNameVisionBox);
+  g_rect.setStartPos(655, 250);
   g_rect.setEndPos(1269, 651);
+  g_rect.setColor(kUiVisBoxColor);
+  g_rect.setLineWidth(2);
   g_rect.setLayer(kStaticUiLayer);
-  g_rect.setLineWidth(1.5);
+};
+
+#pragma endregion
+
+#pragma region 受击反馈
+void UiDrawer::genArmorHit(hello_world::referee::Arc &g_hit) {
+  // 装甲板被击中时的警告角度,小陀螺模式因数据链路延迟等原因，会导致提示方向有一定误差
+  // 故将范围角度进行一定预判性偏置并适当扩大提示范围,具体偏置角度待测试
+  // 偏置在底盘顺时针小陀螺时应为正值，逆时针反之
+  const float kHitArcAngleRangeGyro = 90.0f;
+  const float kHitArcAngleBiasGyro = 10.0f;
+  const float kHitArcAngleRangeFollow = 80.0f;
+
+  if (is_armor_hit_) {
+    g_hit.setLineWidth(6);
+  } else {
+    g_hit.setLineWidth(0);
+  }
+
+  // 跟随模式前向对应的装甲板应设置为1号，其余装甲板序号由裁判系统要求，逆时针递增
+  float armor_angle_hit = 0.0f, arc_angle_hit_start = 0.0f,
+        arc_angle_hit_end = 0.0f;
+  if (chassis_working_mode_ == Chassis::WorkingMode::Gyro) {
+    if (armor_id_hit_ == last_armor_id_hit_) {
+      armor_angle_hit = last_armor_angle_hit_;
+    }
+    arc_angle_hit_start =
+        armor_angle_hit - kHitArcAngleRangeGyro / 2.0f + kHitArcAngleBiasGyro,
+    arc_angle_hit_end =
+        armor_angle_hit + kHitArcAngleRangeGyro / 2.0f + kHitArcAngleBiasGyro;
+  } else {
+    armor_angle_hit = -(theta_i2r_ * 180.0f / M_PI + 90.0f * armor_id_hit_);
+    arc_angle_hit_start = armor_angle_hit - kHitArcAngleRangeFollow / 2.0f;
+    arc_angle_hit_end = armor_angle_hit + kHitArcAngleRangeFollow / 2.0f;
+  }
+
+  arc_angle_hit_start =
+      hello_world::NormPeriodData(0.0f, 360.0f, arc_angle_hit_start);
+  arc_angle_hit_end =
+      hello_world::NormPeriodData(0.0f, 360.0f, arc_angle_hit_end);
+
+  float radius = 200.0f; // 灯条所处圆的半径
+  g_hit.setColor(hello_world::referee::Graphic::Color::kPurple);
+  g_hit.setAng(arc_angle_hit_start, arc_angle_hit_end);
+  g_hit.setCenterPos(kUiScreenMiddleX,
+                     kUiScreenMiddleY); // 灯条中心位置
+  g_hit.setRadius(radius, radius);
+  g_hit.setName(kUiNameHitWarning);
+  g_hit.setLayer(kDynamicUiLayer);
+  last_armor_id_hit_ = armor_id_hit_;
+  last_armor_angle_hit_ = armor_angle_hit;
 };
 
 #pragma endregion

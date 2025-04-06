@@ -28,10 +28,10 @@
 #include "super_cap.hpp"
 
 #include "can_tx_mgr.hpp"
+#include "referee.hpp"
 #include "transmitter.hpp"
 #include "uart_rx_mgr.hpp"
 #include "uart_tx_mgr.hpp"
-#include "referee.hpp"
 #include "ui_drawer.hpp"
 
 #include "module_fsm.hpp"
@@ -47,6 +47,10 @@
 namespace robot {
 /* Exported constants --------------------------------------------------------*/
 /* Exported types ------------------------------------------------------------*/
+struct RobotRfrData {
+  uint8_t hurt_module_id = 0; //< 扣血模块ID
+  uint8_t hurt_reason = 6;    ///< 扣血原因，@see HpDeductionReason
+};
 
 class Robot : public hello_world::module::ModuleFsm {
 public:
@@ -65,6 +69,8 @@ public:
   typedef hello_world::referee::RobotPerformancePackage PerformancePkg;
   typedef hello_world::referee::RobotPowerHeatPackage PowerHeatPkg;
   typedef hello_world::referee::RobotShooterPackage ShooterPkg;
+  typedef hello_world::referee::RobotHurtPackage HurtPkg;
+  typedef hello_world::referee::HpDeductionReason HurtReason;
   typedef hello_world::referee::Referee Referee;
   typedef hello_world::referee::ids::RobotId RobotId;
 
@@ -76,6 +82,8 @@ public:
   typedef robot::Gimbal Gimbal;
   typedef robot::Shooter Shooter;
   typedef robot::UiDrawer UiDrawer;
+
+  typedef RobotRfrData RfrData;
 
   class TxDevMgrPair {
   public:
@@ -165,6 +173,7 @@ public:
   void registerPerformancePkg(PerformancePkg *ptr);
   void registerPowerHeatPkg(PowerHeatPkg *ptr);
   void registerShooterPkg(ShooterPkg *ptr);
+  void registerHurtPkg(HurtPkg *ptr);
 
 private:
   //  数据更新和工作状态更新，由 update 函数调用
@@ -216,9 +225,11 @@ private:
   float last_rev_gimbal_tick_ = 0.0f;  ///< 上一次云台转向的时间戳
 
   RobotId robot_id_ = RobotId::kBlueStandard3;
-  UiDrawer ui_drawer_ ; 
-  uint8_t rfr_tx_data_[255] = {0};  ///< 机器人交互数据包发送缓存
-  size_t rfr_tx_data_len_ = 0;      ///< 机器人交互数据包发送缓存长度
+  UiDrawer ui_drawer_;
+  uint8_t rfr_tx_data_[255] = {0}; ///< 机器人交互数据包发送缓存
+  size_t rfr_tx_data_len_ = 0;     ///< 机器人交互数据包发送缓存长度
+  
+  RobotRfrData robot_rfr_data_; ///< 裁判系统数据包指针
   // 主要模块状态机组件指针
   Chassis *chassis_ptr_ = nullptr; ///< 底盘模块指针
   Gimbal *gimbal_ptr_ = nullptr;   ///< 云台模块指针
@@ -229,7 +240,7 @@ private:
   Imu *imu_ptr_ = nullptr;       ///< 底盘 IMU 指针
 
   // 只接收数据的组件指针
-  DT7 *rc_ptr_ = nullptr; ///< DT7 指针 只接收数据
+  DT7 *rc_ptr_ = nullptr;             ///< DT7 指针 只接收数据
 
   // 只发送数据的组件指针
   Cap *cap_ptr_ = nullptr; ///< 底盘超级电容指针 只发送数据
@@ -247,6 +258,7 @@ private:
   PowerHeatPkg *rfr_power_heat_pkg_ptr_ =
       nullptr; ///< 裁判系统电源和热量包指针 收发数据
   ShooterPkg *rfr_shooter_pkg_ptr_ = nullptr; ///< 裁判系统射击包指针 收发数据
+  HurtPkg *rfr_hurt_pkg_ptr_ = nullptr;       ///< 裁判系统受伤包指针 收发数据
 
   TxDevMgrPair tx_dev_mgr_pairs_[(uint32_t)TxDevIdx::kNum] = {
       {nullptr}}; ///< 发送设备管理器对数组

@@ -153,6 +153,8 @@ robot::Robot *GetRobot() {
     unique_robot.registerPerformancePkg(GetRobotPerformancePackage());
     unique_robot.registerPowerHeatPkg(GetRobotPowerHeatPackage());
     unique_robot.registerShooterPkg(GetRobotShooterPackage());
+    unique_robot.registerHurtPkg(GetRobotHurtPackage());
+    
     is_robot_inited = true;
   }
   return &unique_robot;
