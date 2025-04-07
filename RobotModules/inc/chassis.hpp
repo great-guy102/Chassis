@@ -215,6 +215,12 @@ public:
       return theta_i2r_;
     }
   };
+  bool getIsAllWheelOnline(){
+    return is_all_wheel_online_;
+  }
+  bool getIsAllSteerOnline(){
+    return is_all_steer_online_;
+  }
   void revChassis() {
       last_rev_chassis_flag_ = rev_chassis_flag_;
       rev_chassis_flag_ = !rev_chassis_flag_;

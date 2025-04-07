@@ -533,6 +533,10 @@ void Robot::setUiDrawerData() {
   HW_ASSERT(chassis_ptr_ != nullptr, "Chassis FSM pointer is null",
             chassis_ptr_);
   ui_drawer_.setChassisWorkState(chassis_ptr_->getPwrState());
+  ui_drawer_.setIsWheelMotorsOnline(chassis_ptr_->getIsAllWheelOnline());
+  // ui_drawer_.setIsWheelMotorsOnline(false); // TODO:UI测试
+   ui_drawer_.setIsSteerMotorsOnline(chassis_ptr_->getIsAllSteerOnline());
+  // ui_drawer_.setIsSteerMotorsOnline(false); // TODO:UI测试
   ui_drawer_.setChassisWorkingMode(chassis_ptr_->getWorkingMode());
   ui_drawer_.setChassisManualCtrlSrc(manual_ctrl_src_);
   ui_drawer_.setChassisThetaI2r(chassis_ptr_->getThetaI2r());
@@ -540,6 +544,10 @@ void Robot::setUiDrawerData() {
   // Gimbal
   HW_ASSERT(gimbal_ptr_ != nullptr, "Gimbal FSM pointer is null", gimbal_ptr_);
   ui_drawer_.setGimbalWorkState(gc_comm_ptr_->gimbal_data().gp.pwr_state);
+  // ui_drawer_.setGimbalWorkState(PwrState::kResurrection); //TODO:UI测试
+  ui_drawer_.setIsGimbalMotorsOnline(
+      gc_comm_ptr_->gimbal_data().gp.is_gimbal_motors_online);
+  // ui_drawer_.setIsGimbalMotorsOnline(false); // TODO:UI测试
   ui_drawer_.setGimbalCtrlMode(gimbal_ptr_->getCtrlMode());
   ui_drawer_.setGimbalManualCtrlSrc(manual_ctrl_src_);
   ui_drawer_.setGimbalWorkingMode(gimbal_ptr_->getWorkingMode());
@@ -550,10 +558,14 @@ void Robot::setUiDrawerData() {
   HW_ASSERT(shooter_ptr_ != nullptr, "Shooter FSM pointer is null",
             shooter_ptr_);
   ui_drawer_.setShooterWorkState(gc_comm_ptr_->shooter_data().gp.pwr_state);
+  ui_drawer_.setIsShooterMotorsOnline(
+      gc_comm_ptr_->shooter_data().gp.is_shooter_motors_online);
+  // ui_drawer_.setIsShooterMotorsOnline(false); // TODO:UI测试
   ui_drawer_.setShooterCtrlMode(shooter_ptr_->getCtrlMode());
   ui_drawer_.setShooterManualCtrlSrc(manual_ctrl_src_);
   ui_drawer_.setShooterStuckFlag(
       gc_comm_ptr_->shooter_data().gp.is_shooter_stuck);
+  // ui_drawer_.setShooterStuckFlag(true); //TODO:UI测试
   ui_drawer_.setFeedStuckStatus(
       gc_comm_ptr_->shooter_data().gp.feed_stuck_state);
   ui_drawer_.setHeat(gc_comm_ptr_->referee_data().cp.shooter_heat);
@@ -562,15 +574,17 @@ void Robot::setUiDrawerData() {
   // Cap
   HW_ASSERT(cap_ptr_ != nullptr, "Cap pointer is null", cap_ptr_);
   ui_drawer_.setCapPwrPercent(cap_ptr_->getRemainingPower());
+  // ui_drawer_.setCapPwrPercent(65.7); // TODO:UI测试
 
   // vision
   HW_ASSERT(gc_comm_ptr_ != nullptr, "GimbalChassisComm pointer is null",
             gc_comm_ptr_);
   bool is_vision_valid = gc_comm_ptr_->vision_data().gp.is_enemy_detected;
-  // bool is_vision_valid = true;  //TODO:调试
+  ui_drawer_.setIsVisionOnline(gc_comm_ptr_->vision_data().gp.is_vision_online);
+  // ui_drawer_.setIsVisionOnline(false); //TODO:UI测试
+  ui_drawer_.setIsVisionValid(is_vision_valid);
   ui_drawer_.setVisTgtX(gc_comm_ptr_->vision_data().gp.vtm_x, is_vision_valid);
   ui_drawer_.setVisTgtY(gc_comm_ptr_->vision_data().gp.vtm_y, is_vision_valid);
-  ui_drawer_.setIsVisionValid(is_vision_valid);
 
   // hurt
   if (robot_rfr_data_.hurt_reason ==
