@@ -1,6 +1,6 @@
 /**
  *******************************************************************************
- * @file      :ins_fsm.hpp
+ * @file      :ins_robot.hpp
  * @brief     :
  * @history   :
  *  Version     Date            Author          Note
@@ -13,8 +13,8 @@
  *******************************************************************************
  */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef INSTANCE_INS_FSM_HPP_
-#define INSTANCE_INS_FSM_HPP_
+#ifndef INSTANCE_INS_ROBOT_HPP_
+#define INSTANCE_INS_ROBOT_HPP_
 
 /* Includes ------------------------------------------------------------------*/
 #include "chassis.hpp"
@@ -33,4 +33,4 @@ robot::Shooter *GetShooter();
 robot::Robot *GetRobot();
 /* Exported function prototypes ----------------------------------------------*/
 
-#endif /* INSTANCE_INS_FSM_HPP_ */
+#endif /* INSTANCE_INS_ROBOT_HPP_ */

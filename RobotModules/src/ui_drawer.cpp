@@ -724,11 +724,11 @@ void UiDrawer::genShooterHeat(hello_world::referee::Arc &g) {
   percent = hello_world::Bound(percent, 0.0f, 1.0f);
 
   hello_world::referee::Graphic::Color color;
-  if (percent > 0.8) {
+  if (percent > 0.7) {
     color = kUiNormalColor;
-  } else if (percent > 0.6) {
-    color = kUiWarningColor;
   } else if (percent > 0.3) {
+    color = kUiWarningColor;
+  } else {
     color = kUiErrorColor;
   }
 

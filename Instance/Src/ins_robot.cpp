@@ -1,6 +1,6 @@
 /**
  *******************************************************************************
- * @file      :ins_fsm.cpp
+ * @file      :ins_robot.cpp
  * @brief     :
  * @history   :
  *  Version     Date            Author          Note
@@ -16,12 +16,12 @@
 #include "ins_all.hpp"
 /* Private constants ---------------------------------------------------------*/
 const robot::Chassis::Config kChassisConfig = {
-    .normal_trans_vel = 3.6f,  ///< 正常平移速度
-    .gyro_rot_spd_move = 7.0f,     ///< 小陀螺旋转速度
-    .gyro_rot_spd_stand = 12.0f,    ///< 静止时小陀螺旋转速度
-    .yaw_sensitivity = 2 * PI, ///< YAW 轴灵敏度(单位：rad/s)
-    .max_trans_vel = 5.0f,     ///< 最大平移速度
-    .max_rot_spd = 14.0f,      ///< 最大旋转速度
+    .normal_trans_vel = 3.6f,    ///< 正常平移速度
+    .gyro_rot_spd_move = 7.0f,   ///< 小陀螺旋转速度
+    .gyro_rot_spd_stand = 12.0f, ///< 静止时小陀螺旋转速度
+    .yaw_sensitivity = 2 * PI,   ///< YAW 轴灵敏度(单位：rad/s)
+    .max_trans_vel = 5.0f,       ///< 最大平移速度
+    .max_rot_spd = 14.0f,        ///< 最大旋转速度
 };
 /* Private macro -------------------------------------------------------------*/
 /* Private types -------------------------------------------------------------*/
@@ -119,42 +119,36 @@ robot::Robot *GetRobot() {
     // 只接收数据的组件指针
     unique_robot.registerRc(GetRemoteControl());
     // 只发送数据的组件指针
-    unique_robot.registerCap(GetCap(), GetCan1TxMgr());
+    // CAN1
+    unique_robot.registerCap(GetCap());
     unique_robot.registerMotorSteers(GetMotorSteerLeftFront(),
-                                     robot::Robot::kSteerMotorIdxLeftFront,
-                                     GetCan1TxMgr());
+                                     robot::Robot::kSteerMotorIdxLeftFront);
     unique_robot.registerMotorSteers(GetMotorSteerLeftRear(),
-                                     robot::Robot::kSteerMotorIdxLeftRear,
-                                     GetCan1TxMgr());
+                                     robot::Robot::kSteerMotorIdxLeftRear);
     unique_robot.registerMotorSteers(GetMotorSteerRightRear(),
-                                     robot::Robot::kSteerMotorIdxRightRear,
-                                     GetCan1TxMgr());
+                                     robot::Robot::kSteerMotorIdxRightRear);
     unique_robot.registerMotorSteers(GetMotorSteerRightFront(),
-                                     robot::Robot::kSteerMotorIdxRightFront,
-                                     GetCan1TxMgr());
-
+                                     robot::Robot::kSteerMotorIdxRightFront);
+    // CAN2
     unique_robot.registerMotorWheels(GetMotorWheelLeftFront(),
-                                     robot::Robot::kWheelMotorIdxLeftFront,
-                                     GetCan2TxMgr());
+                                     robot::Robot::kWheelMotorIdxLeftFront);
     unique_robot.registerMotorWheels(GetMotorWheelLeftRear(),
-                                     robot::Robot::kWheelMotorIdxLeftRear,
-                                     GetCan2TxMgr());
+                                     robot::Robot::kWheelMotorIdxLeftRear);
     unique_robot.registerMotorWheels(GetMotorWheelRightRear(),
-                                     robot::Robot::kWheelMotorIdxRightRear,
-                                     GetCan2TxMgr());
+                                     robot::Robot::kWheelMotorIdxRightRear);
     unique_robot.registerMotorWheels(GetMotorWheelRightFront(),
-                                     robot::Robot::kWheelMotorIdxRightFront,
-                                     GetCan2TxMgr());
+                                     robot::Robot::kWheelMotorIdxRightFront);
     // 收发数据的组件指针
-    unique_robot.registerGimbalChassisComm(GetGimbalChassisComm(),
-                                           GetCan2TxMgr());
-    unique_robot.registerReferee(GetReferee(), GetRfrTxMgr());
+    // CAN2
+    unique_robot.registerGimbalChassisComm(GetGimbalChassisComm());
+    // USART6
+    unique_robot.registerReferee(GetReferee());
 
     unique_robot.registerPerformancePkg(GetRobotPerformancePackage());
     unique_robot.registerPowerHeatPkg(GetRobotPowerHeatPackage());
     unique_robot.registerShooterPkg(GetRobotShooterPackage());
     unique_robot.registerHurtPkg(GetRobotHurtPackage());
-    
+
     is_robot_inited = true;
   }
   return &unique_robot;
