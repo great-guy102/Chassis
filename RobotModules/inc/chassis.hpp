@@ -99,12 +99,12 @@ struct ChassisRfrData {
 };
 
 struct ChassisConfig {
-  float normal_trans_vel; ///< 正常平移速度
-  float gyro_rot_spd_move;     ///< 平移时小陀螺旋转速度
-  float gyro_rot_spd_stand;    ///< 静止时小陀螺旋转速度
-  float yaw_sensitivity;  ///< 跟随前馈灵敏度
-  float max_trans_vel;    ///< 最大平移速度
-  float max_rot_spd;      ///< 最大旋转速度
+  float normal_trans_vel;   ///< 正常平移速度
+  float gyro_rot_spd_move;  ///< 平移时小陀螺旋转速度
+  float gyro_rot_spd_stand; ///< 静止时小陀螺旋转速度
+  float yaw_sensitivity;    ///< 跟随前馈灵敏度
+  float max_trans_vel;      ///< 最大平移速度
+  float max_rot_spd;        ///< 最大旋转速度
 };
 
 class Chassis : public hello_world::module::ModuleFsm {
@@ -195,36 +195,20 @@ public:
 
   WorkingMode getWorkingMode() const { return working_mode_; }
   WorkingMode getLastWorkingMode() const { return last_working_mode_; }
-  void setWorkingMode(WorkingMode mode) {
-    if (working_mode_ != mode) {
-      last_working_mode_ = working_mode_;
-      working_mode_ = mode;
-    }
-  }
+  void setWorkingMode(WorkingMode mode);
   void setNormCmd(const State &cmd) { cmd_norm_ = cmd; }
   void setRfrData(const RfrData &data) { rfr_data_ = data; }
-  float getThetaI2r(bool rev_gimbal_flag = false,
-                    bool actual_head_dir = true) const {
-    if (actual_head_dir == true) {
-      return theta_i2r_;
-    }
-
-    if (rev_chassis_flag_ || rev_gimbal_flag) {
-      return hello_world::AngleNormRad(theta_i2r_ + PI);
-    } else {
-      return theta_i2r_;
-    }
-  };
-  bool getIsAllWheelOnline(){
-    return is_all_wheel_online_;
-  }
-  bool getIsAllSteerOnline(){
-    return is_all_steer_online_;
-  }
+  float getThetaI2r(bool actual_head_dir = true) const;
+  bool getIsAllWheelOnline() { return is_all_wheel_online_; }
+  bool getIsAllSteerOnline() { return is_all_steer_online_; }
   void revChassis() {
-      last_rev_chassis_flag_ = rev_chassis_flag_;
-      rev_chassis_flag_ = !rev_chassis_flag_;
-      last_rev_chassis_tick_ = work_tick_;
+    last_rev_chassis_flag_ = rev_chassis_flag_;
+    rev_chassis_flag_ = !rev_chassis_flag_;
+    last_rev_chassis_tick_ = work_tick_;
+  }
+  void setRevGimbalFlag(bool flag) {
+    last_rev_gimbal_flag_ = rev_gimbal_flag_;
+    rev_gimbal_flag_ = flag;
   }
   void setGyroDir(GyroDir dir) { gyro_dir_ = dir; }
   void setGyroMode(GyroMode mode) { gyro_mode_ = mode; }
@@ -295,8 +279,7 @@ private:
 
   // 由 robot 设置的数据
   bool use_cap_flag_ = false; ///< 是否使用超级电容
-  GyroDir gyro_dir_ = GyroDir::Unspecified,
-          last_gyro_dir_ = GyroDir::Unspecified;
+  GyroDir gyro_dir_ = GyroDir::Unspecified; ///< 小陀螺方向
   GyroMode gyro_mode_ = GyroMode::ConstW; ///< 陀螺模式
   ///< 小陀螺方向，正为绕 Z 轴逆时针，负为顺时针，
   State cmd_norm_ = {0};    ///< 原始控制指令，基于图传坐标系
@@ -331,8 +314,12 @@ private:
       0}; ///< 舵电机的电流参考值(限幅后) 单位 rad/s
   State chassis_state_ = {0}, last_chassis_state_ = {0}; ///< 底盘状态
 
-  bool rev_chassis_flag_ = false;      ///< 转向后退标志
-  bool last_rev_chassis_flag_ = false; ///< 上一次转向后退标志
+  bool rev_chassis_flag_ = false;      ///< 底盘转向标志
+  bool last_rev_chassis_flag_ = false; ///< 上一次底盘转向标志
+  bool rev_gimbal_flag_ = false;       ///< 云台转向标志
+  bool last_rev_gimbal_flag_ = false;  ///< 上一次云台转向标志
+  bool is_gyro2follow_handled_ =
+      false; ///< 小陀螺模式切换到跟随模式时，是否处理过
   uint32_t last_rev_chassis_tick_ = 0; ///< 上一次底盘转向的时间戳
 
   // gimbal board fdb data  在 update 函数中更新

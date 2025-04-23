@@ -333,27 +333,9 @@ void Chassis::revNormCmd() {
 
   case WorkingMode::Gyro: {
     // 陀螺模式下，如果外部没有设置陀螺旋转方向，
-    // 则每次进入陀螺模式时，随机选择一个方向
-    first_follow_flag = true;
-
-    if (first_gyro_flag) {
-      first_gyro_flag = false;
-      // if (last_gyro_dir_ == GyroDir::Clockwise) {
-      //   gyro_dir_ = GyroDir::AntiClockwise;
-      // } else if (last_gyro_dir_ == GyroDir::AntiClockwise) {
-      //   gyro_dir_ = GyroDir::Clockwise;
-      // }
-    } else {
-      gyro_dir_ = last_gyro_dir_;
+    if (gyro_dir_ == GyroDir::Unspecified) {
+      gyro_dir_ = GyroDir::Clockwise;
     }
-
-    // if (gyro_dir_ == GyroDir::Unspecified) {
-    //   if (last_gyro_dir_ == GyroDir::Clockwise) {
-    //     gyro_dir_ = GyroDir::AntiClockwise;
-    //   } else if (last_gyro_dir_ == GyroDir::AntiClockwise) {
-    //     gyro_dir_ = GyroDir::Clockwise;
-    //   }
-    // }
     // 小陀螺模式下，旋转分量为定值
     // cmd_raw.w = (config_.gyro_rot_spd - 0.5f + arm_sin_f32((2*PI / 4000) *
     // work_tick_)) * (int8_t)gyro_dir_;
@@ -372,7 +354,6 @@ void Chassis::revNormCmd() {
     } else {
       cmd_raw.w = config_.gyro_rot_spd_move * (int8_t)gyro_dir_;
     };
-    last_gyro_dir_ = gyro_dir_;
     break;
   }
 
@@ -562,10 +543,9 @@ float rfr_pwr = 0.0f; // TODO:功限调试
 void Chassis::calcMotorsLimitedRef() {
   float up_ref = 120.0f;
   if (working_mode_ == WorkingMode::Gyro) {
-    up_ref = 60.0f;
-  } else {
-    up_ref = 120.0f;
+    up_ref = 80.0f;
   }
+
   hello_world::power_limiter::PowerLimiterRuntimeParams runtime_params = {
       .p_ref_max =
           up_ref +
@@ -580,16 +560,15 @@ void Chassis::calcMotorsLimitedRef() {
   };
 
   if (!cap_ptr_->isOffline()) {
+    runtime_params.remaining_energy = cap_ptr_->getRemainingPower();
     if (use_cap_flag_ == true) {
-      runtime_params.remaining_energy = cap_ptr_->getRemainingPower();
+      runtime_params.p_ref_max = 480.0f;
       runtime_params.energy_converge = 30.0f;
-    } else {
-      runtime_params.remaining_energy = cap_ptr_->getRemainingPower();
-      runtime_params.energy_converge = 50.0f;
+      runtime_params.p_slope = 8.0f;
     }
   } else {
     runtime_params.remaining_energy = static_cast<float>(rfr_data_.pwr_buffer);
-    runtime_params.energy_converge = 20.0f;
+    runtime_params.energy_converge = 15.0f;
   }
   pwr_limiter_ptr_->updateSteeringModel(steer_speed_fdb_, steer_current_ref_,
                                         nullptr);
@@ -905,6 +884,30 @@ void Chassis::registerGimbalChassisComm(GimbalChassisComm *ptr) {
   gc_comm_ptr_ = ptr;
 };
 
+#pragma endregion
+#pragma region 功能函数定义
+void Chassis::setWorkingMode(WorkingMode mode) {
+  if (mode == WorkingMode::Follow && working_mode_ == WorkingMode::Gyro) {
+    is_gyro2follow_handled_ = false;
+  }
+  if (working_mode_ != mode) {
+    last_working_mode_ = working_mode_;
+    working_mode_ = mode;
+  }
+}
+
+float Chassis::getThetaI2r(bool actual_head_dir) const {
+  if (actual_head_dir == true) {
+    return theta_i2r_;
+  }
+
+  // Using XOR logic (!=) between the two flags
+  if (rev_chassis_flag_ != rev_gimbal_flag_) {
+    return hello_world::AngleNormRad(theta_i2r_ + PI);
+  } else {
+    return theta_i2r_;
+  }
+};
 #pragma endregion
 
 /* Private function definitions ----------------------------------------------*/

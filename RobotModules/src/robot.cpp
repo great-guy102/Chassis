@@ -273,7 +273,6 @@ void Robot::genModulesCmdFromRc() {
 
     if (r_switch == RcSwitchState::kUp) {
       // * 左上右上
-      use_cap_flag = true;
       gimbal_working_mode = Gimbal::WorkingMode::Sentry;
       gimbal_ctrl_mode = CtrlMode::kAuto;
       shooter_ctrl_mode = CtrlMode::kAuto;
@@ -295,7 +294,6 @@ void Robot::genModulesCmdFromRc() {
 
     if (r_switch == RcSwitchState::kUp) {
       // * 左中右上
-      use_cap_flag = true;
       gimbal_working_mode = Gimbal::WorkingMode::Sentry;
       gimbal_ctrl_mode = CtrlMode::kAuto;
       shooter_ctrl_mode = CtrlMode::kAuto;
@@ -317,7 +315,6 @@ void Robot::genModulesCmdFromRc() {
 
     if (r_switch == RcSwitchState::kUp) {
       // * 左下右上
-      use_cap_flag = true;
       gimbal_working_mode = Gimbal::WorkingMode::Sentry;
       gimbal_ctrl_mode = CtrlMode::kAuto;
       shooter_ctrl_mode = CtrlMode::kAuto;
@@ -355,6 +352,7 @@ void Robot::genModulesCmdFromRc() {
 
   if ((work_tick_ - last_rev_gimbal_tick_ > 200) &&
       (work_tick_ - last_rev_chassis_tick_ > 200)) {
+    chassis_ptr_->setRevGimbalFlag(rev_gimbal_flag);
     if (rev_gimbal_flag) {
       rev_gimbal_rc_cnt = (rev_gimbal_rc_cnt == 0 ? 1 : 0);
       chassis_ptr_->revChassis();
@@ -409,22 +407,26 @@ void Robot::genModulesCmdFromKb() {
   } else {
     if (chassis_working_mode == Chassis::WorkingMode::Depart) {
       chassis_working_mode = Chassis::WorkingMode::Follow;
-    } // TODO:待优化控制逻辑
-  }
-  if (rc_ptr_->key_C()) {
-    rev_gimbal_flag = true;
-  }
-  if (rc_ptr_->key_F()) {
-    shooter_ctrl_mode = CtrlMode::kAuto;
-  }
-  if (rc_ptr_->key_Z()) {
-    shooter_working_mode = Shooter::WorkingMode::kBackward;
+    }
   }
   if (rc_ptr_->key_R()) {
     ui_drawer_.refresh();
   }
+
+  if (rc_ptr_->key_F()) {
+  }
+
   if (rc_ptr_->key_SHIFT()) {
     use_cap_flag = true;
+  }
+  if (rc_ptr_->key_Z()) {
+    shooter_working_mode = Shooter::WorkingMode::kBackward;
+  }
+  if (rc_ptr_->key_X()) {
+    shooter_ctrl_mode = CtrlMode::kAuto;
+  }
+  if (rc_ptr_->key_C()) {
+    rev_gimbal_flag = true;
   }
 
   if (rc_ptr_->mouse_l_btn()) {
@@ -448,6 +450,7 @@ void Robot::genModulesCmdFromKb() {
 
   if ((work_tick_ - last_rev_gimbal_tick_ > 200) &&
       (work_tick_ - last_rev_chassis_tick_ > 200)) {
+    chassis_ptr_->setRevGimbalFlag(rev_gimbal_flag);
     if (rev_gimbal_flag) {
       rev_gimbal_kb_cnt = (rev_gimbal_kb_cnt == 0 ? 1 : 0);
       chassis_ptr_->revChassis();

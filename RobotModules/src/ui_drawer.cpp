@@ -193,9 +193,9 @@ bool UiDrawer::encode(uint8_t *data_ptr, size_t &data_len) {
   }
   if (ui_idx_ >= kNumAllPkgs) {
     if (is_all_added) {
-      ui_idx_ = kSuiPkgNum;
+      ui_idx_ = kSuiPkgNum; // 当所有元素已添加时，从动态UI开始
     } else {
-      ui_idx_ = 0;
+      ui_idx_ = 0; // 否则从头开始添加
     }
   }
 
@@ -208,11 +208,11 @@ bool UiDrawer::encode(uint8_t *data_ptr, size_t &data_len) {
 
   if (res) {
     ui_idx_++;
+    if(!is_all_added){
+      n_added_++;
+    }
   }
 
-  if (res && (is_all_added == false)) {
-    n_added_++;
-  }
   return res;
 };
 
