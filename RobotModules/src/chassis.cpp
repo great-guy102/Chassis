@@ -318,7 +318,7 @@ uint16_t rev_chassis_cnt = 0;    // TODO:调试
 uint16_t motors_offline_cnt = 0; // TODO:调试
 // float error_time = 0.0f; // TODO:调试
 void Chassis::revNormCmd() {
-  static bool first_follow_flag = true, first_gyro_flag = true;
+  static bool first_follow_flag = true;
   State cmd_raw = cmd_norm_;
   State cmd_state_raw = {0.0f};
 
@@ -327,7 +327,6 @@ void Chassis::revNormCmd() {
     // 分离模式不对 cmd_norm_ 进行额外处理
     gyro_dir_ = GyroDir::Unspecified;
     first_follow_flag = true;
-    first_gyro_flag = true;
     break;
   }
 
@@ -358,7 +357,6 @@ void Chassis::revNormCmd() {
   }
 
   case WorkingMode::Follow: {
-    first_gyro_flag = true;
     // //  在转头过程中，底盘不响应跟随转动指令
     if (work_tick_ - last_rev_chassis_tick_ < 200) {
       break;

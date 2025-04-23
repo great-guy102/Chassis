@@ -258,9 +258,9 @@ void Robot::genModulesCmdFromRc() {
   CtrlMode gimbal_ctrl_mode = CtrlMode::kManual;
   CtrlMode shooter_ctrl_mode = CtrlMode::kManual;
 
-  bool use_cap_flag = false;
-  bool shoot_flag = (rc_wheel > 0.9f); // 自动模式也能手动发弹;
-  // bool shoot_flag = false;               // TODO:调试
+  bool use_cap_flag = (rc_wheel > 0.9f);
+  // bool shoot_flag = (rc_wheel > 0.9f); // 自动模式也能手动发弹;
+  bool shoot_flag = false; // TODO：调试
   bool rev_gimbal_flag = false; // TODO:掉头模式，只建议分离/跟随模式使用
   bool rev_chassis_flag = false;
 
