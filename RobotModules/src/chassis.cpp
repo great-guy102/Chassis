@@ -213,7 +213,6 @@ void Chassis::runOnWorking() {
   calcSteerCurrentRef();
   calcMotorsLimitedRef();
   calcWheelCurrentRef();
-  // calcChassisState(); // TODO:调试
 };
 
 void Chassis::runAlways() { setCommData(pwr_state_ == PwrState::kWorking); };
@@ -321,8 +320,21 @@ void Chassis::revNormCmd() {
   static bool first_follow_flag = true;
   State cmd_raw = cmd_norm_;
   State cmd_state_raw = {0.0f};
+  WorkingMode act_working_mode = working_mode_; // 实际执行的工作模式
 
-  switch (working_mode_) {
+  // 当小陀螺模式切换到跟随模式时，保证底盘不会反转，否则会大大消耗功率
+  if (!is_gyro2follow_handled_) {
+    float theta_i2r = getThetaI2r(false);
+    if (!(working_mode_ == WorkingMode::Follow && last_working_mode_ == WorkingMode::Gyro) ||
+        (gyro_dir_ == GyroDir::AntiClockwise && (theta_i2r < 0 && theta_i2r > -(5.0f / 6.0f * PI))) ||
+        (gyro_dir_ == GyroDir::Clockwise && (theta_i2r > 0 && theta_i2r < (5.0f / 6.0f * PI)))) {
+      is_gyro2follow_handled_ = true;
+    } else {
+      act_working_mode = WorkingMode::Gyro;
+    }
+  }
+
+  switch (act_working_mode) {
   case WorkingMode::Depart: {
     // 分离模式不对 cmd_norm_ 进行额外处理
     gyro_dir_ = GyroDir::Unspecified;
@@ -330,34 +342,9 @@ void Chassis::revNormCmd() {
     break;
   }
 
-  case WorkingMode::Gyro: {
-    // 陀螺模式下，如果外部没有设置陀螺旋转方向，
-    if (gyro_dir_ == GyroDir::Unspecified) {
-      gyro_dir_ = GyroDir::Clockwise;
-    }
-    // 小陀螺模式下，旋转分量为定值
-    // cmd_raw.w = (config_.gyro_rot_spd - 0.5f + arm_sin_f32((2*PI / 4000) *
-    // work_tick_)) * (int8_t)gyro_dir_;
-    if (cmd_raw.v_x * cmd_raw.v_x + cmd_raw.v_y * cmd_raw.v_y < 0.0001f) {
-      if (gyro_mode_ == GyroMode::ConstW) {
-        cmd_raw.w = config_.gyro_rot_spd_stand * (int8_t)gyro_dir_;
-      } else if (gyro_mode_ == GyroMode::SinW) {
-        // cmd_raw.w = (config_.gyro_rot_spd_stand - 1.0f +
-        //              1.5f * arm_sin_f32((2 * PI / 4000) * work_tick_)) *
-        //             (int8_t)gyro_dir_;
-        cmd_raw.w = (config_.gyro_rot_spd_stand +
-                     0.75f * arm_sin_f32((2 * PI / 4000) * work_tick_) +
-                     0.75f * arm_sin_f32((2 * PI / 16000) * work_tick_)) *
-                    (int8_t)gyro_dir_;
-      }
-    } else {
-      cmd_raw.w = config_.gyro_rot_spd_move * (int8_t)gyro_dir_;
-    };
-    break;
-  }
-
   case WorkingMode::Follow: {
-    // //  在转头过程中，底盘不响应跟随转动指令
+    gyro_dir_ = GyroDir::Unspecified;
+    //  在转头过程中，底盘不响应跟随转动指令
     if (work_tick_ - last_rev_chassis_tick_ < 200) {
       break;
     }
@@ -373,11 +360,11 @@ void Chassis::revNormCmd() {
 
     if (first_follow_flag) {
       first_follow_flag = false;
-      if (fabs(theta_fdb) < PI / 2) {
-        theta_ref = 0.0f;
-      } else {
-        theta_ref = PI;
-      }
+      // if (fabs(theta_i2r_) < PI / 2) {
+      //   theta_ref = 0.0f;
+      // } else {
+      //   theta_ref = PI;
+      // }
     }
     if (last_rev_chassis_flag_ != rev_chassis_flag_) {
       last_rev_chassis_flag_ = rev_chassis_flag_;
@@ -422,6 +409,33 @@ void Chassis::revNormCmd() {
 
     break;
   }
+
+  case WorkingMode::Gyro: {
+    // 陀螺模式下，如果外部没有设置陀螺旋转方向，
+    if (gyro_dir_ == GyroDir::Unspecified) {
+      gyro_dir_ = GyroDir::Clockwise;
+    }
+    // 小陀螺模式下，旋转分量为定值
+    // cmd_raw.w = (config_.gyro_rot_spd - 0.5f + arm_sin_f32((2*PI / 4000) *
+    // work_tick_)) * (int8_t)gyro_dir_;
+    if (cmd_raw.v_x * cmd_raw.v_x + cmd_raw.v_y * cmd_raw.v_y < 0.0001f) {
+      if (gyro_mode_ == GyroMode::ConstW) {
+        cmd_raw.w = config_.gyro_rot_spd_stand * (int8_t)gyro_dir_;
+      } else if (gyro_mode_ == GyroMode::SinW) {
+        // cmd_raw.w = (config_.gyro_rot_spd_stand - 1.0f +
+        //              1.5f * arm_sin_f32((2 * PI / 4000) * work_tick_)) *
+        //             (int8_t)gyro_dir_;
+        cmd_raw.w = (config_.gyro_rot_spd_stand +
+                     0.75f * arm_sin_f32((2 * PI / 4000) * work_tick_) +
+                     0.75f * arm_sin_f32((2 * PI / 16000) * work_tick_)) *
+                    (int8_t)gyro_dir_;
+      }
+    } else {
+      cmd_raw.w = config_.gyro_rot_spd_move * (int8_t)gyro_dir_;
+    };
+    break;
+  }
+
   default: {
     break;
   }
@@ -891,6 +905,19 @@ void Chassis::setWorkingMode(WorkingMode mode) {
   if (working_mode_ != mode) {
     last_working_mode_ = working_mode_;
     working_mode_ = mode;
+  }
+}
+
+/**
+ * @brief       设置旋转方向，要求旋转方向必须有定义
+ * @param        dir: 旋转方向，GyroDir
+ * @note        用户在设置小陀螺模式后，可调用此函数指定小陀螺旋转方向
+ *              非小陀螺模式，用户无需指定小陀螺旋转方向为Unspecified，
+ *              底盘状态机会自行做该处理。
+ */
+void Chassis::setGyroDir(GyroDir dir) {
+  if (dir != GyroDir::Unspecified) {
+    gyro_dir_ = dir;
   }
 }
 

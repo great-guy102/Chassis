@@ -210,7 +210,7 @@ public:
     last_rev_gimbal_flag_ = rev_gimbal_flag_;
     rev_gimbal_flag_ = flag;
   }
-  void setGyroDir(GyroDir dir) { gyro_dir_ = dir; }
+  void setGyroDir(GyroDir dir);
   void setGyroMode(GyroMode mode) { gyro_mode_ = mode; }
   void setOmegaFeedforward(float omega) { omega_feedforward_ = omega; }
   void setUseCapFlag(bool flag) { use_cap_flag_ = flag; }
@@ -278,9 +278,9 @@ private:
   Config config_;
 
   // 由 robot 设置的数据
-  bool use_cap_flag_ = false; ///< 是否使用超级电容
+  bool use_cap_flag_ = false;               ///< 是否使用超级电容
   GyroDir gyro_dir_ = GyroDir::Unspecified; ///< 小陀螺方向
-  GyroMode gyro_mode_ = GyroMode::ConstW; ///< 陀螺模式
+  GyroMode gyro_mode_ = GyroMode::ConstW;   ///< 陀螺模式
   ///< 小陀螺方向，正为绕 Z 轴逆时针，负为顺时针，
   State cmd_norm_ = {0};    ///< 原始控制指令，基于图传坐标系
   ChassisRfrData rfr_data_; ///< 底盘 RFR 数据
@@ -366,9 +366,11 @@ private:
       nullptr}; ///< 舵电机指针 接收、发送数据 【YAW 只接收数据】
 };
 
-/* Exported variables --------------------------------------------------------*/
+/* Exported variables
+ * --------------------------------------------------------*/
 
-/* Exported function prototypes ----------------------------------------------*/
+/* Exported function prototypes
+ * ----------------------------------------------*/
 
 inline ChassisState operator*(float scalar, const ChassisState &cmd) {
   return cmd * scalar;

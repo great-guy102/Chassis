@@ -260,7 +260,7 @@ void Robot::genModulesCmdFromRc() {
 
   bool use_cap_flag = (rc_wheel > 0.9f);
   // bool shoot_flag = (rc_wheel > 0.9f); // 自动模式也能手动发弹;
-  bool shoot_flag = false; // TODO：调试
+  bool shoot_flag = false;      // TODO：调试
   bool rev_gimbal_flag = false; // TODO:掉头模式，只建议分离/跟随模式使用
   bool rev_chassis_flag = false;
 
@@ -284,7 +284,6 @@ void Robot::genModulesCmdFromRc() {
       // * 左上右下
       // TODO：云台PID测试模式
       // gimbal_working_mode = Gimbal::WorkingMode::PidTest;
-
       gimbal_ctrl_mode = CtrlMode::kAuto;
       shooter_ctrl_mode = CtrlMode::kAuto;
     }
@@ -294,9 +293,8 @@ void Robot::genModulesCmdFromRc() {
 
     if (r_switch == RcSwitchState::kUp) {
       // * 左中右上
-      gimbal_working_mode = Gimbal::WorkingMode::Sentry;
-      gimbal_ctrl_mode = CtrlMode::kAuto;
-      shooter_ctrl_mode = CtrlMode::kAuto;
+      gimbal_ctrl_mode = CtrlMode::kManual;
+      shooter_ctrl_mode = CtrlMode::kManual;
     } else if (r_switch == RcSwitchState::kMid) {
       // * 左中右中
       gimbal_ctrl_mode = CtrlMode::kAuto;
@@ -305,34 +303,29 @@ void Robot::genModulesCmdFromRc() {
       // * 左中右下
       // TODO：云台PID测试模式
       // gimbal_working_mode = Gimbal::WorkingMode::PidTest;
-
       gimbal_ctrl_mode = CtrlMode::kAuto;
       shooter_ctrl_mode = CtrlMode::kAuto;
     }
   } else if (l_switch == RcSwitchState::kDown) {
     // * 左下
     chassis_working_mode = Chassis::WorkingMode::Gyro;
-
+    gyro_dir = Chassis::GyroDir::Clockwise;
+    gyro_mode = Chassis::GyroMode::SinW;
     if (r_switch == RcSwitchState::kUp) {
       // * 左下右上
       gimbal_working_mode = Gimbal::WorkingMode::Sentry;
       gimbal_ctrl_mode = CtrlMode::kAuto;
       shooter_ctrl_mode = CtrlMode::kAuto;
-      gyro_dir = Chassis::GyroDir::Clockwise;
     } else if (r_switch == RcSwitchState::kMid) {
       // * 左下右中
       gimbal_ctrl_mode = CtrlMode::kAuto;
       shooter_ctrl_mode = CtrlMode::kManual;
-      gyro_dir = Chassis::GyroDir::Clockwise;
-      gyro_mode = Chassis::GyroMode::SinW;
     } else if (r_switch == RcSwitchState::kDown) {
       // * 左下右下
       // TODO：云台PID测试模式
       // gimbal_working_mode = Gimbal::WorkingMode::PidTest;
-
       gimbal_ctrl_mode = CtrlMode::kAuto;
       shooter_ctrl_mode = CtrlMode::kAuto;
-      gyro_dir = Chassis::GyroDir::Clockwise;
     }
   }
 
