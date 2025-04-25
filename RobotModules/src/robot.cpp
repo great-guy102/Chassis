@@ -456,8 +456,9 @@ void Robot::genModulesCmdFromKb() {
     }
   }
 
+  // 指令是否取反取决于裁判系统的协议，此处适配新版操作手端的设置
   GimbalCmd gimbal_cmd;
-  gimbal_cmd.pitch = hello_world::Bound(-0.01 * rc_ptr_->mouse_y(), -1, 1);
+  gimbal_cmd.pitch = hello_world::Bound(0.01 * rc_ptr_->mouse_y(), -1, 1);
   gimbal_cmd.yaw = hello_world::Bound(-0.01 * rc_ptr_->mouse_x(), -1, 1);
   gimbal_ptr_->setNormCmdDelta(gimbal_cmd);
   gimbal_ptr_->setCtrlMode(gimbal_ctrl_mode);
