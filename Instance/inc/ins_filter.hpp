@@ -13,8 +13,8 @@
  *******************************************************************************
  */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef INSTANCE_INS_FILTER_HPP_
-#define INSTANCE_INS_FILTER_HPP_
+#ifndef CHASSIS_INSTANCE_INS_FILTER_HPP_
+#define CHASSIS_INSTANCE_INS_FILTER_HPP_
 
 /* Includes ------------------------------------------------------------------*/
 #include "base.hpp"
@@ -29,4 +29,4 @@ namespace hw_filter = hello_world::filter;
 hw_filter::Ramp *GetRampCmdVx(void);
 hw_filter::Ramp *GetRampCmdVy(void);
 hw_filter::Ramp *GetRampCmdV(void);
-#endif /* INSTANCE_INS_FILTER_HPP_ */
+#endif /* CHASSIS_INSTANCE_INS_FILTER_HPP_ */

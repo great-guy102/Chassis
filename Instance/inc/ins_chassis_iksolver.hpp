@@ -13,8 +13,8 @@
  *******************************************************************************
  */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef INSTANCE_INS_CHASSIS_IKSOLVER_HPP_
-#define INSTANCE_INS_CHASSIS_IKSOLVER_HPP_
+#ifndef CHASSIS_INSTANCE_INS_CHASSIS_IKSOLVER_HPP_
+#define CHASSIS_INSTANCE_INS_CHASSIS_IKSOLVER_HPP_
 
 /* Includes ------------------------------------------------------------------*/
 #include "chassis_iksolver.hpp"
@@ -27,4 +27,4 @@ namespace hw_chassis_iksolver = hello_world::chassis_ik_solver;
 /* Exported function prototypes ----------------------------------------------*/
 hw_chassis_iksolver::ChassisIkSolver *GetChassisIkSolver(void);
 
-#endif /* INSTANCE_INS_CHASSIS_IKSOLVER_HPP_ */
+#endif /* CHASSIS_INSTANCE_INS_CHASSIS_IKSOLVER_HPP_ */

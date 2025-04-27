@@ -13,8 +13,8 @@
  *******************************************************************************
  */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef INSTANCE_INS_IMU_HPP_
-#define INSTANCE_INS_IMU_HPP_
+#ifndef CHASSIS_INSTANCE_INS_IMU_HPP_
+#define CHASSIS_INSTANCE_INS_IMU_HPP_
 
 /* Includes ------------------------------------------------------------------*/
 #include "imu.hpp"
@@ -28,4 +28,4 @@ namespace hw_imu = hello_world::imu;
 
 hw_imu::Imu *GetImu(void);
 
-#endif /* INSTANCE_INS_IMU_HPP_ */
+#endif /* CHASSIS_INSTANCE_INS_IMU_HPP_ */

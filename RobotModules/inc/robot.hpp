@@ -13,8 +13,8 @@
  *******************************************************************************
  */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef ROBOT_MODULES_ROBOT_HPP_
-#define ROBOT_MODULES_ROBOT_HPP_
+#ifndef CHASSIS_ROBOT_MODULES_ROBOT_HPP_
+#define CHASSIS_ROBOT_MODULES_ROBOT_HPP_
 
 /* Includes ------------------------------------------------------------------*/
 #include "DT7.hpp"
@@ -210,4 +210,4 @@ private:
 /* Exported variables --------------------------------------------------------*/
 /* Exported function prototypes ----------------------------------------------*/
 } // namespace robot
-#endif /* ROBOT_MODULE_ROBOT_HPP_ */
+#endif /* CHASSIS_ROBOT_MODULE_ROBOT_HPP_ */

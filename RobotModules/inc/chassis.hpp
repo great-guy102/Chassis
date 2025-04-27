@@ -13,8 +13,8 @@
  *******************************************************************************
  */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef ROBOT_MODULES_CHASSIS_HPP_
-#define ROBOT_MODULES_CHASSIS_HPP_
+#ifndef CHASSIS_ROBOT_MODULES_CHASSIS_HPP_
+#define CHASSIS_ROBOT_MODULES_CHASSIS_HPP_
 
 /* Includes ------------------------------------------------------------------*/
 #include <cmath>
@@ -377,4 +377,4 @@ inline ChassisState operator*(float scalar, const ChassisState &cmd) {
 };
 
 } // namespace robot
-#endif /* ROBOT_MODULES_CHASSIS_HPP_ */
+#endif /* CHASSIS_ROBOT_MODULES_CHASSIS_HPP_ */

@@ -13,8 +13,8 @@
  *******************************************************************************
  */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef INS_RFR_HPP_
-#define INS_RFR_HPP_
+#ifndef CHASSIS_INSTANCE_INS_RFR_HPP_
+#define CHASSIS_INSTANCE_INS_RFR_HPP_
 
 /* Includes ------------------------------------------------------------------*/
 #include "referee.hpp"
@@ -30,4 +30,4 @@ hello_world::referee::RobotShooterPackage *GetRobotShooterPackage();
 hello_world::referee::RobotHurtPackage *GetRobotHurtPackage();
 hello_world::referee::Referee *GetReferee();
 
-#endif /* INS_RFR_HPP_ */
+#endif /* CHASSIS_INSTANCE_INS_RFR_HPP_ */

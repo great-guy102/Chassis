@@ -16,8 +16,8 @@
  * | 1.0.0 | 2024-MM-DD | ZhouShichan | description |
  */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef HW_COMPONENTS_DEVICES_REFEREE_RFR_ENCODER_HPP_
-#define HW_COMPONENTS_DEVICES_REFEREE_RFR_ENCODER_HPP_
+#ifndef CHASSIS_ROBOT_MODULES_RFR_ENCODER_HPP_
+#define CHASSIS_ROBOT_MODULES_RFR_ENCODER_HPP_
 
 /* Includes ------------------------------------------------------------------*/
 #include "rfr_pkg/rfr_pkg_core.hpp"
@@ -66,4 +66,4 @@ class RfrEncoder : public MemMgr
 }  // namespace referee
 }  // namespace hello_world
 
-#endif /* HW_COMPONENTS_DEVICES_REFEREE_RFR_ENCODER_HPP_ */
+#endif /* CHASSIS_ROBOT_MODULES_RFR_ENCODER_HPP_ */

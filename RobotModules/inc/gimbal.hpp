@@ -13,8 +13,8 @@
  *******************************************************************************
  */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef ROBOT_MODULES_GIMBAL_HPP_
-#define ROBOT_MODULES_GIMBAL_HPP_
+#ifndef CHASSIS_ROBOT_MODULES_GIMBAL_HPP_
+#define CHASSIS_ROBOT_MODULES_GIMBAL_HPP_
 /* Includes ------------------------------------------------------------------*/
 #include "allocator.hpp"
 #include "module_fsm.hpp"
@@ -109,4 +109,4 @@ inline GimbalCmd operator*(float scalar, const GimbalCmd &cmd) {
   return {cmd.pitch * scalar, cmd.yaw * scalar};
 }
 } // namespace robot
-#endif /* ROBOT_MODULES_GIMBAL_HPP_ */
+#endif /* CHASSIS_ROBOT_MODULES_GIMBAL_HPP_ */

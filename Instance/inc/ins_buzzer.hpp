@@ -13,8 +13,8 @@
  *******************************************************************************
  */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef INSTANCE_INS_BUZZER_HPP_
-#define INSTANCE_INS_BUZZER_HPP_
+#ifndef CHASSIS_INSTANCE_INS_BUZZER_HPP_
+#define CHASSIS_INSTANCE_INS_BUZZER_HPP_
 
 /* Includes ------------------------------------------------------------------*/
 #include "buzzer.hpp"
@@ -27,4 +27,4 @@ namespace hw_buzzer = hello_world::buzzer;
 /* Exported variables --------------------------------------------------------*/
 /* Exported function prototypes ----------------------------------------------*/
 hw_buzzer::Buzzer *GetBuzzer(void);
-#endif /* INSTANCE_INS_BUZZER_HPP_ */
+#endif /* CHASSIS_INSTANCE_INS_BUZZER_HPP_ */

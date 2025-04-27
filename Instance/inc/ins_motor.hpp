@@ -13,8 +13,8 @@
  *******************************************************************************
  */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef INSTANCE_INS_MOTOR_HPP_
-#define INSTANCE_INS_MOTOR_HPP_
+#ifndef CHASSIS_INSTANCE_INS_MOTOR_HPP_
+#define CHASSIS_INSTANCE_INS_MOTOR_HPP_
 
 /* Includes ------------------------------------------------------------------*/
 #include "motor.hpp"
@@ -38,4 +38,4 @@ hw_motor::Motor *GetMotorSteerRightFront();
 // 创建yaw电机
 hw_motor::Motor *GetMotorYaw();
 
-#endif /* INSTANCE_INS_MOTOR_HPP_ */
+#endif /* CHASSIS_INSTANCE_INS_MOTOR_HPP_ */

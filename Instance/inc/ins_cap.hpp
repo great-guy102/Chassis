@@ -13,8 +13,8 @@
  *******************************************************************************
  */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef INSTANCE_INS_CAP_HPP_
-#define INSTANCE_INS_CAP_HPP_
+#ifndef CHASSIS_INSTANCE_INS_CAP_HPP_
+#define CHASSIS_INSTANCE_INS_CAP_HPP_
 
 /* Includes ------------------------------------------------------------------*/
 #include "super_cap.hpp"
@@ -26,4 +26,4 @@
 hello_world::cap::SuperCap *GetCap(void);
 /* Exported function prototypes ----------------------------------------------*/
 
-#endif /* INSTANCE_INS_CAP_HPP_ */
+#endif /* CHASSIS_INSTANCE_INS_CAP_HPP_ */

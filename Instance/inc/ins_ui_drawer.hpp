@@ -13,8 +13,8 @@
  *******************************************************************************
  */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef INS_UI_DRAWER_HPP_
-#define INS_UI_DRAWER_HPP_
+#ifndef CHASSIS_INSTANCE_INS_UI_DRAWER_HPP_
+#define CHASSIS_INSTANCE_INS_UI_DRAWER_HPP_
 
 /* Includes ------------------------------------------------------------------*/
 #include "ui_drawer.hpp"
@@ -26,4 +26,4 @@
 /* Exported function prototypes ----------------------------------------------*/
 robot::UiDrawer *GetUiDrawer();
 
-#endif /* INS_UI_DRAWER_HPP_ */
+#endif /* CHASSIS_INSTANCE_INS_UI_DRAWER_HPP_ */

@@ -13,8 +13,8 @@
  *******************************************************************************
  */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef UI_DRAWER_HPP_
-#define UI_DRAWER_HPP_
+#ifndef CHASSIS_ROBOT_MODULE_UI_DRAWER_HPP_
+#define CHASSIS_ROBOT_MODULE_UI_DRAWER_HPP_
 
 /* Includes ------------------------------------------------------------------*/
 #include "fsm.hpp"
@@ -248,13 +248,13 @@ private:
     pkg.setStrintg(g, str);
     return encodePkg(data_ptr, data_len, opt, pkg);
   };
-//汇总
+  // 汇总
   bool encodeStaticUi(uint8_t *data_ptr, size_t &data_len, GraphicOperation opt,
                       StaticUiIdx idx);
   bool encodeDynamicUi(uint8_t *data_ptr, size_t &data_len,
                        GraphicOperation opt, DynamicUiIdx idx);
   bool encodeDelAll(uint8_t *data_ptr, size_t &data_len);
-// UI组
+  // UI组
   bool encodeStaticPkgGroup1(uint8_t *data_ptr, size_t &data_len,
                              GraphicOperation opt);
   bool encodeStaticPkgGroup2(uint8_t *data_ptr, size_t &data_len,
@@ -263,7 +263,7 @@ private:
                              GraphicOperation opt);
   bool encodeDynaUiPkgGroup2(uint8_t *data_ptr, size_t &data_len,
                              GraphicOperation opt);
-//WorkState
+  // WorkState
   bool encodeChassisWorkStateTitle(uint8_t *data_ptr, size_t &data_len,
                                    GraphicOperation opt);
   bool encodeChassisWorkStateContent(uint8_t *data_ptr, size_t &data_len,
@@ -276,15 +276,15 @@ private:
                                    GraphicOperation opt);
   bool encodeShooterWorkStateContent(uint8_t *data_ptr, size_t &data_len,
                                      GraphicOperation opt);
-//Online
+  // Online
   bool encodeMotionModuleOnlineTitle(uint8_t *data_ptr, size_t &data_len,
-                                    GraphicOperation opt);
+                                     GraphicOperation opt);
   bool encodeMotionModuleOnlineContent(uint8_t *data_ptr, size_t &data_len,
-                                      GraphicOperation opt);
+                                       GraphicOperation opt);
   bool encodeShootModuleOnlineTitle(uint8_t *data_ptr, size_t &data_len,
-                                      GraphicOperation opt);
+                                    GraphicOperation opt);
   bool encodeShootModuleOnlineContent(uint8_t *data_ptr, size_t &data_len,
-                                        GraphicOperation opt);
+                                      GraphicOperation opt);
 #pragma endregion
 
 #pragma region UI生成函数
@@ -380,4 +380,4 @@ private:
 /* Exported function prototypes ----------------------------------------------*/
 } // namespace robot
 
-#endif /* UI_DRAWER_HPP_ */
+#endif /* CHASSIS_ROBOT_MODULE_UI_DRAWER_HPP_ */

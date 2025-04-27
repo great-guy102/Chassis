@@ -13,8 +13,8 @@
  *******************************************************************************
  */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef COMM_TASK_HPP_
-#define COMM_TASK_HPP_
+#ifndef CHASSIS_TASK_COMM_TASK_HPP_
+#define CHASSIS_TASK_COMM_TASK_HPP_
 
 /* Includes ------------------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
@@ -31,4 +31,4 @@ void CommTask(void);
 }
 #endif
 
-#endif /* COMM_TASK_HPP_ */
+#endif /* CHASSIS_TASK_COMM_TASK_HPP_ */

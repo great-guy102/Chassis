@@ -13,8 +13,8 @@
  *******************************************************************************
  */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef INSTANCE_INS_COMM_HPP_
-#define INSTANCE_INS_COMM_HPP_
+#ifndef CHASSIS_INSTANCE_INS_COMM_HPP_
+#define CHASSIS_INSTANCE_INS_COMM_HPP_
 
 /* Includes ------------------------------------------------------------------*/
 
@@ -40,4 +40,4 @@ hello_world::comm::UartTxMgr *GetRfrTxMgr(void);
 
 hello_world::comm::UartRxMgr *GetRcRxMgr(void);
 
-#endif /* INSTANCE_INS_COMM_HPP_ */
+#endif /* CHASSIS_INSTANCE_INS_COMM_HPP_ */

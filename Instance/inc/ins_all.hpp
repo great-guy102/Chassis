@@ -13,8 +13,8 @@
  *******************************************************************************
  */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef INSTANCE_INS_ALL_HPP_
-#define INSTANCE_INS_ALL_HPP_
+#ifndef CHASSIS_INSTANCE_INS_ALL_HPP_
+#define CHASSIS_INSTANCE_INS_ALL_HPP_
 
 /* Includes ------------------------------------------------------------------*/
 #include "ins_buzzer.hpp"
@@ -37,4 +37,4 @@
 /* Exported variables --------------------------------------------------------*/
 /* Exported function prototypes ----------------------------------------------*/
 
-#endif /* INSTANCE_INS_ALL_HPP_ */
+#endif /* CHASSIS_INSTANCE_INS_ALL_HPP_ */

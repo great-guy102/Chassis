@@ -13,8 +13,8 @@
  *******************************************************************************
  */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef INSTANCE_INS_ROBOT_HPP_
-#define INSTANCE_INS_ROBOT_HPP_
+#ifndef CHASSIS_INSTANCE_INS_ROBOT_HPP_
+#define CHASSIS_INSTANCE_INS_ROBOT_HPP_
 
 /* Includes ------------------------------------------------------------------*/
 #include "chassis.hpp"
@@ -33,4 +33,4 @@ robot::Shooter *GetShooter();
 robot::Robot *GetRobot();
 /* Exported function prototypes ----------------------------------------------*/
 
-#endif /* INSTANCE_INS_ROBOT_HPP_ */
+#endif /* CHASSIS_INSTANCE_INS_ROBOT_HPP_ */

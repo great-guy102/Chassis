@@ -13,8 +13,8 @@
  *******************************************************************************
  */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef INS_RC_HPP_
-#define INS_RC_HPP_
+#ifndef CHASSIS_INSTANCE_INS_RC_HPP_
+#define CHASSIS_INSTANCE_INS_RC_HPP_
 
 /* Includes ------------------------------------------------------------------*/
 #include "DT7.hpp"
@@ -29,4 +29,4 @@ namespace hw_rc = hello_world::remote_control;
 /* Exported function prototypes ----------------------------------------------*/
 hw_rc::DT7 *GetRemoteControl(void);
 
-#endif /* INS_RC_HPP_ */
+#endif /* CHASSIS_INSTANCE_INS_RC_HPP_ */

@@ -13,8 +13,8 @@
  *******************************************************************************
  */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef MAIN_TASK_HPP_
-#define MAIN_TASK_HPP_
+#ifndef CHASSIS_TASK_MAIN_TASK_HPP_
+#define CHASSIS_TASK_MAIN_TASK_HPP_
 
 /* Includes ------------------------------------------------------------------*/
 #ifdef __cplusplus
@@ -31,4 +31,4 @@ void MainTask(void);
 #ifdef __cplusplus
 }
 #endif
-#endif /* MAIN_TASK_HPP_ */
+#endif /* CHASSIS_TASK_MAIN_TASK_HPP_ */

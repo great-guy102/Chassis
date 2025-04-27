@@ -13,8 +13,8 @@
  *******************************************************************************
  */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef INSTANCE_INS_PID_HPP_
-#define INSTANCE_INS_PID_HPP_
+#ifndef CHASSIS_INSTANCE_INS_PID_HPP_
+#define CHASSIS_INSTANCE_INS_PID_HPP_
 
 /* Includes ------------------------------------------------------------------*/
 #include "pid.hpp"
@@ -36,4 +36,4 @@ hw_pid::MultiNodesPid *GetPidMotorSteerRightRear();
 hw_pid::MultiNodesPid *GetPidMotorSteerRightFront();
 
 hw_pid::MultiNodesPid *GetPidFollowOmega();
-#endif /* INSTANCE_INS_PID_HPP_ */
+#endif /* CHASSIS_INSTANCE_INS_PID_HPP_ */
