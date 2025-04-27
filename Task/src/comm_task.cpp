@@ -25,6 +25,7 @@
 #include "tick.hpp"
 
 // custom
+#include "gimbal_chassis_comm.hpp"
 #include "ins_all.hpp"
 
 using hello_world::comm::CanRxMgr;
@@ -32,8 +33,7 @@ using hello_world::comm::CanTxMgr;
 using hello_world::comm::UartRxMgr;
 using hello_world::comm::UartTxMgr;
 using hello_world::referee::Referee;
-using hello_world::remote_control::DT7;
-
+using robot::GimbalChassisComm;
 /* Private macro -------------------------------------------------------------*/
 
 /* Private constants ---------------------------------------------------------*/
@@ -48,12 +48,10 @@ static CanTxMgr *can1_tx_mgr_ptr = nullptr;
 static CanRxMgr *can2_rx_mgr_ptr = nullptr;
 static CanTxMgr *can2_tx_mgr_ptr = nullptr;
 
-static UartRxMgr *rc_rx_mgr_ptr = nullptr;
-// static DT7* rc_ptr = nullptr;
-
 static UartRxMgr *rfr_rx_mgr_ptr = nullptr;
 static UartTxMgr *rfr_tx_mgr_ptr = nullptr;
-// static Referee* rfr_ptr = nullptr;
+
+static GimbalChassisComm *gc_comm_ptr = nullptr;
 
 /* External variables --------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
@@ -63,13 +61,6 @@ static void CommAddTransmitter(void);
 static void CommHardWareInit(void);
 
 /* Exported function definitions ---------------------------------------------*/
-
-void CommTaskInit(void) {
-  PrivatePointerInit();
-  CommAddReceiver();
-  CommAddTransmitter();
-  CommHardWareInit();
-};
 
 void CommTask(void) {
   HW_ASSERT(can1_tx_mgr_ptr != nullptr, "can1_tx_mgr_ptr is nullptr",
@@ -87,6 +78,11 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
             can2_rx_mgr_ptr);
   can1_rx_mgr_ptr->rxFifoMsgPendingCallback(hcan);
   can2_rx_mgr_ptr->rxFifoMsgPendingCallback(hcan);
+
+  HW_ASSERT(gc_comm_ptr != nullptr, "gc_comm_ptr is nullptr", gc_comm_ptr);
+  if (!gc_comm_ptr->isOffline()) {
+    HAL_IWDG_Refresh(&hiwdg);
+  }
 }
 
 void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan) {
@@ -149,18 +145,9 @@ uint32_t uart6_rx_cnt = 0;
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
   uart_rx_tick = hello_world::tick::GetTickMs();
   uart_rx_cb_in++;
-  // 遥控器
-  if (huart == &huart3) {
-    uart3_rx_cnt++;
-    uint32_t tick_start = __HAL_TIM_GET_COUNTER(&htim2);
-    rc_rx_mgr_ptr->rxEventCallback(huart, Size);
-    HAL_IWDG_Refresh(&hiwdg);
-    uint32_t tick_end = __HAL_TIM_GET_COUNTER(&htim2);
-    uart3_uticks = (tick_end - tick_start) / (84.0f * 1e3);
-    uart3_rx_cnt--;
-  }
+
   // 裁判系统
-  else if (huart == &huart6) {
+  if (huart == &huart6) {
     uart6_rx_cnt++;
     uint32_t tick_start = __HAL_TIM_GET_COUNTER(&htim2);
     rfr_rx_mgr_ptr->rxEventCallback(huart, Size);
@@ -171,17 +158,19 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
 }
 
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
-  // 遥控器
-  if (huart == &huart3) {
-    rc_rx_mgr_ptr->startReceive();
-  }
   // 裁判系统
-  else if (huart == &huart6) {
+  if (huart == &huart6) {
     rfr_rx_mgr_ptr->startReceive();
   }
 };
 
 /* Private function definitions ----------------------------------------------*/
+void CommTaskInit(void) {
+  PrivatePointerInit();
+  CommAddReceiver();
+  CommAddTransmitter();
+  CommHardWareInit();
+};
 
 static void PrivatePointerInit(void) {
   can1_rx_mgr_ptr = GetCan1RxMgr();
@@ -189,8 +178,6 @@ static void PrivatePointerInit(void) {
 
   can2_rx_mgr_ptr = GetCan2RxMgr();
   can2_tx_mgr_ptr = GetCan2TxMgr();
-
-  rc_rx_mgr_ptr = GetRcRxMgr();
 
   rfr_rx_mgr_ptr = GetRfrRxMgr();
   rfr_tx_mgr_ptr = GetRfrTxMgr();
@@ -213,10 +200,6 @@ static void CommAddReceiver(void) {
   can2_rx_mgr_ptr->addReceiver(GetMotorWheelRightRear());
   can2_rx_mgr_ptr->addReceiver(GetMotorWheelRightFront());
   can2_rx_mgr_ptr->addReceiver(GetMotorYaw()); // 用于底盘控制，只接受消息
-
-  HW_ASSERT(rc_rx_mgr_ptr != nullptr, "rc_rx_mgr_ptr is nullptr",
-            rc_rx_mgr_ptr);
-  rc_rx_mgr_ptr->addReceiver(GetRemoteControl());
 
   HW_ASSERT(rfr_rx_mgr_ptr != nullptr, "rfr_rx_mgr_ptr is nullptr",
             rfr_rx_mgr_ptr);
@@ -259,10 +242,6 @@ void CommHardWareInit(void) {
   can2_rx_mgr_ptr->startReceive();
   HAL_CAN_Start(&hcan2);
 
-  // rc DMA init
-  HW_ASSERT(rc_rx_mgr_ptr != nullptr, "rc_rx_mgr_ptr is nullptr",
-            rc_rx_mgr_ptr);
-  rc_rx_mgr_ptr->startReceive();
   // rfr DMA Init
   HW_ASSERT(rfr_rx_mgr_ptr != nullptr, "rfr_rx_mgr_ptr is nullptr",
             rfr_rx_mgr_ptr);

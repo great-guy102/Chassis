@@ -38,6 +38,4 @@ hello_world::comm::CanTxMgr *GetCan2TxMgr(void);
 hello_world::comm::UartRxMgr *GetRfrRxMgr(void);
 hello_world::comm::UartTxMgr *GetRfrTxMgr(void);
 
-hello_world::comm::UartRxMgr *GetRcRxMgr(void);
-
 #endif /* CHASSIS_INSTANCE_INS_COMM_HPP_ */

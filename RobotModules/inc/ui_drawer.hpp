@@ -17,12 +17,7 @@
 #define CHASSIS_ROBOT_MODULE_UI_DRAWER_HPP_
 
 /* Includes ------------------------------------------------------------------*/
-#include "fsm.hpp"
-#include "module_fsm.hpp"
-
 #include "chassis.hpp"
-#include "gimbal.hpp"
-#include "shooter.hpp"
 
 #include "rfr_encoder.hpp"
 #include "rfr_official_pkgs.hpp"
@@ -41,15 +36,6 @@ public:
   typedef hello_world::referee::String String;
   typedef hello_world::referee::GraphicLayer GraphicLayer;
   typedef hello_world::referee::String::Color StringColor;
-
-  typedef hello_world::module::CtrlMode FsmCtrlMode;
-  typedef hello_world::module::ManualCtrlSrc FsmManualCtrlSrc;
-  typedef hello_world::module::PwrState FsmWorkState;
-  typedef hello_world::module::PwrState PwrState;
-  typedef hello_world::module::Fric::WorkingMode ShooterWorkingMode;
-
-  typedef robot::Chassis::WorkingMode ChassisWorkingMode;
-  typedef robot::Gimbal::WorkingMode GimbalWorkingMode;
 
   enum StaticUiIdx {
     kSuiDelAll = 0,
@@ -103,19 +89,19 @@ public:
     }
   }
   void setChassisThetaI2r(float theta_i2r) { theta_i2r_ = theta_i2r; }
-  void setChassisWorkState(FsmWorkState state) {
+  void setChassisWorkState(PwrState state) {
     if (state != chassis_work_state_) {
       last_chassis_work_state_ = chassis_work_state_;
       chassis_work_state_ = state;
     }
   }
-  void setChassisCtrlMode(FsmCtrlMode mode) {
+  void setChassisCtrlMode(CtrlMode mode) {
     if (mode != chassis_ctrl_mode_) {
       last_chassis_ctrl_mode_ = chassis_ctrl_mode_;
       chassis_ctrl_mode_ = mode;
     }
   }
-  void setChassisManualCtrlSrc(FsmManualCtrlSrc src) {
+  void setChassisManualCtrlSrc(ManualCtrlSrc src) {
     if (src != chassis_manual_ctrl_src_) {
       last_chassis_manual_ctrl_src_ = chassis_manual_ctrl_src_;
       chassis_manual_ctrl_src_ = src;
@@ -139,19 +125,19 @@ public:
     gimbal_joint_angle_pitch_fdb_ = pitch;
   }
   void setGimbalJointAngYawFdb(float yaw) { gimbal_joint_angle_yaw_fdb_ = yaw; }
-  void setGimbalWorkState(FsmWorkState state) {
+  void setGimbalWorkState(PwrState state) {
     if (state != gimbal_work_state_) {
       last_gimbal_work_state_ = gimbal_work_state_;
       gimbal_work_state_ = state;
     }
   }
-  void setGimbalCtrlMode(FsmCtrlMode mode) {
+  void setGimbalCtrlMode(CtrlMode mode) {
     if (mode != gimbal_ctrl_mode_) {
       last_gimbal_ctrl_mode_ = gimbal_ctrl_mode_;
       gimbal_ctrl_mode_ = mode;
     }
   }
-  void setGimbalManualCtrlSrc(FsmManualCtrlSrc src) {
+  void setGimbalManualCtrlSrc(ManualCtrlSrc src) {
     if (src != gimbal_manual_ctrl_src_) {
       last_gimbal_manual_ctrl_src_ = gimbal_manual_ctrl_src_;
       gimbal_manual_ctrl_src_ = src;
@@ -185,19 +171,19 @@ public:
   }
   void setHeat(float heat) { heat_ = heat; }
   void setHeatLimit(float limit) { heat_limit_ = limit; }
-  void setShooterWorkState(FsmWorkState state) {
+  void setShooterWorkState(PwrState state) {
     if (state != shooter_work_state_) {
       last_shooter_work_state_ = shooter_work_state_;
       shooter_work_state_ = state;
     }
   }
-  void setShooterCtrlMode(FsmCtrlMode mode) {
+  void setShooterCtrlMode(CtrlMode mode) {
     if (mode != shooter_ctrl_mode_) {
       last_shooter_ctrl_mode_ = shooter_ctrl_mode_;
       shooter_ctrl_mode_ = mode;
     }
   }
-  void setShooterManualCtrlSrc(FsmManualCtrlSrc src) {
+  void setShooterManualCtrlSrc(ManualCtrlSrc src) {
     if (src != shooter_manual_ctrl_src_) {
       last_shooter_manual_ctrl_src_ = shooter_manual_ctrl_src_;
       shooter_manual_ctrl_src_ = src;
@@ -319,12 +305,12 @@ private:
   bool is_steer_motors_online_ = false,
        last_is_steer_motors_online_ = false; ///< 舵电机是否全部在线
   float theta_i2r_ = 0.0f;
-  FsmWorkState chassis_work_state_ = FsmWorkState::kDead;
-  FsmWorkState last_chassis_work_state_ = FsmWorkState::kDead;
-  FsmCtrlMode chassis_ctrl_mode_ = FsmCtrlMode::kManual;
-  FsmCtrlMode last_chassis_ctrl_mode_ = FsmCtrlMode::kManual;
-  FsmManualCtrlSrc chassis_manual_ctrl_src_ = FsmManualCtrlSrc::kRc;
-  FsmManualCtrlSrc last_chassis_manual_ctrl_src_ = FsmManualCtrlSrc::kRc;
+  PwrState chassis_work_state_ = PwrState::kDead;
+  PwrState last_chassis_work_state_ = PwrState::kDead;
+  CtrlMode chassis_ctrl_mode_ = CtrlMode::kManual;
+  CtrlMode last_chassis_ctrl_mode_ = CtrlMode::kManual;
+  ManualCtrlSrc chassis_manual_ctrl_src_ = ManualCtrlSrc::kRc;
+  ManualCtrlSrc last_chassis_manual_ctrl_src_ = ManualCtrlSrc::kRc;
   ChassisWorkingMode chassis_working_mode_ = ChassisWorkingMode::Depart;
   ChassisWorkingMode last_chassis_working_mode_ = ChassisWorkingMode::Depart;
 
@@ -333,12 +319,12 @@ private:
        last_is_gimbal_motors_online_ = false; ///< 云台是否在线
   float gimbal_joint_angle_pitch_fdb_ = 0.0f,
         gimbal_joint_angle_yaw_fdb_ = 0.0f;
-  FsmWorkState gimbal_work_state_ = FsmWorkState::kDead;
-  FsmWorkState last_gimbal_work_state_ = FsmWorkState::kDead;
-  FsmCtrlMode gimbal_ctrl_mode_ = FsmCtrlMode::kManual;
-  FsmCtrlMode last_gimbal_ctrl_mode_ = FsmCtrlMode::kManual;
-  FsmManualCtrlSrc gimbal_manual_ctrl_src_ = FsmManualCtrlSrc::kRc;
-  FsmManualCtrlSrc last_gimbal_manual_ctrl_src_ = FsmManualCtrlSrc::kRc;
+  PwrState gimbal_work_state_ = PwrState::kDead;
+  PwrState last_gimbal_work_state_ = PwrState::kDead;
+  CtrlMode gimbal_ctrl_mode_ = CtrlMode::kManual;
+  CtrlMode last_gimbal_ctrl_mode_ = CtrlMode::kManual;
+  ManualCtrlSrc gimbal_manual_ctrl_src_ = ManualCtrlSrc::kRc;
+  ManualCtrlSrc last_gimbal_manual_ctrl_src_ = ManualCtrlSrc::kRc;
   GimbalWorkingMode gimbal_working_mode_ = GimbalWorkingMode::Normal;
   GimbalWorkingMode last_gimbal_working_mode_ = GimbalWorkingMode::Normal;
 
@@ -349,12 +335,12 @@ private:
        last_shooter_stuck_flag_ = false;                   // 记录卡弹状态
   uint8_t feed_stuck_status_ = 0, last_feed_stuck_status_; // 记录卡弹状态
   float heat_ = 0, heat_limit_ = 100;
-  FsmWorkState shooter_work_state_ = FsmWorkState::kDead;
-  FsmWorkState last_shooter_work_state_ = FsmWorkState::kDead;
-  FsmCtrlMode shooter_ctrl_mode_ = FsmCtrlMode::kManual;
-  FsmCtrlMode last_shooter_ctrl_mode_ = FsmCtrlMode::kManual;
-  FsmManualCtrlSrc shooter_manual_ctrl_src_ = FsmManualCtrlSrc::kRc;
-  FsmManualCtrlSrc last_shooter_manual_ctrl_src_ = FsmManualCtrlSrc::kRc;
+  PwrState shooter_work_state_ = PwrState::kDead;
+  PwrState last_shooter_work_state_ = PwrState::kDead;
+  CtrlMode shooter_ctrl_mode_ = CtrlMode::kManual;
+  CtrlMode last_shooter_ctrl_mode_ = CtrlMode::kManual;
+  ManualCtrlSrc shooter_manual_ctrl_src_ = ManualCtrlSrc::kRc;
+  ManualCtrlSrc last_shooter_manual_ctrl_src_ = ManualCtrlSrc::kRc;
   ShooterWorkingMode shooter_working_mode_ = ShooterWorkingMode::kShoot;
   ShooterWorkingMode last_shooter_working_mode_ = ShooterWorkingMode::kShoot;
 

@@ -23,7 +23,7 @@ float wheel_speed_ref_debug = 0;
 
 hello_world::pid::MultiNodesPid::Datas pid_data; // TODO:PID调试数据
 // 使用示例：pid_data = pid_ptr->getPidAt(0).datas();
-// Chassis::State cmd_state_raw = {0.0f}, cmd_state = {0.0f}; // TODO:调试
+// Chassis::ChassisState cmd_state_raw = {0.0f}, cmd_state = {0.0f}; // TODO:调试
 namespace robot {
 /* Private constants ---------------------------------------------------------*/
 /* Private types -------------------------------------------------------------*/
@@ -111,7 +111,7 @@ void Chassis::updateGimbalBoardData() {
     is_gimbal_imu_ready_ = true;
   } else {
     is_gimbal_imu_ready_ =
-        gc_comm_ptr_->main_board_data().gp.is_gimbal_imu_ready;
+        gc_comm_ptr_->main_board_data().gp.gimbal_is_imu_ready;
   }
 };
 
@@ -183,10 +183,10 @@ void Chassis::updateMotorData() {
 void Chassis::updateCapData() {
   HW_ASSERT(cap_ptr_ != nullptr, "pointer to Capacitor is nullptr", cap_ptr_);
   if (cap_ptr_->isOffline()) {
-    is_high_spd_enabled_ = false;
+    is_cap_usable_ = false;
     cap_remaining_energy_ = 0.0f;
   } else {
-    is_high_spd_enabled_ = cap_ptr_->isUsingSuperCap();
+    is_cap_usable_ = cap_ptr_->isUsingSuperCap();
     cap_remaining_energy_ = cap_ptr_->getRemainingPower();
   }
 };
@@ -236,7 +236,7 @@ void Chassis::calcChassisState() {
   const float r_square = (length * length + width * width) / 4.0f;
 
   float theta_i2r = 0.0f;
-  State chassis_state_raw = {0.0f};
+  ChassisState chassis_state_raw = {0.0f};
 
   if (is_all_wheel_online_ && is_all_steer_online_) {
     float steer_angle[4] = {0.0f}, wheel_speed[4] = {0.0f};
@@ -318,8 +318,8 @@ uint16_t motors_offline_cnt = 0; // TODO:调试
 // float error_time = 0.0f; // TODO:调试
 void Chassis::revNormCmd() {
   static bool first_follow_flag = true;
-  State cmd_raw = cmd_norm_;
-  State cmd_state_raw = {0.0f};
+  ChassisState cmd_raw = cmd_norm_;
+  ChassisState cmd_state_raw = {0.0f};
   WorkingMode act_working_mode = working_mode_; // 实际执行的工作模式
 
   // 当小陀螺模式切换到跟随模式时，保证底盘不会反转，否则会大大消耗功率
@@ -571,7 +571,7 @@ void Chassis::calcMotorsLimitedRef() {
       .danger_energy = 5.0f,
   };
 
-  if (!cap_ptr_->isOffline()) {
+  if (is_cap_usable_) {
     runtime_params.remaining_energy = cap_ptr_->getRemainingPower();
     if (use_cap_flag_ == true) {
       runtime_params.p_ref_max = 480.0f;
@@ -644,7 +644,7 @@ void Chassis::reset() {
                      ///< 轴到底盘坐标系的旋转角度，右手定则判定正反向，单位 rad
 
   // cap fdb data 在 update 函数中更新
-  is_high_spd_enabled_ = false; ///< 是否开启了高速模式 （开启意味着从电容取电）
+  is_cap_usable_ = false; ///< 是否可用超电 （开启意味着从电容取电）
   cap_remaining_energy_ = 0.0f; ///< 剩余电容能量百分比，单位 %
 
   resetCmds();

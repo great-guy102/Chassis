@@ -208,7 +208,7 @@ bool UiDrawer::encode(uint8_t *data_ptr, size_t &data_len) {
 
   if (res) {
     ui_idx_++;
-    if(!is_all_added){
+    if (!is_all_added) {
       n_added_++;
     }
   }
@@ -508,7 +508,7 @@ bool UiDrawer::encodeChassisWorkStateContent(uint8_t *data_ptr,
     color = kUiWarningColor;
     str = PwrStateToStr(chassis_work_state_);
   } else {
-    str = Chassis::WorkingModeToStr(chassis_working_mode_) + "-" +
+    str = robot::ChassisWorkingModeToStr(chassis_working_mode_) + "-" +
           CtrlModeSrcToStr(chassis_ctrl_mode_, chassis_manual_ctrl_src_);
   }
 
@@ -640,7 +640,7 @@ bool UiDrawer::encodeGimbalWorkStateContent(uint8_t *data_ptr, size_t &data_len,
     color = kUiWarningColor;
     str = PwrStateToStr(gimbal_work_state_);
   } else {
-    str = Gimbal::WorkingModeToStr(gimbal_working_mode_) + "-" +
+    str = robot::GimbalWorkingModeToStr(gimbal_working_mode_) + "-" +
           CtrlModeSrcToStr(gimbal_ctrl_mode_, gimbal_manual_ctrl_src_);
   }
 
@@ -706,7 +706,7 @@ bool UiDrawer::encodeShooterWorkStateContent(uint8_t *data_ptr,
         break;
       }
     } else {
-      str = Shooter::WorkingModeToStr(shooter_working_mode_) + "-" +
+      str = robot::ShooterWorkingModeToStr(shooter_working_mode_) + "-" +
             CtrlModeSrcToStr(shooter_ctrl_mode_, shooter_manual_ctrl_src_);
     }
   }

@@ -27,7 +27,6 @@
 #include "ins_motor.hpp"
 #include "ins_pid.hpp"
 #include "ins_pwr_limiter.hpp"
-#include "ins_rc.hpp"
 #include "ins_rfr.hpp"
 #include "ins_robot.hpp"
 

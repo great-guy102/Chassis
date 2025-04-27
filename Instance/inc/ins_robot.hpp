@@ -18,18 +18,13 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "chassis.hpp"
-#include "feed.hpp"
-#include "gimbal.hpp"
 #include "robot.hpp"
-#include "shooter.hpp"
 /* Exported macro ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 /* Exported types ------------------------------------------------------------*/
 /* Exported variables --------------------------------------------------------*/
 
 robot::Chassis *GetChassis();
-robot::Gimbal *GetGimbal();
-robot::Shooter *GetShooter();
 robot::Robot *GetRobot();
 /* Exported function prototypes ----------------------------------------------*/
 

@@ -31,8 +31,6 @@ static bool is_chassis_inited = false;
 
 robot::Robot unique_robot = robot::Robot();
 robot::Chassis unique_chassis = robot::Chassis(kChassisConfig);
-robot::Gimbal unique_gimbal = robot::Gimbal();
-robot::Shooter unique_shooter = robot::Shooter();
 
 /* External variables --------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
@@ -101,23 +99,17 @@ robot::Chassis *GetChassis() {
   return &unique_chassis;
 };
 
-robot::Gimbal *GetGimbal() { return &unique_gimbal; };
-robot::Shooter *GetShooter() { return &unique_shooter; };
-
 robot::Robot *GetRobot() {
   if (!is_robot_inited) {
     // main 组件指针注册
     // 主要模块状态机组件指针
     unique_robot.registerChassis(GetChassis());
-    unique_robot.registerShooter(GetShooter());
-    unique_robot.registerGimbal(GetGimbal());
 
     // 无通信功能的组件指针
     unique_robot.registerBuzzer(GetBuzzer());
     unique_robot.registerImu(GetImu());
 
     // 只接收数据的组件指针
-    unique_robot.registerRc(GetRemoteControl());
     // 只发送数据的组件指针
     // CAN1
     unique_robot.registerCap(GetCap());

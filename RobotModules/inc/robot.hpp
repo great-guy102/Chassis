@@ -21,7 +21,6 @@
 #include "buzzer.hpp"
 #include "fsm.hpp"
 #include "imu.hpp"
-#include "module_fsm.hpp"
 #include "motor.hpp"
 #include "ramp.hpp"
 #include "referee.hpp"
@@ -29,10 +28,9 @@
 #include "tick.hpp"
 
 #include "gimbal_chassis_comm.hpp"
+#include "module_state.hpp"
 
 #include "chassis.hpp"
-#include "gimbal.hpp"
-#include "shooter.hpp"
 #include "ui_drawer.hpp"
 /* Exported macro ------------------------------------------------------------*/
 
@@ -62,16 +60,10 @@ public:
   typedef hello_world::referee::Referee Referee;
   typedef hello_world::referee::ids::RobotId RobotId;
 
-  typedef hello_world::module::PwrState PwrState;
-  typedef hello_world::module::CtrlMode CtrlMode;
-  typedef hello_world::module::ManualCtrlSrc ManualCtrlSrc;
-
   typedef robot::Chassis Chassis;
-  typedef robot::Gimbal Gimbal;
-  typedef robot::Shooter Shooter;
+  typedef robot::Chassis::ChassisCmd ChassisCmd;
   typedef robot::UiDrawer UiDrawer;
-
-  typedef RobotRfrData RfrData;
+  typedef robot::RobotRfrData RfrData;
 
   enum WheelMotorIdx : uint8_t {
     kWheelMotorIdxLeftFront,  ///< 左前轮电机下标
@@ -105,8 +97,6 @@ public:
   void standby() override;
 
   void registerChassis(Chassis *ptr);
-  void registerGimbal(Gimbal *ptr);
-  void registerShooter(Shooter *ptr);
 
   void registerBuzzer(Buzzer *ptr);
   void registerCap(Cap *ptr);
@@ -115,7 +105,6 @@ public:
   void registerMotorSteers(Motor *motor_ptr, uint8_t idx);
   void registerGimbalChassisComm(GimbalChassisComm *ptr);
   void registerReferee(Referee *ptr);
-  void registerRc(DT7 *ptr);
 
   void registerPerformancePkg(PerformancePkg *ptr);
   void registerPowerHeatPkg(PowerHeatPkg *ptr);
@@ -127,17 +116,14 @@ private:
   void updateData();
   void updateImuData();
   void updateRfrData();
-  void updateRcData();
   void updatePwrState();
 
+  // 工作状态下，获取控制指令的函数
   void genModulesCmd();
-
-  void genModulesCmdFromRc();
-  void genModulesCmdFromKb();
-
+  
   // 设置通讯组件数据函数
   void setCommData();
-  void setGimbalChassisCommData();
+  // void setGimbalChassisCommData();
   void setUiDrawerData();
 
   // 重置数据函数
@@ -179,15 +165,10 @@ private:
   RobotRfrData robot_rfr_data_; ///< 裁判系统数据包指针
   // 主要模块状态机组件指针
   Chassis *chassis_ptr_ = nullptr; ///< 底盘模块指针
-  Gimbal *gimbal_ptr_ = nullptr;   ///< 云台模块指针
-  Shooter *shooter_ptr_ = nullptr; ///< 发射模块指针
 
   // 无通信功能的组件指针
   Buzzer *buzzer_ptr_ = nullptr; ///< 蜂鸣器指针
   Imu *imu_ptr_ = nullptr;       ///< 底盘 IMU 指针
-
-  // 只接收数据的组件指针
-  DT7 *rc_ptr_ = nullptr; ///< DT7 指针 只接收数据
 
   // 只发送数据的组件指针
   Cap *cap_ptr_ = nullptr; ///< 底盘超级电容指针 只发送数据

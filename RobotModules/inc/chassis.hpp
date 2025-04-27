@@ -13,8 +13,8 @@
  *******************************************************************************
  */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef CHASSIS_ROBOT_MODULES_CHASSIS_HPP_
-#define CHASSIS_ROBOT_MODULES_CHASSIS_HPP_
+#ifndef ROBOT_MODULES_CHASSIS_HPP_
+#define ROBOT_MODULES_CHASSIS_HPP_
 
 /* Includes ------------------------------------------------------------------*/
 #include <cmath>
@@ -30,82 +30,13 @@
 #include "motor.hpp"
 #include "super_cap.hpp"
 
-#include "module_fsm.hpp"
-
 #include "gimbal_chassis_comm.hpp"
+#include "module_state.hpp"
 /* Exported macro ------------------------------------------------------------*/
 
 namespace robot {
 /* Exported constants --------------------------------------------------------*/
 /* Exported types ------------------------------------------------------------*/
-
-union ChassisState {
-  struct {
-    float v_x;
-    float v_y;
-    float w;
-  };
-  float data[3];
-  void reset() {
-    v_x = 0;
-    v_y = 0;
-    w = 0;
-  }
-  ChassisState operator+(const ChassisState &other) const {
-    return {v_x + other.v_x, v_y + other.v_y, w + other.w};
-  }
-
-  ChassisState operator-(const ChassisState &other) const {
-    return {v_x - other.v_x, v_y - other.v_y, w - other.w};
-  }
-
-  ChassisState operator*(float scalar) const {
-    return {v_x * scalar, v_y * scalar, w * scalar};
-  }
-
-  ChassisState operator+=(const ChassisState &other) {
-    v_x += other.v_x;
-    v_y += other.v_y;
-    w += other.w;
-    return *this;
-  }
-
-  ChassisState operator-=(const ChassisState &other) {
-    v_x -= other.v_x;
-    v_y -= other.v_y;
-    w -= other.w;
-    return *this;
-  }
-
-  ChassisState operator*=(float scalar) {
-    v_x *= scalar;
-    v_y *= scalar;
-    w *= scalar;
-    return *this;
-  }
-
-  friend ChassisState operator*(float scalar, const ChassisState &state);
-};
-
-struct ChassisRfrData {
-  bool is_rfr_on = false; ///< 裁判系统是否在线
-  bool is_pwr_on =
-      false; ///< 机器人底盘电源是否开启【裁判系统告知，离线时默认开启】
-  uint16_t pwr_limit =
-      80; ///< 机器人底盘功率限制【裁判系统告知，离线时采用默认值】
-  uint16_t pwr_buffer =
-      60; ///< 机器人底盘缓冲能量【裁判系统告知，离线时采用默认值】
-  uint16_t current_hp = 100; ///< 底盘血量【裁判系统告知，离线时采用默认值】
-};
-
-struct ChassisConfig {
-  float normal_trans_vel;   ///< 正常平移速度
-  float gyro_rot_spd_move;  ///< 平移时小陀螺旋转速度
-  float gyro_rot_spd_stand; ///< 静止时小陀螺旋转速度
-  float yaw_sensitivity;    ///< 跟随前馈灵敏度
-  float max_trans_vel;      ///< 最大平移速度
-  float max_rot_spd;        ///< 最大旋转速度
-};
 
 class Chassis : public hello_world::module::ModuleFsm {
 public:
@@ -116,37 +47,13 @@ public:
   typedef hello_world::power_limiter::PowerLimiter PwrLimiter;
   typedef hello_world::filter::Ramp Ramp;
 
-  typedef hello_world::module::PwrState PwrState;
-  typedef hello_world::module::CtrlMode CtrlMode;
-  typedef hello_world::module::ManualCtrlSrc ManualCtrlSrc;
-
   typedef robot::GimbalChassisComm GimbalChassisComm;
-  typedef ChassisWorkingMode WorkingMode;
-
-  typedef ChassisState State;
-  typedef ChassisRfrData RfrData;
-  typedef ChassisConfig Config;
-
-  static std::string WorkingModeToStr(WorkingMode mode) {
-    if (mode == Chassis::WorkingMode::Depart)
-      return "Depart";
-    if (mode == Chassis::WorkingMode::Follow)
-      return "Follow";
-    if (mode == Chassis::WorkingMode::Gyro)
-      return "Gyro";
-    return "Unknown";
-  };
-
-  enum class GyroDir : int8_t {
-    Clockwise = -1,    ///< 顺时针
-    Unspecified = 0,   ///< 静止
-    AntiClockwise = 1, ///< 逆时针
-  };
-
-  enum class GyroMode : int8_t {
-    ConstW = 0, ///< 常速旋转
-    SinW = 1,   ///< 正弦偏置速度旋转
-  };
+  typedef robot::ChassisState ChassisCmd;
+  typedef robot::ChassisWorkingMode WorkingMode;
+  typedef robot::GyroDir GyroDir;
+  typedef robot::GyroMode GyroMode;
+  typedef robot::ChassisRfrData RfrData;
+  typedef robot::ChassisConfig Config;
 
   enum WheelMotorIdx : uint8_t {
     kWheelMotorIdxLeftFront,  ///< 左前轮电机下标
@@ -193,28 +100,38 @@ public:
   void reset() override;
   void standby() override;
 
+  void setWorkingMode(WorkingMode mode); // 逻辑定义
   WorkingMode getWorkingMode() const { return working_mode_; }
   WorkingMode getLastWorkingMode() const { return last_working_mode_; }
-  void setWorkingMode(WorkingMode mode);
-  void setNormCmd(const State &cmd) { cmd_norm_ = cmd; }
+
+  void setNormCmd(const ChassisCmd &cmd) { cmd_norm_ = cmd; }
+  ChassisCmd getNormCmd() const { return cmd_norm_; }
+
+  void setGyroDir(GyroDir dir); // 逻辑定义
+  GyroDir getGyroDir() const { return gyro_dir_; }
+
+  void setGyroMode(GyroMode mode) { gyro_mode_ = mode; }
+  GyroMode getGyroMode() const { return gyro_mode_; }
+
+  void setUseCapFlag(bool flag) { use_cap_flag_ = flag; }
+  bool getUseCapFlag() const { return use_cap_flag_; }
+
   void setRfrData(const RfrData &data) { rfr_data_ = data; }
+  void setRevGimbalFlag(bool flag) {
+    last_rev_gimbal_flag_ = rev_gimbal_flag_;
+    rev_gimbal_flag_ = flag;
+  }
+  void setOmegaFeedforward(float omega) { omega_feedforward_ = omega; }
+
   float getThetaI2r(bool actual_head_dir = true) const;
   bool getIsAllWheelOnline() { return is_all_wheel_online_; }
   bool getIsAllSteerOnline() { return is_all_steer_online_; }
+  
   void revChassis() {
     last_rev_chassis_flag_ = rev_chassis_flag_;
     rev_chassis_flag_ = !rev_chassis_flag_;
     last_rev_chassis_tick_ = work_tick_;
   }
-  void setRevGimbalFlag(bool flag) {
-    last_rev_gimbal_flag_ = rev_gimbal_flag_;
-    rev_gimbal_flag_ = flag;
-  }
-  void setGyroDir(GyroDir dir);
-  void setGyroMode(GyroMode mode) { gyro_mode_ = mode; }
-  void setOmegaFeedforward(float omega) { omega_feedforward_ = omega; }
-  void setUseCapFlag(bool flag) { use_cap_flag_ = flag; }
-  bool getUseCapFlag() const { return use_cap_flag_; }
 
   void registerRampCmdVx(Ramp *ptr);
   void registerRampCmdVy(Ramp *ptr);
@@ -278,15 +195,15 @@ private:
   Config config_;
 
   // 由 robot 设置的数据
-  bool use_cap_flag_ = false;               ///< 是否使用超级电容
-  GyroDir gyro_dir_ = GyroDir::Unspecified; ///< 小陀螺方向
-  GyroMode gyro_mode_ = GyroMode::ConstW;   ///< 陀螺模式
-  ///< 小陀螺方向，正为绕 Z 轴逆时针，负为顺时针，
-  State cmd_norm_ = {0};    ///< 原始控制指令，基于图传坐标系
-  ChassisRfrData rfr_data_; ///< 底盘 RFR 数据
-
   WorkingMode working_mode_ = WorkingMode::Depart;      ///< 工作模式
   WorkingMode last_working_mode_ = WorkingMode::Depart; ///< 上一次工作模式
+  GyroDir gyro_dir_ = GyroDir::Unspecified;             ///< 小陀螺方向
+  GyroMode gyro_mode_ = GyroMode::ConstW;               ///< 陀螺模式
+  ///< 小陀螺方向，正为绕 Z 轴逆时针，负为顺时针，
+  bool use_cap_flag_ = false; ///< 是否使用超级电容
+
+  ChassisCmd cmd_norm_ = {0}; ///< 原始控制指令，基于图传坐标系
+  ChassisRfrData rfr_data_;   ///< 底盘 RFR 数据
 
   // 在 update 函数中更新的数据
   bool is_power_on_ = false; ///< 底盘电源是否开启
@@ -296,9 +213,9 @@ private:
   uint32_t resurrection_tick_ = 0; ///< 底盘模块复活时间戳
 
   // 在 runOnWorking 函数中更新的数据
-  State cmd_ = {0.0f}; ///< 控制指令，基于图传坐标系
-  State cmd_state_ = {0.0f},
-        last_cmd_state_ = {0.0f}; ///< 反映底盘实际运动状态的控制指令
+  ChassisCmd cmd_ = {0.0f}; ///< 控制指令，基于图传坐标系
+  ChassisCmd cmd_state_ = {0.0f},
+             last_cmd_state_ = {0.0f}; ///< 反映底盘实际运动状态的控制指令
   float omega_feedforward_ =
       0; ///< 云台 YAW 轴角速度，用于底盘跟随前馈，单位 rad/s
   float wheel_speed_ref_[4] = {0}; ///< 轮电机的速度参考值 单位 rad/s
@@ -312,7 +229,7 @@ private:
   float steer_current_ref_[4] = {0}; ///< 舵电机的电流参考值 单位 A [-3.0, 3.0]
   float steer_current_ref_limited_[4] = {
       0}; ///< 舵电机的电流参考值(限幅后) 单位 rad/s
-  State chassis_state_ = {0}, last_chassis_state_ = {0}; ///< 底盘状态
+  ChassisState chassis_state_ = {0}, last_chassis_state_ = {0}; ///< 底盘状态
 
   bool rev_chassis_flag_ = false;      ///< 底盘转向标志
   bool last_rev_chassis_flag_ = false; ///< 上一次底盘转向标志
@@ -341,8 +258,7 @@ private:
             ///< 轴到底盘坐标系的旋转角度，右手定则判定正反向，单位 rad
 
   // cap fdb data 在 update 函数中更新
-  bool is_high_spd_enabled_ =
-      false; ///< 是否开启了高速模式 （开启意味着从电容取电）
+  bool is_cap_usable_ = false; ///< 是否开启了高速模式 （开启意味着从电容取电）
   float cap_remaining_energy_ = 0.0f; ///< 剩余电容能量百分比，单位 %
 
   // 各组件指针
