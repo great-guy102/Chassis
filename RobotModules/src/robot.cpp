@@ -196,7 +196,7 @@ void Robot::genModulesCmd() {
   }
   last_rev_gimbal_cnt = chassis_data.rev_gimbal_cnt;
 
-  ChassisCmd chassis_cmd = {chassis_data.x_vel_raw, chassis_data.y_vel_raw,
+  ChassisCmd chassis_cmd = {chassis_data.v_x_raw, chassis_data.v_y_raw,
                             0.0f};
   chassis_ptr_->setWorkingMode(chassis_data.chassis_working_mode);
   chassis_ptr_->setNormCmd(chassis_cmd);

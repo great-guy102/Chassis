@@ -28,15 +28,18 @@
 namespace robot {
 /* Exported constants --------------------------------------------------------*/
 /* Exported types ------------------------------------------------------------*/
+typedef hello_world::referee::Graphic::Color GraphicColor;
+typedef hello_world::referee::Pixel Pixel;
+
 class UiDrawer {
 public:
   typedef hello_world::referee::GraphicOperation GraphicOperation;
   typedef hello_world::referee::ids::RobotId RobotId;
   typedef hello_world::referee::RfrEncoder RfrEncoder;
   typedef hello_world::referee::String String;
-  typedef hello_world::referee::GraphicLayer GraphicLayer;
-  typedef hello_world::referee::String::Color StringColor;
-
+  typedef hello_world::referee::StraightLine StraightLine;
+  typedef hello_world::referee::Rectangle Rectangle;
+  
   enum StaticUiIdx {
     kSuiDelAll = 0,
     kSuiChassisStatusTitle,
@@ -189,10 +192,10 @@ public:
       shooter_manual_ctrl_src_ = src;
     }
   }
-  void setShooterWorkingMode(ShooterWorkingMode mode) {
-    if (mode != shooter_working_mode_) {
-      last_shooter_working_mode_ = shooter_working_mode_;
-      shooter_working_mode_ = mode;
+  void setFricWorkingMode(FricWorkingMode mode) {
+    if (mode != fric_working_mode_) {
+      last_fric_working_mode_ = fric_working_mode_;
+      fric_working_mode_ = mode;
     }
   }
 
@@ -317,8 +320,8 @@ private:
   // var for gimbal
   bool is_gimbal_motors_online_ = false,
        last_is_gimbal_motors_online_ = false; ///< 云台是否在线
-  float gimbal_joint_angle_pitch_fdb_ = 0.0f,
-        gimbal_joint_angle_yaw_fdb_ = 0.0f;
+  float gimbal_joint_angle_yaw_fdb_ = 0.0f,
+        gimbal_joint_angle_pitch_fdb_ = 0.0f;
   PwrState gimbal_work_state_ = PwrState::kDead;
   PwrState last_gimbal_work_state_ = PwrState::kDead;
   CtrlMode gimbal_ctrl_mode_ = CtrlMode::kManual;
@@ -341,8 +344,8 @@ private:
   CtrlMode last_shooter_ctrl_mode_ = CtrlMode::kManual;
   ManualCtrlSrc shooter_manual_ctrl_src_ = ManualCtrlSrc::kRc;
   ManualCtrlSrc last_shooter_manual_ctrl_src_ = ManualCtrlSrc::kRc;
-  ShooterWorkingMode shooter_working_mode_ = ShooterWorkingMode::kShoot;
-  ShooterWorkingMode last_shooter_working_mode_ = ShooterWorkingMode::kShoot;
+  FricWorkingMode fric_working_mode_ = FricWorkingMode::kShoot;
+  FricWorkingMode last_fric_working_mode_ = FricWorkingMode::kShoot;
 
   // var for super capacitor
   float cap_pwr_percent_ = 0;

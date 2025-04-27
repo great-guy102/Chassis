@@ -31,29 +31,29 @@ const hello_world::referee::GraphicLayer kStaticUiLayer =
 const hello_world::referee::GraphicLayer kDynamicUiLayer =
     hello_world::referee::GraphicLayer::k1;
 
-const hello_world::referee::Graphic::Color kUiNormalColor =
-    hello_world::referee::Graphic::Color::kGreen;
-const hello_world::referee::Graphic::Color kUiWarningColor =
-    hello_world::referee::Graphic::Color::kOrange;
-const hello_world::referee::Graphic::Color kUiErrorColor =
-    hello_world::referee::Graphic::Color::kPurple;
+const GraphicColor kUiNormalColor =
+    GraphicColor::kGreen;
+const GraphicColor kUiWarningColor =
+    GraphicColor::kOrange;
+const GraphicColor kUiErrorColor =
+    GraphicColor::kPurple;
 
-const hello_world::referee::Graphic::Color kUiStringTitleColor =
-    hello_world::referee::Graphic::Color::kYellow;
-const hello_world::referee::Graphic::Color kUiPassLineColor =
-    hello_world::referee::Graphic::Color::kOrange;
-const hello_world::referee::Graphic::Color kUiVisTgtColor =
-    hello_world::referee::Graphic::Color::kGreen;
-const hello_world::referee::Graphic::Color kUiVisBoxColor =
-    hello_world::referee::Graphic::Color::kWhite;
+const GraphicColor kUiStringTitleColor =
+    GraphicColor::kYellow;
+const GraphicColor kUiPassLineColor =
+    GraphicColor::kOrange;
+const GraphicColor kUiVisTgtColor =
+    GraphicColor::kGreen;
+const GraphicColor kUiVisBoxColor =
+    GraphicColor::kWhite;
 
 // 布局、尺寸
 const uint16_t kUiScreenMiddleX = 1920 / 2; // 操作界面中心位置
 const uint16_t kUiScreenMiddleY = 1080 / 2; // 操作界面中心位置
 
 // 各模块模式状态 左上角
-const hello_world::referee::Pixel kUiModuleStateFontSize = 16;
-const hello_world::referee::Pixel kUiModuleStateLineWidth = 3;
+const Pixel kUiModuleStateFontSize = 16;
+const Pixel kUiModuleStateLineWidth = 3;
 
 const uint16_t kUiWorkStateAreaX1 = 30;
 const uint16_t kUiWorkStateAreaX2_1 = 155;
@@ -64,8 +64,8 @@ const uint16_t kUiWorkStateAreaY1 = 870;
 const int16_t kUiWorkStateAreaYDelta = -35;
 
 // 各模块在线情况 右上角
-const hello_world::referee::Pixel kUiOnlineFontSize = 16;
-const hello_world::referee::Pixel kUiOnlineLineWidth = 3;
+const Pixel kUiOnlineFontSize = 16;
+const Pixel kUiOnlineLineWidth = 3;
 
 const uint16_t kUiOnlineAreaX1 = 1530;
 const uint16_t kUiOnlineAreaX2 = kUiOnlineAreaX1 + 8 * kUiOnlineFontSize;
@@ -129,13 +129,13 @@ const uint8_t kUiNameGimbalWorkStateTitle[3] = {0x00, 0x00,
 const uint8_t kUiNameGimbalWorkStateContent[3] = {0x00, 0x00,
                                                   0x41}; ///< 云台工作状态内容
 // joint
-const uint8_t kUiNameGimbalPitchTitle[3] = {0x00, 0x00,
-                                            0x42}; ///< 云台俯仰角度标题
-const uint8_t kUiNameGimbalPitchFdb[3] = {0x00, 0x00,
-                                          0x43}; ///< 云台俯仰角度反馈
 const uint8_t kUiNameGimbalYawTitle[3] = {0x00, 0x00,
+                                            0x42}; ///< 云台俯仰角度标题
+const uint8_t kUiNameGimbalYawFdb[3] = {0x00, 0x00,
+                                          0x43}; ///< 云台俯仰角度反馈
+const uint8_t kUiNameGimbalPitchTitle[3] = {0x00, 0x00,
                                           0x44};           ///< 云台偏航角度标题
-const uint8_t kUiNameGimbalYawFdb[3] = {0x00, 0x00, 0x47}; ///< 云台偏航角度反馈
+const uint8_t kUiNameGimbalPitchFdb[3] = {0x00, 0x00, 0x47}; ///< 云台偏航角度反馈
 const uint8_t kUiNameGimbalPassSafe[3] = {0x00, 0x00,
                                           0x45}; ///< 云台过洞安全提示
 
@@ -186,10 +186,10 @@ const float ksafepitchmax = 0.2;  //
 bool UiDrawer::encode(uint8_t *data_ptr, size_t &data_len) {
   bool res = false;
   bool is_all_added = (n_added_ == kNumAllPkgs);
-  hello_world::referee::GraphicOperation opt =
-      hello_world::referee::GraphicOperation::kAdd;
+  GraphicOperation opt =
+      GraphicOperation::kAdd;
   if (is_all_added) {
-    opt = hello_world::referee::GraphicOperation::kModify;
+    opt = GraphicOperation::kModify;
   }
   if (ui_idx_ >= kNumAllPkgs) {
     if (is_all_added) {
@@ -254,14 +254,14 @@ bool UiDrawer::encodeDynamicUi(uint8_t *data_ptr, size_t &data_len,
   bool res = true;
   switch (idx) {
   case kDuiChassisStatusContent:
-    if (opt == hello_world::referee::GraphicOperation::kModify) {
+    if (opt == GraphicOperation::kModify) {
       if (last_chassis_work_state_ == chassis_work_state_ &&
           last_chassis_working_mode_ == chassis_working_mode_ &&
           last_chassis_ctrl_mode_ == chassis_ctrl_mode_ &&
           last_chassis_manual_ctrl_src_ == chassis_manual_ctrl_src_) {
         return true;
       }
-    } else if (opt == hello_world::referee::GraphicOperation::kAdd) {
+    } else if (opt == GraphicOperation::kAdd) {
     } else {
       return true;
     }
@@ -277,14 +277,14 @@ bool UiDrawer::encodeDynamicUi(uint8_t *data_ptr, size_t &data_len,
     break;
 
   case kDuiGimbalStatusContent:
-    if (opt == hello_world::referee::GraphicOperation::kModify) {
+    if (opt == GraphicOperation::kModify) {
       if (last_gimbal_work_state_ == gimbal_work_state_ &&
           last_gimbal_working_mode_ == gimbal_working_mode_ &&
           last_gimbal_ctrl_mode_ == gimbal_ctrl_mode_ &&
           last_gimbal_manual_ctrl_src_ == gimbal_manual_ctrl_src_) {
         return true;
       }
-    } else if (opt == hello_world::referee::GraphicOperation::kAdd) {
+    } else if (opt == GraphicOperation::kAdd) {
     } else {
       return true;
     }
@@ -299,33 +299,33 @@ bool UiDrawer::encodeDynamicUi(uint8_t *data_ptr, size_t &data_len,
 
     break;
   case kDuiShooterStatusContent:
-    if (opt == hello_world::referee::GraphicOperation::kModify) {
+    if (opt == GraphicOperation::kModify) {
       if (last_shooter_work_state_ == shooter_work_state_ &&
-          last_shooter_working_mode_ == shooter_working_mode_ &&
+          last_fric_working_mode_ == fric_working_mode_ &&
           last_shooter_ctrl_mode_ == shooter_ctrl_mode_ &&
           last_shooter_manual_ctrl_src_ == shooter_manual_ctrl_src_) {
         return true;
       }
-    } else if (opt == hello_world::referee::GraphicOperation::kAdd) {
+    } else if (opt == GraphicOperation::kAdd) {
     } else {
       return true;
     }
     res = encodeShooterWorkStateContent(data_ptr, data_len, opt);
     if (res == true) {
       last_shooter_work_state_ = shooter_work_state_;
-      last_shooter_working_mode_ = shooter_working_mode_;
+      last_fric_working_mode_ = fric_working_mode_;
       last_shooter_ctrl_mode_ = shooter_ctrl_mode_;
       last_shooter_manual_ctrl_src_ = shooter_manual_ctrl_src_;
     }
     break;
   case kDuiMotionModuleOnlineContent:
-    if (opt == hello_world::referee::GraphicOperation::kModify) {
+    if (opt == GraphicOperation::kModify) {
       if (last_is_wheel_motors_online_ == is_wheel_motors_online_ &&
           last_is_steer_motors_online_ == is_steer_motors_online_ &&
           last_is_gimbal_motors_online_ == is_gimbal_motors_online_) {
         return true;
       }
-    } else if (opt == hello_world::referee::GraphicOperation::kAdd) {
+    } else if (opt == GraphicOperation::kAdd) {
     } else {
       return true;
     }
@@ -338,12 +338,12 @@ bool UiDrawer::encodeDynamicUi(uint8_t *data_ptr, size_t &data_len,
     break;
 
   case kDuiShootModuleOnlineContent:
-    if (opt == hello_world::referee::GraphicOperation::kModify) {
+    if (opt == GraphicOperation::kModify) {
       if (last_is_shooter_motors_online_ == is_shooter_motors_online_ &&
           last_is_vision_online_ == is_vision_online_) {
         return true;
       }
-    } else if (opt == hello_world::referee::GraphicOperation::kAdd) {
+    } else if (opt == GraphicOperation::kAdd) {
     } else {
       return true;
     }
@@ -379,7 +379,7 @@ bool UiDrawer::encodeDelAll(uint8_t *data_ptr, size_t &data_len) {
 // bool UiDrawer::encodeStaticPkgGroup1(uint8_t* data_ptr, size_t& data_len,
 // GraphicOperation opt)
 // {
-//   hello_world::referee::StraightLine g_aim_line_v, g_aim_line_h5m,
+//   StraightLine g_aim_line_v, g_aim_line_h5m,
 //   g_aim_line_h8m, g_aim_line_h10m, g_aim_line_h15m;
 //   genAimLineV(g_aim_line_v);
 //   g_aim_line_v.setOperation(opt);
@@ -404,7 +404,7 @@ bool UiDrawer::encodeDelAll(uint8_t *data_ptr, size_t &data_len) {
 bool UiDrawer::encodeStaticPkgGroup2(uint8_t *data_ptr, size_t &data_len,
                                      GraphicOperation opt) {
   // 新增视觉框
-  hello_world::referee::Rectangle g_vision_box;
+  Rectangle g_vision_box;
   genVisionbox(g_vision_box);
   g_vision_box.setOperation(opt);
 
@@ -450,9 +450,9 @@ bool UiDrawer::encodeDynaUiPkgGroup1(uint8_t *data_ptr, size_t &data_len,
 };
 bool UiDrawer::encodeDynaUiPkgGroup2(uint8_t *data_ptr, size_t &data_len,
                                      GraphicOperation opt) {
-  hello_world::referee::Rectangle g_cap_pwr_percent_rect;
+  Rectangle g_cap_pwr_percent_rect;
   hello_world::referee::FloatingNumber g_cap_pwr_percent_num;
-  hello_world::referee::StraightLine g_pass_line_left, g_pass_line_right;
+  StraightLine g_pass_line_left, g_pass_line_right;
   hello_world::referee::Arc g_armor_hit;
 
   genCapPwrPercent(g_cap_pwr_percent_rect, g_cap_pwr_percent_num);
@@ -487,7 +487,7 @@ bool UiDrawer::encodeDynaUiPkgGroup2(uint8_t *data_ptr, size_t &data_len,
 bool UiDrawer::encodeChassisWorkStateTitle(uint8_t *data_ptr, size_t &data_len,
                                            GraphicOperation opt) {
   std::string str = "Chassis:";
-  hello_world::referee::String options = hello_world::referee::String(
+  String options = String(
       kUiNameChassisWorkStateTitle, opt, kStaticUiLayer, kUiStringTitleColor,
       kUiWorkStateAreaX1, kUiWorkStateAreaY1, kUiModuleStateFontSize,
       str.length(), kUiModuleStateLineWidth);
@@ -500,9 +500,9 @@ bool UiDrawer::encodeChassisWorkStateTitle(uint8_t *data_ptr, size_t &data_len,
  */
 bool UiDrawer::encodeChassisWorkStateContent(uint8_t *data_ptr,
                                              size_t &data_len,
-                                             UiDrawer::GraphicOperation opt) {
+                                             GraphicOperation opt) {
   std::string str = "Unknown";
-  hello_world::referee::Graphic::Color color = kUiNormalColor;
+  GraphicColor color = kUiNormalColor;
 
   if (chassis_work_state_ != PwrState::kWorking) {
     color = kUiWarningColor;
@@ -512,7 +512,7 @@ bool UiDrawer::encodeChassisWorkStateContent(uint8_t *data_ptr,
           CtrlModeSrcToStr(chassis_ctrl_mode_, chassis_manual_ctrl_src_);
   }
 
-  hello_world::referee::String options = hello_world::referee::String(
+  String options = String(
       kUiNameChassisWorkStateContent, opt, kDynamicUiLayer, color,
       kUiWorkStateAreaX2_1, kUiWorkStateAreaY1, kUiModuleStateFontSize,
       str.length(), kUiModuleStateLineWidth);
@@ -536,7 +536,7 @@ void UiDrawer::genChassisDir(hello_world::referee::Arc &g_head,
   arc_angle_tail_end = hello_world::NormPeriodData(0, 360, arc_angle_tail_end);
 
   float radius = 50; // 灯条所处圆的半径
-  g_head.setColor(hello_world::referee::Graphic::Color::kYellow);
+  g_head.setColor(GraphicColor::kYellow);
   g_head.setAng(arc_angle_head_start, arc_angle_head_end);
   g_head.setCenterPos(kUiScreenMiddleX, kUiScreenMiddleY);
   g_head.setRadius(radius, radius);
@@ -544,7 +544,7 @@ void UiDrawer::genChassisDir(hello_world::referee::Arc &g_head,
   g_head.setLineWidth(3);
   g_head.setLayer(kDynamicUiLayer);
 
-  g_tail.setColor(hello_world::referee::Graphic::Color::kCyan);
+  g_tail.setColor(GraphicColor::kCyan);
   g_tail.setAng(arc_angle_tail_start, arc_angle_tail_end);
   g_tail.setCenterPos(kUiScreenMiddleX, kUiScreenMiddleY);
   g_tail.setRadius(radius, radius);
@@ -553,13 +553,13 @@ void UiDrawer::genChassisDir(hello_world::referee::Arc &g_head,
   g_head.setLayer(kDynamicUiLayer);
 };
 
-void UiDrawer::genCapPwrPercent(hello_world::referee::Rectangle &g_rect,
+void UiDrawer::genCapPwrPercent(Rectangle &g_rect,
                                 hello_world::referee::FloatingNumber &g_num) {
   uint16_t start_x = kPixelCenterXCapBox - kPixelCapBoxWidth / 2;
   float percent = hello_world::Bound(cap_pwr_percent_ / 100.0f, 0, 1);
   uint16_t end_x = start_x + kPixelCapBoxWidth * percent;
 
-  hello_world::referee::Graphic::Color color;
+  GraphicColor color;
 
   if (percent > 0.75) {
     color = kUiNormalColor;
@@ -586,7 +586,7 @@ void UiDrawer::genCapPwrPercent(hello_world::referee::Rectangle &g_rect,
   g_num.setLineWidth(kUiModuleStateLineWidth);
 };
 
-void UiDrawer::genChassisPassLineLeft(hello_world::referee::StraightLine &g) {
+void UiDrawer::genChassisPassLineLeft(StraightLine &g) {
   uint16_t end_posX = 0;
   uint16_t start_posX = 0;
   uint16_t end_posY = 0;
@@ -600,7 +600,7 @@ void UiDrawer::genChassisPassLineLeft(hello_world::referee::StraightLine &g) {
   g.setColor(kUiPassLineColor);
   g.setLineWidth(3);
 };
-void UiDrawer::genChassisPassLineRight(hello_world::referee::StraightLine &g) {
+void UiDrawer::genChassisPassLineRight(StraightLine &g) {
   uint16_t end_posX = 0;
   uint16_t start_posX = 0;
   uint16_t end_posY = 0;
@@ -620,10 +620,10 @@ void UiDrawer::genChassisPassLineRight(hello_world::referee::StraightLine &g) {
  * @brief 编码左上方 UI 字符串 `Gimbal:`
  */
 bool UiDrawer::encodeGimbalWorkStateTitle(uint8_t *data_ptr, size_t &data_len,
-                                          UiDrawer::GraphicOperation opt) {
+                                          GraphicOperation opt) {
   std::string str = "Gimbal:";
 
-  hello_world::referee::String options = hello_world::referee::String(
+  String options = String(
       kUiNameGimbalWorkStateTitle, opt, kStaticUiLayer, kUiStringTitleColor,
       kUiWorkStateAreaX1, kUiWorkStateAreaY1 + kUiWorkStateAreaYDelta,
       kUiModuleStateFontSize, str.length(), kUiModuleStateLineWidth);
@@ -633,9 +633,9 @@ bool UiDrawer::encodeGimbalWorkStateTitle(uint8_t *data_ptr, size_t &data_len,
  * @brief 根据云台工作状态编码左上方 UI 字符串(`Gimbal:` 之后的内容)
  */
 bool UiDrawer::encodeGimbalWorkStateContent(uint8_t *data_ptr, size_t &data_len,
-                                            UiDrawer::GraphicOperation opt) {
+                                            GraphicOperation opt) {
   std::string str = "Unknown";
-  hello_world::referee::Graphic::Color color = kUiNormalColor;
+  GraphicColor color = kUiNormalColor;
   if (gimbal_work_state_ != PwrState::kWorking) {
     color = kUiWarningColor;
     str = PwrStateToStr(gimbal_work_state_);
@@ -644,7 +644,7 @@ bool UiDrawer::encodeGimbalWorkStateContent(uint8_t *data_ptr, size_t &data_len,
           CtrlModeSrcToStr(gimbal_ctrl_mode_, gimbal_manual_ctrl_src_);
   }
 
-  hello_world::referee::String options = hello_world::referee::String(
+  String options = String(
       kUiNameGimbalWorkStateContent, opt, kDynamicUiLayer, color,
       kUiWorkStateAreaX2_2, kUiWorkStateAreaY1 + kUiWorkStateAreaYDelta,
       kUiModuleStateFontSize, str.length(), kUiModuleStateLineWidth);
@@ -668,10 +668,10 @@ void UiDrawer::genGimbalPassSafe(hello_world::referee::Circle &g,
 //  * @brief 编码左上方 UI 字符串 `Shooter:`
 //  */
 bool UiDrawer::encodeShooterWorkStateTitle(uint8_t *data_ptr, size_t &data_len,
-                                           UiDrawer::GraphicOperation opt) {
+                                           GraphicOperation opt) {
   std::string str = "Shooter:";
 
-  hello_world::referee::String options = hello_world::referee::String(
+  String options = String(
       kUiNameShooterWorkStateTitle, opt, kStaticUiLayer, kUiStringTitleColor,
       kUiWorkStateAreaX1, kUiWorkStateAreaY1 + 2 * kUiWorkStateAreaYDelta,
       kUiModuleStateFontSize, str.length(), kUiModuleStateLineWidth);
@@ -682,9 +682,9 @@ bool UiDrawer::encodeShooterWorkStateTitle(uint8_t *data_ptr, size_t &data_len,
  */
 bool UiDrawer::encodeShooterWorkStateContent(uint8_t *data_ptr,
                                              size_t &data_len,
-                                             UiDrawer::GraphicOperation opt) {
+                                             GraphicOperation opt) {
   std::string str = "Unknown";
-  hello_world::referee::Graphic::Color color = kUiNormalColor;
+  GraphicColor color = kUiNormalColor;
   if (shooter_work_state_ != PwrState::kWorking) {
     str = PwrStateToStr(shooter_work_state_);
     color = kUiWarningColor;
@@ -706,12 +706,12 @@ bool UiDrawer::encodeShooterWorkStateContent(uint8_t *data_ptr,
         break;
       }
     } else {
-      str = robot::ShooterWorkingModeToStr(shooter_working_mode_) + "-" +
+      str = robot::FricWorkingModeToStr(fric_working_mode_) + "-" +
             CtrlModeSrcToStr(shooter_ctrl_mode_, shooter_manual_ctrl_src_);
     }
   }
 
-  hello_world::referee::String options = hello_world::referee::String(
+  String options = String(
       kUiNameShooterWorkStateContent, opt, kDynamicUiLayer, color,
       kUiWorkStateAreaX2_3, kUiWorkStateAreaY1 + 2 * kUiWorkStateAreaYDelta,
       kUiModuleStateFontSize, str.length(), kUiModuleStateLineWidth);
@@ -723,7 +723,7 @@ void UiDrawer::genShooterHeat(hello_world::referee::Arc &g) {
   float percent = heat_limit_ > 0 ? heat_ / heat_limit_ : 0.0f;
   percent = hello_world::Bound(percent, 0.0f, 1.0f);
 
-  hello_world::referee::Graphic::Color color;
+  GraphicColor color;
   if (percent > 0.7) {
     color = kUiNormalColor;
   } else if (percent > 0.3) {
@@ -757,7 +757,7 @@ void UiDrawer::genVisTgt(hello_world::referee::Circle &g) {
   g.setLayer(kDynamicUiLayer);
 };
 
-void UiDrawer::genVisionbox(hello_world::referee::Rectangle &g_rect) {
+void UiDrawer::genVisionbox(Rectangle &g_rect) {
   // uint16_t start_x = kPixelCenterXVisionBox - kPixelVisionBoxWidth / 2;
   // uint16_t end_x = start_x + kPixelVisionBoxWidth;
 
@@ -812,7 +812,7 @@ void UiDrawer::genArmorHit(hello_world::referee::Arc &g_hit) {
       hello_world::NormPeriodData(0.0f, 360.0f, arc_angle_hit_end);
 
   float radius = 200.0f; // 灯条所处圆的半径
-  g_hit.setColor(hello_world::referee::Graphic::Color::kPurple);
+  g_hit.setColor(GraphicColor::kPurple);
   g_hit.setAng(arc_angle_hit_start, arc_angle_hit_end);
   g_hit.setCenterPos(kUiScreenMiddleX,
                      kUiScreenMiddleY); // 灯条中心位置
@@ -830,7 +830,7 @@ bool UiDrawer::encodeMotionModuleOnlineTitle(uint8_t *data_ptr,
                                              size_t &data_len,
                                              GraphicOperation opt) {
   std::string str = "Wheels  Steers  Gimbal";
-  hello_world::referee::String options = hello_world::referee::String(
+  String options = String(
       kUiNameMotionModuleOnlineTitle, opt, kStaticUiLayer, kUiStringTitleColor,
       kUiOnlineAreaX1, kUiOnlineAreaY1, kUiOnlineFontSize, str.length(),
       kUiOnlineLineWidth);
@@ -841,7 +841,7 @@ bool UiDrawer::encodeMotionModuleOnlineContent(uint8_t *data_ptr,
                                                GraphicOperation opt) {
   std::string str1 = "Unknown ", str2 = "Unknown ", str3 = "Unknown ";
 
-  hello_world::referee::Graphic::Color color = kUiNormalColor;
+  GraphicColor color = kUiNormalColor;
   if (!(is_wheel_motors_online_ && is_steer_motors_online_ &&
         is_gimbal_motors_online_)) {
     color = kUiErrorColor;
@@ -862,7 +862,7 @@ bool UiDrawer::encodeMotionModuleOnlineContent(uint8_t *data_ptr,
     str3 = "Offline ";
   }
   std::string str = str1 + str2 + str3;
-  hello_world::referee::String options = hello_world::referee::String(
+  String options = String(
       kUiNameMotionModuleOnlineContent, opt, kDynamicUiLayer, color,
       kUiOnlineAreaX1, kUiOnlineAreaY1 + kUiOnlineAreaYDelta, kUiOnlineFontSize,
       str.length(), kUiOnlineLineWidth);
@@ -872,7 +872,7 @@ bool UiDrawer::encodeMotionModuleOnlineContent(uint8_t *data_ptr,
 bool UiDrawer::encodeShootModuleOnlineTitle(uint8_t *data_ptr, size_t &data_len,
                                             GraphicOperation opt) {
   std::string str = "Shooter Vision";
-  hello_world::referee::String options = hello_world::referee::String(
+  String options = String(
       kUiNameShootModuleOnlineTitle, opt, kStaticUiLayer, kUiStringTitleColor,
       kUiOnlineAreaX2, kUiOnlineAreaY1 + kUiOnlineAreaYDelta * 2,
       kUiOnlineFontSize, str.length(), kUiOnlineLineWidth);
@@ -884,7 +884,7 @@ bool UiDrawer::encodeShootModuleOnlineContent(uint8_t *data_ptr,
                                               GraphicOperation opt) {
   std::string str1 = "Unknown ", str2 = "Unknown ";
 
-  hello_world::referee::Graphic::Color color = kUiNormalColor;
+  GraphicColor color = kUiNormalColor;
   if (!(is_shooter_motors_online_ && is_vision_online_)) {
     color = kUiErrorColor;
   }
@@ -899,7 +899,7 @@ bool UiDrawer::encodeShootModuleOnlineContent(uint8_t *data_ptr,
     str2 = "Offline ";
   }
   std::string str = str1 + str2;
-  hello_world::referee::String options = hello_world::referee::String(
+  String options = String(
       kUiNameShootModuleOnlineContent, opt, kDynamicUiLayer, color,
       kUiOnlineAreaX2, kUiOnlineAreaY1 + kUiOnlineAreaYDelta * 3,
       kUiOnlineFontSize, str.length(), kUiOnlineLineWidth);
