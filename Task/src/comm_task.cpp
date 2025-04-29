@@ -79,10 +79,10 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
   can1_rx_mgr_ptr->rxFifoMsgPendingCallback(hcan);
   can2_rx_mgr_ptr->rxFifoMsgPendingCallback(hcan);
 
-  HW_ASSERT(gc_comm_ptr != nullptr, "gc_comm_ptr is nullptr", gc_comm_ptr);
-  if (!gc_comm_ptr->isOffline()) {
-    HAL_IWDG_Refresh(&hiwdg);
-  }
+  // HW_ASSERT(gc_comm_ptr != nullptr, "gc_comm_ptr is nullptr", gc_comm_ptr);
+  // if (!gc_comm_ptr->isOffline()) {
+  //   HAL_IWDG_Refresh(&hiwdg);
+  // }
 }
 
 void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan) {

@@ -13,11 +13,13 @@
  *******************************************************************************
  */
 /* Includes ------------------------------------------------------------------*/
-#include "main_task.hpp"
-
-#include "comm_task.hpp"
-#include "ins_all.hpp"
 #include "tim.h"
+#include "iwdg.h"
+
+#include "ins_all.hpp"
+
+#include "main_task.hpp"
+#include "comm_task.hpp"    
 /* Private macro -------------------------------------------------------------*/
 /* Private constants ---------------------------------------------------------*/
 /* Private types -------------------------------------------------------------*/
