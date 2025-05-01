@@ -14,7 +14,6 @@
  */
 /* Includes ------------------------------------------------------------------*/
 #include "tim.h"
-#include "iwdg.h"
 
 #include "ins_all.hpp"
 

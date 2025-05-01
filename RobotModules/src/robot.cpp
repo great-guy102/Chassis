@@ -185,19 +185,20 @@ void Robot::genModulesCmd() {
   GimbalChassisComm::ChassisData::GimbalPart &chassis_data =
       gc_comm_ptr_->chassis_data().gp;
 
+  if (last_rev_gimbal_cnt != chassis_data.rev_gimbal_cnt) {
+    last_rev_gimbal_tick_ = work_tick_;
+    rev_gimbal_flag = true;
+    // rev_gimbal_flag = false; // TODO:调试
+    chassis_ptr_->revChassis();
+  }
+  last_rev_gimbal_cnt = chassis_data.rev_gimbal_cnt;
   if (last_rev_chassis_cnt != chassis_data.rev_chassis_cnt) {
     last_rev_chassis_tick_ = work_tick_;
     chassis_ptr_->revChassis();
   }
   last_rev_chassis_cnt = chassis_data.rev_chassis_cnt;
-  if (last_rev_gimbal_cnt != chassis_data.rev_gimbal_cnt) {
-    last_rev_gimbal_tick_ = work_tick_;
-    rev_gimbal_flag = true;
-  }
-  last_rev_gimbal_cnt = chassis_data.rev_gimbal_cnt;
 
-  ChassisCmd chassis_cmd = {chassis_data.v_x_raw, chassis_data.v_y_raw,
-                            0.0f};
+  ChassisCmd chassis_cmd = {chassis_data.v_x_raw, chassis_data.v_y_raw, 0.0f};
   chassis_ptr_->setWorkingMode(chassis_data.chassis_working_mode);
   chassis_ptr_->setNormCmd(chassis_cmd);
   chassis_ptr_->setUseCapFlag(chassis_data.use_cap_flag);
@@ -224,6 +225,7 @@ void Robot::runOnWorking() {
   if (buzzer_ptr_->is_playing()) {
     buzzer_ptr_->play();
   }
+  genModulesCmd();
   HW_ASSERT(chassis_ptr_ != nullptr, "Chassis FSM pointer is null",
             chassis_ptr_);
   chassis_ptr_->update();
@@ -379,11 +381,10 @@ void Robot::sendCanData() {
   }
 
   // CAN2负载高，交替发送降低负载
-  if (work_tick_ > 1000 && work_tick_ % 2 == 1) {
-    sendGimbalChassisCommData();
-  }
   if (work_tick_ % 2 == 0) {
     sendWheelsMotorData();
+  } else if (work_tick_ % 2 == 1) {
+    sendGimbalChassisCommData();
   }
 };
 void Robot::sendWheelsMotorData() {

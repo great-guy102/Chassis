@@ -97,7 +97,7 @@ int main(void) {
   MX_TIM2_Init();
   MX_TIM4_Init();
   MX_TIM6_Init();
-  // MX_IWDG_Init();
+  MX_IWDG_Init();
   MX_USART1_UART_Init();
   MX_USART3_UART_Init();
   MX_USART6_UART_Init();

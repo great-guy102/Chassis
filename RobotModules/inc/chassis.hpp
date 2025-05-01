@@ -197,6 +197,7 @@ private:
   // 由 robot 设置的数据
   WorkingMode working_mode_ = WorkingMode::Depart;      ///< 工作模式
   WorkingMode last_working_mode_ = WorkingMode::Depart; ///< 上一次工作模式
+  WorkingMode act_working_mode_ = WorkingMode::Depart; ///< 实际执行的工作模式
   GyroDir gyro_dir_ = GyroDir::Unspecified;             ///< 小陀螺方向
   GyroMode gyro_mode_ = GyroMode::ConstW;               ///< 陀螺模式
   ///< 小陀螺方向，正为绕 Z 轴逆时针，负为顺时针，

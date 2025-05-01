@@ -23,7 +23,8 @@ float wheel_speed_ref_debug = 0;
 
 hello_world::pid::MultiNodesPid::Datas pid_data; // TODO:PID调试数据
 // 使用示例：pid_data = pid_ptr->getPidAt(0).datas();
-// Chassis::ChassisState cmd_state_raw = {0.0f}, cmd_state = {0.0f}; // TODO:调试
+// Chassis::ChassisState cmd_state_raw = {0.0f}, cmd_state = {0.0f}; //
+// TODO:调试
 namespace robot {
 /* Private constants ---------------------------------------------------------*/
 /* Private types -------------------------------------------------------------*/
@@ -320,21 +321,24 @@ void Chassis::revNormCmd() {
   static bool first_follow_flag = true;
   ChassisState cmd_raw = cmd_norm_;
   ChassisState cmd_state_raw = {0.0f};
-  WorkingMode act_working_mode = working_mode_; // 实际执行的工作模式
+  act_working_mode_ = working_mode_; // 实际执行的工作模式
 
   // 当小陀螺模式切换到跟随模式时，保证底盘不会反转，否则会大大消耗功率
   if (!is_gyro2follow_handled_) {
     float theta_i2r = getThetaI2r(false);
-    if (!(working_mode_ == WorkingMode::Follow && last_working_mode_ == WorkingMode::Gyro) ||
-        (gyro_dir_ == GyroDir::AntiClockwise && (theta_i2r < 0 && theta_i2r > -(5.0f / 6.0f * PI))) ||
-        (gyro_dir_ == GyroDir::Clockwise && (theta_i2r > 0 && theta_i2r < (5.0f / 6.0f * PI)))) {
+    if (!(working_mode_ == WorkingMode::Follow &&
+          last_working_mode_ == WorkingMode::Gyro) ||
+        (gyro_dir_ == GyroDir::AntiClockwise &&
+         (theta_i2r < 0 && theta_i2r > -(5.0f / 6.0f * PI))) ||
+        (gyro_dir_ == GyroDir::Clockwise &&
+         (theta_i2r > 0 && theta_i2r < (5.0f / 6.0f * PI)))) {
       is_gyro2follow_handled_ = true;
     } else {
-      act_working_mode = WorkingMode::Gyro;
+      act_working_mode_ = WorkingMode::Gyro;
     }
   }
 
-  switch (act_working_mode) {
+  switch (act_working_mode_) {
   case WorkingMode::Depart: {
     // 分离模式不对 cmd_norm_ 进行额外处理
     gyro_dir_ = GyroDir::Unspecified;
@@ -644,7 +648,7 @@ void Chassis::reset() {
                      ///< 轴到底盘坐标系的旋转角度，右手定则判定正反向，单位 rad
 
   // cap fdb data 在 update 函数中更新
-  is_cap_usable_ = false; ///< 是否可用超电 （开启意味着从电容取电）
+  is_cap_usable_ = false;       ///< 是否可用超电 （开启意味着从电容取电）
   cap_remaining_energy_ = 0.0f; ///< 剩余电容能量百分比，单位 %
 
   resetCmds();
@@ -899,13 +903,14 @@ void Chassis::registerGimbalChassisComm(GimbalChassisComm *ptr) {
 #pragma endregion
 #pragma region 功能函数定义
 void Chassis::setWorkingMode(WorkingMode mode) {
+  if (working_mode_ == mode) {
+    return; // 如果工作模式没有变化，则不需要处理
+  }
   if (mode == WorkingMode::Follow && working_mode_ == WorkingMode::Gyro) {
     is_gyro2follow_handled_ = false;
   }
-  if (working_mode_ != mode) {
-    last_working_mode_ = working_mode_;
-    working_mode_ = mode;
-  }
+  last_working_mode_ = working_mode_;
+  working_mode_ = mode;
 }
 
 /**
@@ -917,7 +922,7 @@ void Chassis::setWorkingMode(WorkingMode mode) {
  */
 void Chassis::setGyroDir(GyroDir dir) {
   if (dir != GyroDir::Unspecified) {
-    gyro_dir_ = dir;
+    gyro_dir_ = dir; // 防止小陀螺切跟随处理时，方向被重置
   }
 }
 
