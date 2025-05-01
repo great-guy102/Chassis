@@ -329,9 +329,10 @@ void Chassis::revNormCmd() {
     if (!(working_mode_ == WorkingMode::Follow &&
           last_working_mode_ == WorkingMode::Gyro) ||
         (gyro_dir_ == GyroDir::AntiClockwise &&
-         (theta_i2r < 0 && theta_i2r > -(5.0f / 6.0f * PI))) ||
+         (theta_i2r < -(1.0f / 5.0f * PI) &&
+          theta_i2r > -(5.0f / 6.0f * PI))) ||
         (gyro_dir_ == GyroDir::Clockwise &&
-         (theta_i2r > 0 && theta_i2r < (5.0f / 6.0f * PI)))) {
+         (theta_i2r > (1.0f / 5.0f * PI) && theta_i2r < (5.0f / 6.0f * PI)))) {
       is_gyro2follow_handled_ = true;
     } else {
       act_working_mode_ = WorkingMode::Gyro;
