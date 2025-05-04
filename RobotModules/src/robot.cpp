@@ -57,7 +57,7 @@ const hello_world::referee::RobotShooterData kDefaultRobotShooterData = {
                                                   ///< ShooterId
 
     .launching_frequency = 0, ///< 弹丸射频，单位：Hz
-    .bullet_speed = 22.0f,    ///< 弹丸初速度，单位：m/s
+    .bullet_speed = 23.5f,    ///< 弹丸初速度，单位：m/s
 };
 const hello_world::referee::RobotHurtData kDefaultRobotHurtData = {
     .module_id = 0, ///< 模块ID
